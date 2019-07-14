@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(tcc C)
+project(libtcc C)
 
 set(CMAKE_C_STANDARD 99)
 
@@ -56,8 +56,6 @@ if(TCC_INSTALL_RUNTIME)
     add_subdirectory(runtime)
 endif()
 
-include_directories(include/tcc src)
-
 if(TCC_STATIC_BUILD)
     add_library(${TCC_LIB_NAME} STATIC src/libtcc.c)
     message(static)
@@ -68,3 +66,6 @@ else()
     endif()
     add_library(${TCC_LIB_NAME} SHARED src/libtcc.c)
 endif()
+
+target_include_directories(${TCC_LIB_NAME} PRIVATE include/tcc src)
+target_include_directories(${TCC_LIB_NAME} PUBLIC include)
