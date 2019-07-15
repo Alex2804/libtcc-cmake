@@ -45,10 +45,12 @@ else()
     set(TCC_LIB_NAME tcc)
 endif()
 
-add_compile_definitions(ONE_SOURCE=1 "TCC_TARGET_${TARGET_ARCHITECTURE}")
+add_compile_definitions("TCC_TARGET_${TARGET_ARCHITECTURE}")
 if(WIN32)
-    add_compile_definitions(TCC_TARGET_PE)
-    add_subdirectory(win32)
+    add_compile_definitions(ONE_SOURCE=0 TCC_TARGET_PE)
+elseif(UNIX)
+    add_compile_definitions(ONE_SOURCE=1 CONFIG_TRIPLET="x86_64-linux-gnu")
+    add_compile_options(-Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation)
 endif()
 
 if(TCC_INSTALL_RUNTIME)
@@ -66,6 +68,8 @@ file(WRITE ${TCC_CONFIG_DIR} "#define TCC_VERSION \"${TCC_VERSION}\"
 #endif")
 message("generated tcc config.h!")
 
+include_directories(include/tcc src)
+
 if(${TCC_BUILD_TYPE} STREQUAL "STATIC")
     add_library(${TCC_LIB_NAME} STATIC src/libtcc.c)
 elseif(${TCC_BUILD_TYPE} STREQUAL "SHARED")
@@ -79,3 +83,7 @@ endif()
 
 target_include_directories(${TCC_LIB_NAME} PRIVATE include/tcc src)
 target_include_directories(${TCC_LIB_NAME} PUBLIC include)
+
+if(UNIX)
+    target_link_libraries(${TCC_LIB_NAME} dl)
+endif()
