@@ -46,7 +46,6 @@ else()
 endif()
 
 add_compile_definitions(ONE_SOURCE=1 "TCC_TARGET_${TARGET_ARCHITECTURE}")
-
 if(WIN32)
     add_compile_definitions(TCC_TARGET_PE)
     add_subdirectory(win32)
@@ -55,6 +54,17 @@ endif()
 if(TCC_INSTALL_RUNTIME)
     add_subdirectory(runtime)
 endif()
+
+# Generate config.h
+set(TCC_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/config.h")
+message("generating tcc config.h in \"${TCC_CONFIG_DIR}\" ...")
+file(WRITE ${TCC_CONFIG_DIR} "#define TCC_VERSION \"${TCC_VERSION}\"
+#ifdef TCC_TARGET_X86_64
+    #define TCC_LIBTCC1 \"libtcc1-64.a\"
+#else
+    #define TCC_LIBTCC1 \"libtcc1-32.a\"
+#endif")
+message("generated tcc config.h!")
 
 if(${TCC_BUILD_TYPE} STREQUAL "STATIC")
     add_library(${TCC_LIB_NAME} STATIC src/libtcc.c)
