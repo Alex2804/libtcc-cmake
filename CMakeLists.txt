@@ -31,10 +31,10 @@ endif()
 
 if(TARGET_ARCHITECTURE STREQUAL "X86_64") # 64 bit
     set(TCC_LIB_PREFIX "64")
-    add_compile_definitions(TCC_LIBTCC1="libtcc-64.a")
+    add_compile_definitions(TCC_LIBTCC1="libtcc1-64.a")
 elseif(TARGET_ARCHITECTURE STREQUAL "I386") # 32 bit
     set(TCC_LIB_PREFIX "32")
-    add_compile_definitions(TCC_LIBTCC1="libtcc-32.a")
+    add_compile_definitions(TCC_LIBTCC1="libtcc1-32.a")
 elseif(TARGET_ARCHITECTURE STREQUAL "ARM") # arm
     set(TCC_LIB_PREFIX "arm")
 else()
@@ -47,11 +47,11 @@ else()
     set(TCC_LIB_NAME tcc)
 endif()
 
-add_compile_definitions("TCC_TARGET_${TARGET_ARCHITECTURE}")
+add_compile_definitions("TCC_TARGET_${TARGET_ARCHITECTURE}" ONE_SOURCE=1)
 if(WIN32)
-    add_compile_definitions(ONE_SOURCE=0 TCC_TARGET_PE)
+    add_compile_definitions(TCC_TARGET_PE)
 elseif(UNIX)
-    add_compile_definitions(ONE_SOURCE=1 CONFIG_TRIPLET="x86_64-linux-gnu")
+    add_compile_definitions(CONFIG_TRIPLET="x86_64-linux-gnu")
     add_compile_options(-Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation)
 endif()
 
