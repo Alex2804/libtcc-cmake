@@ -4,7 +4,7 @@ project(libtcc C)
 set(CMAKE_C_STANDARD 99)
 
 set(TCC_VERSION 0.9.27)
-set(TCC_BUILD_TYPE_DEFAULT SHARED)
+set(TCC_BUILD_TYPE_DEFAULT STATIC)
 set(TCC_TARGET_SPECIFIC_NAME_DEFAULT FALSE)
 set(TCC_INSTALL_RUNTIME_DEFAULT TRUE)
 set(TCC_INSTALL_SHARED_TO_BINARY_DEFAULT TRUE)
@@ -31,8 +31,10 @@ endif()
 
 if(TARGET_ARCHITECTURE STREQUAL "X86_64") # 64 bit
     set(TCC_LIB_PREFIX "64")
+    add_compile_definitions(TCC_LIBTCC1="libtcc-64.a")
 elseif(TARGET_ARCHITECTURE STREQUAL "I386") # 32 bit
     set(TCC_LIB_PREFIX "32")
+    add_compile_definitions(TCC_LIBTCC1="libtcc-32.a")
 elseif(TARGET_ARCHITECTURE STREQUAL "ARM") # arm
     set(TCC_LIB_PREFIX "arm")
 else()
@@ -60,12 +62,7 @@ endif()
 # Generate config.h
 set(TCC_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/config.h")
 message("generating tcc config.h in \"${TCC_CONFIG_DIR}\" ...")
-file(WRITE ${TCC_CONFIG_DIR} "#define TCC_VERSION \"${TCC_VERSION}\"
-#ifdef TCC_TARGET_X86_64
-    #define TCC_LIBTCC1 \"libtcc1-64.a\"
-#else
-    #define TCC_LIBTCC1 \"libtcc1-32.a\"
-#endif")
+file(WRITE ${TCC_CONFIG_DIR} "#define TCC_VERSION \"${TCC_VERSION}\"")
 message("generated tcc config.h!")
 
 include_directories(include/tcc src)
