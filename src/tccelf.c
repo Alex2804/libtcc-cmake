@@ -1173,7 +1173,7 @@ ST_FUNC void tcc_add_bcheck(TCCState *s1)
     set_elf_sym(symtab_section, 0, 0,
                 ELFW(ST_INFO)(STB_GLOBAL, STT_NOTYPE), 0,
                 bounds_section->sh_num, "__bounds_start");
-    /* pull bcheck.o from libtcc1.a */
+    /* pull bcheck.o from libtcc1-32.a */
     sym_index = set_elf_sym(symtab_section, 0, 0,
                 ELFW(ST_INFO)(STB_GLOBAL, STT_NOTYPE), 0,
                 SHN_UNDEF, "__bound_init");

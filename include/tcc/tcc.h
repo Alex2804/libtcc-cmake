@@ -272,12 +272,12 @@ extern long double strtold (const char *__nptr, char **__endptr);
 # define DEFAULT_ELFINTERP(s) default_elfinterp(s)
 #endif
 
-/* (target specific) libtcc1.a */
+/* (target specific) libtcc1-32.a */
 #ifndef TCC_LIBTCC1
 # define TCC_LIBTCC1 "libtcc1.a"
 #endif
 
-/* library to use with CONFIG_USE_LIBGCC instead of libtcc1.a */
+/* library to use with CONFIG_USE_LIBGCC instead of libtcc1-32.a */
 #if defined CONFIG_USE_LIBGCC && !defined TCC_LIBGCC
 #define TCC_LIBGCC USE_TRIPLET(CONFIG_SYSROOT "/" CONFIG_LDDIR) "/libgcc_s.so.1"
 #endif
