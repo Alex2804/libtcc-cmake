@@ -23,29 +23,31 @@ if(${TCC_BUILD_TYPE} MATCHES "SHARED" AND ((NOT DEFINED TCC_INSTALL_SHARED_TO_BI
 endif()
 
 
-if(NOT DEFINED TARGET_ARCHITECTURE)
+if(NOT DEFINED TCC_TARGET_ARCHITECTURE)
     set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
     include(GetTargetArchitecture)
-    get_target_architecture(TARGET_ARCHITECTURE TRUE)
+    get_target_architecture(TCC_TARGET_ARCHITECTURE TRUE)
 endif()
 
-if(TARGET_ARCHITECTURE STREQUAL "X86_64") # 64 bit
-    set(TCC_LIB_PREFIX "64")
-elseif(TARGET_ARCHITECTURE STREQUAL "I386") # 32 bit
-    set(TCC_LIB_PREFIX "32")
-elseif(TARGET_ARCHITECTURE STREQUAL "ARM") # arm
-    set(TCC_LIB_PREFIX "arm")
+if(TCC_TARGET_ARCHITECTURE STREQUAL "X86_64") # 64 bit
+    set(TCC_LIB_POSTFIX "64")
+elseif(TCC_TARGET_ARCHITECTURE STREQUAL "I386") # 32 bit
+    set(TCC_LIB_POSTFIX "32")
+elseif(TCC_TARGET_ARCHITECTURE STREQUAL "ARM") # arm
+    set(TCC_LIB_POSTFIX "arm")
 else()
-    message(FATAL_ERROR "Unknown Architecture for TCC Library: ${TARGET_ARCHITECTURE}")
+    message(FATAL_ERROR "Unknown Architecture for TCC Library: ${TCC_TARGET_ARCHITECTURE}")
 endif()
 
-if(TCC_TARGET_SPECIFIC_NAME)
-    set(TCC_LIB_NAME "tcc_${TCC_LIB_PREFIX}")
-else()
+if((NOT DEFINED TCC_LIB_NAME) AND TCC_TARGET_SPECIFIC_NAME)
+    set(TCC_LIB_NAME "tcc_${TCC_LIB_POSTFIX}")
+    message("x2")
+elseif(NOT DEFINED TCC_LIB_NAME)
+    message("x1")
     set(TCC_LIB_NAME tcc)
 endif()
 
-add_compile_definitions("TCC_TARGET_${TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-32.a")
+add_compile_definitions("TCC_TARGET_${TCC_TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-32.a")
 if(WIN32)
     add_compile_definitions(TCC_TARGET_PE)
 elseif(UNIX)

@@ -8,5 +8,5 @@ if(WIN32)
 endif()
 
 # copy libtcc1*.a
-file(COPY "lib/lib_${TARGET_ARCHITECTURE}" DESTINATION "${CMAKE_BINARY_DIR}/lib/tcc")
-file(RENAME "${CMAKE_BINARY_DIR}/lib/tcc/lib_${TARGET_ARCHITECTURE}" "${CMAKE_BINARY_DIR}/lib/tcc/lib")
+file(COPY "lib/lib_${TCC_TARGET_ARCHITECTURE}" DESTINATION "${CMAKE_BINARY_DIR}/lib/tcc")
+file(RENAME "${CMAKE_BINARY_DIR}/lib/tcc/lib_${TCC_TARGET_ARCHITECTURE}" "${CMAKE_BINARY_DIR}/lib/tcc/lib")
