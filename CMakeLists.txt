@@ -45,7 +45,7 @@ else()
     set(TCC_LIB_NAME tcc)
 endif()
 
-add_compile_definitions("TCC_TARGET_${TARGET_ARCHITECTURE}" ONE_SOURCE=1)
+add_compile_definitions("TCC_TARGET_${TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-32.a")
 if(WIN32)
     add_compile_definitions(TCC_TARGET_PE)
 elseif(UNIX)
