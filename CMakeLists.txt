@@ -4,6 +4,7 @@ project(libtcc C)
 set(CMAKE_C_STANDARD 99)
 
 set(TCC_VERSION 0.9.27)
+set(TCC_CONFIG_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/config.h")
 set(TCC_BUILD_TYPE_DEFAULT STATIC)
 set(TCC_TARGET_SPECIFIC_NAME_DEFAULT FALSE)
 set(TCC_INSTALL_RUNTIME_DEFAULT TRUE)
@@ -41,9 +42,7 @@ endif()
 
 if((NOT DEFINED TCC_LIB_NAME) AND TCC_TARGET_SPECIFIC_NAME)
     set(TCC_LIB_NAME "tcc_${TCC_LIB_POSTFIX}")
-    message("x2")
 elseif(NOT DEFINED TCC_LIB_NAME)
-    message("x1")
     set(TCC_LIB_NAME tcc)
 endif()
 
@@ -60,9 +59,8 @@ if(TCC_INSTALL_RUNTIME)
 endif()
 
 # Generate config.h
-set(TCC_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/config.h")
-message("generating tcc config.h in \"${TCC_CONFIG_DIR}\" ...")
-file(WRITE ${TCC_CONFIG_DIR} "#define TCC_VERSION \"${TCC_VERSION}\"")
+message("generating tcc config.h in \"${TCC_CONFIG_PATH}\" ...")
+file(WRITE ${TCC_CONFIG_PATH} "#define TCC_VERSION \"${TCC_VERSION}\"")
 message("generated tcc config.h!")
 
 include_directories(include/tcc src)
@@ -75,7 +73,7 @@ elseif(${TCC_BUILD_TYPE} STREQUAL "SHARED")
     endif()
     add_library(${TCC_LIB_NAME} SHARED src/libtcc.c)
 else()
-    message(FATAL_ERROR "build type ${TCC_BUILD_TYPE} not available (Build types must be uppercase)!")
+    message(FATAL_ERROR "build type ${TCC_BUILD_TYPE} not available (Build types must be written in uppercase)!")
 endif()
 
 target_include_directories(${TCC_LIB_NAME} PRIVATE include/tcc src)
