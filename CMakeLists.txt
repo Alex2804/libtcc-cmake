@@ -31,10 +31,8 @@ endif()
 
 if(TARGET_ARCHITECTURE STREQUAL "X86_64") # 64 bit
     set(TCC_LIB_PREFIX "64")
-    add_compile_definitions(TCC_LIBTCC1="libtcc1-64.a")
 elseif(TARGET_ARCHITECTURE STREQUAL "I386") # 32 bit
     set(TCC_LIB_PREFIX "32")
-    add_compile_definitions(TCC_LIBTCC1="libtcc1-32.a")
 elseif(TARGET_ARCHITECTURE STREQUAL "ARM") # arm
     set(TCC_LIB_PREFIX "arm")
 else()
