@@ -20,8 +20,8 @@ tcc_add_include_path(tccState, "lib/tcc/include/");
 ##### TCC_BUILD_TYPE <a name="TCC_BUILD_TYPE"></a>
 
 Possible Values:
-- SHARED *(Default)*
-- STATIC
+- SHARED
+- STATIC *(Default)*
 
 Defines if the Library should be static or shared  
 (**it is required to write the values in uppercase!**).
