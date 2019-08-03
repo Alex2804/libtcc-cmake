@@ -43,14 +43,14 @@ GOTO clean
 %TCC% -c lib_libtcc1/alloca86.S
 %TCC% -c lib_libtcc1/alloca86-bt.S
 %TCC% -ar lib/libtcc1-32.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca86.o alloca86-bt.o
-@GOTO CLEAN
+@GOTO clean
 
 :arm
 %TCC% -c lib_libtcc1/alloca-arm.S
 %TCC% -ar lib/libtcc1-arm.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca-arm.o
-@GOTO CLEAN
+@GOTO clean
 
 :clean
 del *.o
 rmdir /s /q lib_libtcc1
-del %TCC%.exe
+::del %TCC%.exe
