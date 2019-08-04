@@ -12,17 +12,17 @@ if(NOT DEFINED TCC_TARGET_ARCHITECTURE)
 endif()
 
 if(TCC_TARGET_ARCHITECTURE STREQUAL "X86_64") # 64 bit
-    set(LIBTCC_POSTFIX "64")
+    set(LIBTCC_SUFFIX "64")
 elseif(TCC_TARGET_ARCHITECTURE STREQUAL "I386") # 32 bit
-    set(LIBTCC_POSTFIX "32")
+    set(LIBTCC_SUFFIX "32")
 elseif(TCC_TARGET_ARCHITECTURE STREQUAL "ARM") # arm
-    set(LIBTCC_POSTFIX "arm")
+    set(LIBTCC_SUFFIX "arm")
 else()
     message(FATAL_ERROR "Unknown Architecture for TCC Library: ${TCC_TARGET_ARCHITECTURE}")
 endif()
 
 if((NOT DEFINED LIBTCC_NAME) AND TCC_TARGET_SPECIFIC_NAME)
-    set(LIBTCC_NAME "tcc_${LIBTCC_POSTFIX}")
+    set(LIBTCC_NAME "tcc_${LIBTCC_SUFFIX}")
 elseif(NOT DEFINED LIBTCC_NAME)
     set(LIBTCC_NAME tcc)
 endif()
@@ -30,8 +30,9 @@ endif()
 if(WIN32)
     list(APPEND LIBTCC_COMPILE_DEFINITIONS "TCC_TARGET_PE")
 elseif(UNIX)
-    list(APPEND LIBTCC_COMPILE_DEFINITIONS "CONFIG_TRIPLET=x86_64-linux-gnu")
-    list(APPEND LIBTCC_COMPILE_OPTIONS "-Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation")
+    string(TOLOWER ${TCC_TARGET_ARCHITECTURE} LIBTCC_CONFIG_TRIPLET_ARCHITECTURE)
+    message(${LIBTCC_CONFIG_TRIPLET_ARCHITECTURE})
+    list(APPEND LIBTCC_COMPILE_DEFINITIONS "CONFIG_TRIPLET=\"${LIBTCC_CONFIG_TRIPLET_ARCHITECTURE}-linux-gnu\"")
 endif()
 
 if(TCC_INSTALL_RUNTIME)
@@ -53,6 +54,7 @@ include_directories(include/tcc src)
 
 if(${TCC_BUILD_TYPE} STREQUAL "STATIC")
     add_library(${LIBTCC_NAME} STATIC src/libtcc.c)
+    # libtcc.a libtcc.o tccpp.o tccgen.o tccelf.o tccasm.o tccrun.o x86_64-gen.o x86_64-link.o i386-asm.o
 elseif(${TCC_BUILD_TYPE} STREQUAL "SHARED")
     if(WIN32)
         list(APPEND LIBTCC_COMPILE_DEFINITIONS "LIBTCC_AS_DLL")
@@ -65,13 +67,13 @@ endif()
 target_include_directories(${LIBTCC_NAME} PRIVATE include/tcc src)
 target_include_directories(${LIBTCC_NAME} PUBLIC include)
 
+target_compile_definitions(${LIBTCC_NAME} PRIVATE "TCC_TARGET_${TCC_TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-${LIBTCC_SUFFIX}.a" ${LIBTCC_COMPILE_DEFINITIONS})
 if(UNIX)
     target_link_libraries(${LIBTCC_NAME} dl)
+    target_compile_options(${LIBTCC_NAME} PRIVATE -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation)
 endif()
 
-target_compile_definitions(${LIBTCC_NAME} PRIVATE "TCC_TARGET_${TCC_TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-${LIBTCC_POSTFIX}.a" ${LIBTCC_COMPILE_DEFINITIONS})
-target_compile_options(${LIBTCC_NAME} PRIVATE ${LIBTCC_COMPILE_OPTIONS})
-
+set(LIBTCC_TEST TRUE)
 if(LIBTCC_TEST)
     add_subdirectory(tests)
 endif()

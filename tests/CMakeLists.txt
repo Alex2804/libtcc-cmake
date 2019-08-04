@@ -35,7 +35,7 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
     include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
-# Now simply link against gtest or gtest_main as needed. Eg
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TCC_RUNTIME_TARGET_DIR})
 add_executable(tccTest compiletest.cpp)
-target_link_libraries(tccTest tcc gtest_main)
+target_link_libraries(tccTest "${LIBTCC_NAME}" gtest_main)
 add_test(NAME tcc_compile_test COMMAND tccTest)

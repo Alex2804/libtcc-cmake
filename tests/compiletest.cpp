@@ -11,11 +11,11 @@ TEST(TccCompileTests, TccCompileTest1) {
     TCCState *tccState = tcc_new();
     ASSERT_TRUE(tccState);
 
-    tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
+    tcc_add_library_path(tccState, "lib");
+    tcc_set_lib_path(tccState, "lib");
+    tcc_add_include_path(tccState, "include");
 
-    tcc_add_library_path(tccState, "../lib/");
-    tcc_set_lib_path(tccState, "../lib/");
-    tcc_add_include_path(tccState, "../include/");
+    tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
 
     ASSERT_FALSE(tcc_compile_string(tccState, string));
     ASSERT_FALSE(tcc_relocate(tccState, TCC_RELOCATE_AUTO));
@@ -35,11 +35,11 @@ TEST(TccCompileTests, TccCompileTest2) {
     TCCState *tccState = tcc_new();
     ASSERT_TRUE(tccState);
 
-    tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
+    tcc_add_library_path(tccState, "lib");
+    tcc_set_lib_path(tccState, "lib");
+    tcc_add_include_path(tccState, "include");
 
-    tcc_add_library_path(tccState, "../lib/");
-    tcc_set_lib_path(tccState, "../lib/");
-    tcc_add_include_path(tccState, "../include/");
+    tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
 
     ASSERT_FALSE(tcc_compile_string(tccState, string));
     ASSERT_FALSE(tcc_relocate(tccState, TCC_RELOCATE_AUTO));

@@ -23,8 +23,6 @@ echo on
 %TCC% -c lib_libtcc1/wincrt1w.c
 %TCC% -c lib_libtcc1/dllcrt1.c
 %TCC% -c lib_libtcc1/dllmain.c
-%TCC% -c lib_libtcc1/chkstk.S
-%TCC% -w -c lib_libtcc1/bcheck.c
 
 @if %TCC_ARCHITECTURE% == x86_64 GOTO x86_64
 @if %TCC_ARCHITECTURE% == i386 GOTO i386
@@ -34,20 +32,26 @@ echo Unknown architecture of tcc: "%TCC_ARCHITECTURE%"!
 GOTO clean
 
 :x86_64
+%TCC% -c lib_libtcc1/chkstk.S
+%TCC% -w -c lib_libtcc1/bcheck.c
 %TCC% -c lib_libtcc1/alloca86_64.S
 %TCC% -c lib_libtcc1/alloca86_64-bt.S
-%TCC% -ar lib/libtcc1-64.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca86_64.o alloca86_64-bt.o
+%TCC% -ar lib/libtcc1-arm.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca86_64.o alloca86_64-bt.o
 @GOTO clean
 
 :i386
+%TCC% -c lib_libtcc1/chkstk.S
+%TCC% -w -c lib_libtcc1/bcheck.c
 %TCC% -c lib_libtcc1/alloca86.S
 %TCC% -c lib_libtcc1/alloca86-bt.S
-%TCC% -ar lib/libtcc1-32.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca86.o alloca86-bt.o
+%TCC% -ar lib/libtcc1-arm.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca86.o alloca86-bt.o
 @GOTO clean
 
 :arm
 %TCC% -c lib_libtcc1/alloca-arm.S
-%TCC% -ar lib/libtcc1-arm.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca-arm.o
+%TCC% -c lib_libtcc1/armeabi.c
+%TCC% -c lib_libtcc1/armflush.c
+%TCC% -ar lib/libtcc1-arm.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o alloca-arm.o armeabi.o armflush.o
 @GOTO clean
 
 :clean

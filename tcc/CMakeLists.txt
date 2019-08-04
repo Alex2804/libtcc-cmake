@@ -9,7 +9,7 @@ add_executable(TinyCCompiler ../src/tcc.c)
 target_include_directories(TinyCCompiler PRIVATE ../include/tcc ../src)
 target_include_directories(TinyCCompiler PUBLIC ../include)
 
-target_link_libraries(TinyCCompiler tcc)
+target_link_libraries(TinyCCompiler ${LIBTCC_NAME})
 
 if(WIN32)
     set(TCC_COMPILE_DEFINITIONS "TCC_TARGET_PE")
@@ -23,4 +23,8 @@ if(WIN32)
 endif()
 
 # compile libtcc1-*.a after TinyCCompiler
-add_custom_command(TARGET TinyCCompiler POST_BUILD COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/compile_libtcc1 TinyCCompiler WORKING_DIRECTORY ${TCC_RUNTIME_TARGET_DIR})
+if(WIN32)
+    add_custom_command(TARGET TinyCCompiler POST_BUILD COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/compile_libtcc1 TinyCCompiler WORKING_DIRECTORY ${TCC_RUNTIME_TARGET_DIR})
+elseif(UNIX)
+    add_custom_command(TARGET TinyCCompiler POST_BUILD COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/compile_libtcc1.sh TinyCCompiler WORKING_DIRECTORY ${TCC_RUNTIME_TARGET_DIR})
+endif()
