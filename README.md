@@ -17,7 +17,7 @@ tcc_add_include_path(tccState, "lib/tcc/include/");
 
 ---
 ## CMake Variables
-##### TCC_BUILD_TYPE <a name="TCC_BUILD_TYPE"></a>
+##### LIBTCC_BUILD_TYPE <a name="LIBTCC_BUILD_TYPE"></a>
 
 Possible Values:
 - SHARED
@@ -30,10 +30,10 @@ Defines if the Library should be static or shared
 ##### TCC_LIB_NAME <a name="TCC_LIB_NAME"></a>
 Defines the name of the library file.
 By default this is "*tcc*" or "*tcc-(Platform specific postfix)*"
-depending on whether [TCC_TARGET_SPECIFIC_NAME](#TCC_TARGET_SPECIFIC_NAME) is true or false.
+depending on whether [LIBTCC_TARGET_SPECIFIC_NAME](#LIBTCC_TARGET_SPECIFIC_NAME) is true or false.
 
 ---
-##### TCC_TARGET_SPECIFIC_NAME <a name="TCC_TARGET_SPECIFIC_NAME"></a>
+##### LIBTCC_TARGET_SPECIFIC_NAME <a name="LIBTCC_TARGET_SPECIFIC_NAME"></a>
 Possible Values:
 - True
 - False *(Default)*
@@ -41,32 +41,32 @@ Possible Values:
 Defines if the target architecture should be contained in the resulting library (**Ignored if TCC_LIB_NAME is defined**!).
 
 ---
-##### TCC_INSTALL_RUNTIME <a name="TCC_INSTALL_RUNTIME"></a>
+##### LIBTCC_INSTALL_RUNTIME <a name="LIBTCC_INSTALL_RUNTIME"></a>
 Possible Values:
 - True *(Default)*
 - False
 
 Defines if the runtime library and include headers get copied into "*lib*" and "*include*"
-at "[TCC_RUNTIME_TARGET_DIR](#TCC_RUNTIME_TARGET_DIR)/**lib/tcc/**".
+at "[LIBTCC_RUNTIME_TARGET_DIR](#LIBTCC_RUNTIME_TARGET_DIR)/**lib/tcc/**".
 
 ---
-##### TCC_RUNTIME_TARGET_DIR <a name="TCC_RUNTIME_TARGET_DIR"></a>
+##### LIBTCC_RUNTIME_TARGET_DIR <a name="LIBTCC_RUNTIME_TARGET_DIR"></a>
 Defines the directory where to copy the runtime library and headers.
 By default this is *CMAKE_BINARY_DIR*.
 
 ---
-##### TCC_INSTALL_SHARED <a name="TCC_INSTALL_SHARED_TO_BINARY"></a>
+##### LIBTCC_INSTALL_SHARED <a name="LIBTCC_INSTALL_SHARED_TO_BINARY"></a>
 Possible Values:
 - True *(Default)*
 - False
 
-Defines whether the resulting shared library will be copied to [TCC_SHARED_TARGET_DIR](#TCC_SHARED_TARGET_DIR),
+Defines whether the resulting shared library will be copied to [LIBTCC_SHARED_TARGET_DIR](#LIBTCC_SHARED_TARGET_DIR),
 assuming a shared library is created.
 
 ---
-##### TCC_SHARED_TARGET_DIR <a name="TCC_SHARED_TARGET_DIR"></a>
-Defines the directory where to copy the shared library into, assuming a shared library is created and [TCC_INSTALL_SHARED](#TCC_INSTALL_SHARED) is true.
+##### LIBTCC_SHARED_TARGET_DIR <a name="LIBTCC_SHARED_TARGET_DIR"></a>
+Defines the directory where to copy the shared library into, assuming a shared library is created and [LIBTCC_INSTALL_SHARED](#LIBTCC_INSTALL_SHARED) is true.
 
 ---
-##### TCC_TARGET_ARCHITECTURE <a name="TCC_TARGET_ARCHITECTURE"></a>
+##### LIBTCC_TARGET_ARCHITECTURE <a name="LIBTCC_TARGET_ARCHITECTURE"></a>
 Defines the architecture to build for (should be recognized automatically if not defined).

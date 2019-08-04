@@ -36,7 +36,7 @@ GOTO clean
 %TCC% -w -c lib_libtcc1/bcheck.c
 %TCC% -c lib_libtcc1/alloca86_64.S
 %TCC% -c lib_libtcc1/alloca86_64-bt.S
-%TCC% -ar lib/libtcc1-arm.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca86_64.o alloca86_64-bt.o
+%TCC% -ar lib/libtcc1-64.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca86_64.o alloca86_64-bt.o
 @GOTO clean
 
 :i386
@@ -44,7 +44,7 @@ GOTO clean
 %TCC% -w -c lib_libtcc1/bcheck.c
 %TCC% -c lib_libtcc1/alloca86.S
 %TCC% -c lib_libtcc1/alloca86-bt.S
-%TCC% -ar lib/libtcc1-arm.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca86.o alloca86-bt.o
+%TCC% -ar lib/libtcc1-32.a libtcc1.o crt1.o crt1w.o wincrt1.o wincrt1w.o dllcrt1.o dllmain.o chkstk.o bcheck.o alloca86.o alloca86-bt.o
 @GOTO clean
 
 :arm
@@ -56,5 +56,3 @@ GOTO clean
 
 :clean
 del *.o
-rmdir /s /q lib_libtcc1
-::del %TCC%.exe

@@ -28,7 +28,7 @@ TEST(TccCompileTests, TccCompileTest1) {
 
 TEST(TccCompileTests, TccCompileTest2) {
     const char* string = "#include<math.h>\n"
-                         "double test(double x1, double x2) {\n"
+                         "int test(int x1, int x2) {\n"
                          "  return pow(x1+x2, x2);\n"
                          "}";
 
@@ -44,12 +44,13 @@ TEST(TccCompileTests, TccCompileTest2) {
     ASSERT_FALSE(tcc_compile_string(tccState, string));
     ASSERT_FALSE(tcc_relocate(tccState, TCC_RELOCATE_AUTO));
 
-    double (*func)(double, double);
-    func = reinterpret_cast<double(*)(double,double)>(tcc_get_symbol(tccState, "test1"));
+    int (*func)(int, int);
+    func = reinterpret_cast<int(*)(int,int)>(tcc_get_symbol(tccState, "test1"));
     ASSERT_FALSE(func);
 
-    func = reinterpret_cast<double(*)(double,double)>(tcc_get_symbol(tccState, "test"));
+    func = reinterpret_cast<int(*)(int,int)>(tcc_get_symbol(tccState, "test"));
     ASSERT_TRUE(func);
+
     ASSERT_EQ(func(3, 3), 216);
     ASSERT_EQ(func(2, 3), 125);
     ASSERT_EQ(func(2010, 1), 2011);
