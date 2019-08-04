@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.8.12)
+
 enable_language(CXX)
 set(CMAKE_CXX_STANDARD 11)
 
@@ -34,6 +36,6 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LIBTCC_RUNTIME_TARGET_DIR})
-add_executable(tccTest compiletest.cpp)
-target_link_libraries(tccTest "${LIBTCC_NAME}" gtest_main)
-add_test(NAME tcc_compile_test COMMAND tccTest)
+add_executable(libtcc_test compiletest.cpp)
+target_link_libraries(libtcc_test "${LIBTCC_NAME}" gtest_main)
+add_test(NAME tcc_compile_test COMMAND libtcc_test)
