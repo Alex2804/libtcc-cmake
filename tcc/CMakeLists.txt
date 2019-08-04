@@ -1,8 +1,3 @@
-cmake_minimum_required(VERSION 3.14)
-project(tcc C)
-
-set(CMAKE_C_STANDARD 99)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${TCC_RUNTIME_TARGET_DIR}")
 add_executable(TinyCCompiler ../src/tcc.c)
 

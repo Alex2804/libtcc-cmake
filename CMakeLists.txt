@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 2.8.12)
 project(libtcc C)
 
 set(CMAKE_C_STANDARD 99)
@@ -17,6 +17,8 @@ elseif(TCC_TARGET_ARCHITECTURE STREQUAL "I386") # 32 bit
     set(LIBTCC_SUFFIX "32")
 elseif(TCC_TARGET_ARCHITECTURE STREQUAL "ARM") # arm
     set(LIBTCC_SUFFIX "arm")
+elseif(TCC_TARGET_ARCHITECTURE STREQUAL "ARM64") # arm
+    set(LIBTCC_SUFFIX "arm64")
 else()
     message(FATAL_ERROR "Unknown Architecture for TCC Library: ${TCC_TARGET_ARCHITECTURE}")
 endif()
