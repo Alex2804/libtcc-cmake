@@ -6,13 +6,13 @@ You can embed this CMake project as a subdirectory or build it as every other CM
 Make sure that you change the CMake variables according to your needs.
 
 The default values should be enough to build a static library to link against with the required
-dependencies in "path/to/binary/dir/lib/tcc/"
+dependencies in *"path/to/binary/dir/lib"* and *"path/to/binary/dir/include"*
 
 You must pass the location of the dependencies to every *TCCState** with the following 3 lines:
 ````c
-tcc_add_library_path(tccState, "lib/tcc/lib/");
-tcc_set_lib_path(tccState, "lib/tcc/lib/");
-tcc_add_include_path(tccState, "lib/tcc/include/");
+tcc_add_library_path(tccState, "lib");
+tcc_set_lib_path(tccState, "lib");
+tcc_add_include_path(tccState, "include");
 ````
 
 ---
@@ -27,7 +27,7 @@ Defines if the Library should be static or shared
 (**it is required to write the values in uppercase!**).
 
 ---
-##### TCC_LIB_NAME <a name="TCC_LIB_NAME"></a>
+##### LIBTCC_NAME <a name="TCC_LIB_NAME"></a>
 Defines the name of the library file.
 By default this is "*tcc*" or "*tcc-(Platform specific postfix)*"
 depending on whether [LIBTCC_TARGET_SPECIFIC_NAME](#LIBTCC_TARGET_SPECIFIC_NAME) is true or false.
@@ -38,7 +38,7 @@ Possible Values:
 - True
 - False *(Default)*
 
-Defines if the target architecture should be contained in the resulting library (**Ignored if TCC_LIB_NAME is defined**!).
+Defines if the target architecture should be contained in the resulting library (**Ignored if LIBTCC_NAME is defined**!).
 
 ---
 ##### LIBTCC_INSTALL_RUNTIME <a name="LIBTCC_INSTALL_RUNTIME"></a>
