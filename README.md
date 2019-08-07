@@ -46,12 +46,12 @@ Possible Values:
 - True *(Default)*
 - False
 
-Defines if the runtime library and include headers get copied into "*lib*" and "*include*"
-at "[LIBTCC_RUNTIME_TARGET_DIR](#LIBTCC_RUNTIME_TARGET_DIR)/**lib/tcc/**".
+Defines if the include headers get copied into
+"[LIBTCC_RUNTIME_TARGET_DIR](#LIBTCC_RUNTIME_TARGET_DIR)**/include/**".
 
 ---
 ##### LIBTCC_RUNTIME_TARGET_DIR <a name="LIBTCC_RUNTIME_TARGET_DIR"></a>
-Defines the directory where to copy the runtime library and headers.
+Defines the directory where to copy the runtime headers.
 By default this is *CMAKE_BINARY_DIR*.
 
 ---
@@ -70,3 +70,7 @@ Defines the directory where to copy the shared library into, assuming a shared l
 ---
 ##### LIBTCC_TARGET_ARCHITECTURE <a name="LIBTCC_TARGET_ARCHITECTURE"></a>
 Defines the architecture to build for (should be recognized automatically if not defined).
+
+---
+##### LIBTCC_ENABLE_EXTENSION <a name="LIBTCC_ENABLE_EXTENSION"></a>
+Enables the extension (for more information look [here](extension/README.md))

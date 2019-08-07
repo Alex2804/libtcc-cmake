@@ -21,6 +21,14 @@
 #include "tcc.h"
 
 /********************************************************/
+/* include if custom extension is enabled */
+#ifdef ALIBTCC_ENABLE_EXTENSION
+# include "extension/src/libtcc_ext.c"
+#endif
+
+/********************************************************/
+
+/********************************************************/
 /* global variables */
 
 /* use GNU C extensions */
@@ -725,6 +733,10 @@ static void tcc_cleanup(void)
 LIBTCCAPI TCCState *tcc_new(void)
 {
     TCCState *s;
+
+#ifdef ALIBTCC_ENABLE_EXTENSION
+# include "extension/src/libtcc_ext_tcc_new_implementation.c"
+#endif
 
     tcc_cleanup();
 

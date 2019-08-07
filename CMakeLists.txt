@@ -53,12 +53,11 @@ endif()
 
 if(LIBTCC_INSTALL_RUNTIME)
     # copy include directories
-    file(COPY "runtime/include" DESTINATION "${LIBTCC_RUNTIME_TARGET_DIR}")
     if(WIN32)
         file(COPY "runtime/win32/include" DESTINATION "${LIBTCC_RUNTIME_TARGET_DIR}")
+    else()
+        file(COPY "runtime/include" DESTINATION "${LIBTCC_RUNTIME_TARGET_DIR}")
     endif()
-    # compile libtcc1-*.a
-    add_subdirectory(tcc)
 endif()
 
 # Generate config.h
@@ -70,7 +69,6 @@ include_directories(include/tcc src)
 
 if(${LIBTCC_BUILD_TYPE} STREQUAL "STATIC")
     add_library(${LIBTCC_NAME} STATIC src/libtcc.c)
-    # libtcc.a libtcc.o tccpp.o tccgen.o tccelf.o tccasm.o tccrun.o x86_64-gen.o x86_64-link.o i386-asm.o
 elseif(${LIBTCC_BUILD_TYPE} STREQUAL "SHARED")
     if(WIN32)
         list(APPEND LIBTCC_COMPILE_DEFINITIONS "LIBTCC_AS_DLL")
@@ -82,6 +80,10 @@ endif()
 
 target_include_directories(${LIBTCC_NAME} PRIVATE include/tcc src)
 target_include_directories(${LIBTCC_NAME} PUBLIC include)
+
+if(LIBTCC_ENABLE_EXTENSION)
+    include(cmake/SetupExtension.cmake)
+endif()
 
 target_compile_definitions(${LIBTCC_NAME} PRIVATE "TCC_TARGET_${LIBTCC_TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-${LIBTCC_SUFFIX}.a" ${LIBTCC_COMPILE_DEFINITIONS})
 if(UNIX)
