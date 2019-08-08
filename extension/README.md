@@ -3,6 +3,10 @@ This is a extension for libtcc, which builds libtcc1-*.a at runtime and places i
 
 The name of libtcc1-*.a depends on the architecture to build for (e.g on 32 Bit the library is called libtcc1-64.a).
 
+## How to enable the extension
+The extension should be enabled by default and you can disable it by setting
+**LIBTCC_ENABLE_EXTENSION** to *FALSE*.
+
 ## CMake Variables
 ##### LIBTCC1_SRC_PATH <a name="LIBTCC1_SRC_PATH"></a>
 Specifies the path to the source files for libtcc1-*.a.  

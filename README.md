@@ -38,16 +38,16 @@ depending on whether [LIBTCC_TARGET_SPECIFIC_NAME](#LIBTCC_TARGET_SPECIFIC_NAME)
 ---
 ##### LIBTCC_TARGET_SPECIFIC_NAME <a name="LIBTCC_TARGET_SPECIFIC_NAME"></a>
 Possible Values:
-- True
-- False *(Default)*
+- TRUE
+- FALSE *(Default)*
 
 Defines if the target architecture should be contained in the resulting library (**Ignored if LIBTCC_NAME is defined**!).
 
 ---
 ##### LIBTCC_INSTALL_RUNTIME <a name="LIBTCC_INSTALL_RUNTIME"></a>
 Possible Values:
-- True *(Default)*
-- False
+- TRUE *(Default)*
+- FALSE
 
 Defines if the include headers get copied into
 "[LIBTCC_RUNTIME_TARGET_DIR](#LIBTCC_RUNTIME_TARGET_DIR)**/include/**".
@@ -60,8 +60,8 @@ By default this is *CMAKE_BINARY_DIR*.
 ---
 ##### LIBTCC_INSTALL_SHARED <a name="LIBTCC_INSTALL_SHARED_TO_BINARY"></a>
 Possible Values:
-- True *(Default)*
-- False
+- TRUE *(Default)*
+- FALSE
 
 Defines whether the resulting shared library will be copied to [LIBTCC_SHARED_TARGET_DIR](#LIBTCC_SHARED_TARGET_DIR),
 assuming a shared library is created.
@@ -76,4 +76,9 @@ Defines the architecture to build for (should be recognized automatically if not
 
 ---
 ##### LIBTCC_ENABLE_EXTENSION <a name="LIBTCC_ENABLE_EXTENSION"></a>
-Enables the extension to compile libtcc1-*.a at runtime (for more information like CMake variables look [here](extension/README.md))
+Possible Values:
+- TRUE *(Default)*
+- FALSE
+
+Enables the extension to compile libtcc1-*.a at runtime
+(for more information like CMake variables look [here](extension/README.md))
