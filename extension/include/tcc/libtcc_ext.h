@@ -7,12 +7,11 @@
 extern "C" {
 #endif
 
-#ifndef ALIBTCC1_SOURCE_PATH
-# define ALIBTCC1_SOURCE_PATH ""
+#ifndef ALIBTCC1_SRC_PATH
+#error "ALIBTCC1_SRC_PATH must be defined if you wish to use the libtcc extension"
 #endif
-
-#ifndef ALIBTCC1_DESTINATION_PATH
-# define ALIBTCC1_DESTINATION_PATH ""
+#ifndef ALIBTCC1_DEST_PATH
+#error "ALIBTCC1_DEST_PATH must be defined if you wish to use the libtcc extension"
 #endif
 
 /* build ar archives */

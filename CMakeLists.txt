@@ -78,11 +78,15 @@ else()
     message(FATAL_ERROR "build type ${LIBTCC_BUILD_TYPE} not available (Build types must be written in uppercase)!")
 endif()
 
+if(${LIBTCC_BUILD_TYPE} MATCHES "SHARED" AND ((NOT DEFINED LIBTCC_INSTALL_SHARED_TO_BINARY AND LIBTCC_INSTALL_SHARED_TO_BINARY_DEFAULT) OR (DEFINED LIBTCC_INSTALL_SHARED_TO_BINARY AND LIBTCC_INSTALL_SHARED_TO_BINARY)))
+    set_target_properties(${LIBTCC_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${LIBTCC_SHARED_TARGET_DIR})
+endif()
+
 target_include_directories(${LIBTCC_NAME} PRIVATE include/tcc src)
 target_include_directories(${LIBTCC_NAME} PUBLIC include)
 
 if(LIBTCC_ENABLE_EXTENSION)
-    include(cmake/SetupExtension.cmake)
+    include(extension/cmake/SetupExtension.cmake)
 endif()
 
 target_compile_definitions(${LIBTCC_NAME} PRIVATE "TCC_TARGET_${LIBTCC_TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-${LIBTCC_SUFFIX}.a" ${LIBTCC_COMPILE_DEFINITIONS})

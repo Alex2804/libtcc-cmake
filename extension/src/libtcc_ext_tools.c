@@ -21,34 +21,36 @@ char* atcc_concat_path(const char* prefixPath, const char* fileName, const char*
 char** atcc_split_string(const char* string, char delimiter)
 {
     size_t size;
-    char* tmpString;
-    char delimiterArray[] = {delimiter};
     int delimiterCount = 0;
-    char* token;
+    char* tmpString;
     char** splitted;
-    size_t i = 0;
+    size_t index = 0;
+    size_t offset = 0;
 
     if(string == NULL)
         return NULL;
 
-    size = strlen(string);
-    tmpString = (char*) tcc_malloc((size + 1) * sizeof(char));
+    for(size = 0; string[size] != '\0'; size++) {
+        if(string[size] == delimiter)
+            delimiterCount++;
+    }
 
-    strcpy(tmpString, string);
+    tmpString = (char*) tcc_malloc((size + 1) * sizeof(char));
+    memcpy(tmpString, string, size);
     tmpString[size] = '\0';
 
-    for(i = 0; i < size; i++) {
-        if(string[i] == delimiter) delimiterCount++;
-    }
-
-    token = strtok(tmpString, delimiterArray);
     splitted = (char**) tcc_malloc((delimiterCount + 2) * sizeof(char*));
 
-    i = 0;
-    while(token != NULL) {
-        splitted[i++] = token;
-        token = strtok(NULL, delimiterArray);
+    for(size = 0; tmpString[size] != '\0'; size++) {
+        if(tmpString[size] == delimiter) {
+            if(offset == size)
+                tcc_error("There must be content between two delimiters");
+            tmpString[size] = '\0';
+            splitted[index++] = tmpString + (offset * sizeof(char));
+            offset = size + 1;
+        }
     }
+    splitted[index] = tmpString + (offset * sizeof(char));
     splitted[delimiterCount + 1] = NULL;
 
     return splitted;
@@ -56,16 +58,15 @@ char** atcc_split_string(const char* string, char delimiter)
 
 int atcc_splitted_string_length(char** s)
 {
-    size_t i;
-    for(i = 0; s[i] != NULL; i++);
+    size_t i = 0;
+    for(; s[i] != NULL; i++);
     return i;
 }
 
 void atcc_free_splitted_string(char** splitted)
 {
-    if(splitted[0] != NULL) {
+    if(splitted != NULL)
         tcc_free(splitted[0]);
-    }
     tcc_free(splitted);
 }
 

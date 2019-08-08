@@ -1,4 +1,5 @@
-This Project aims to build libtcc as static or shared library with CMake.
+# Libtcc
+This Project aims to build libtcc for supported platforms system independent with cmake.
 
 ## Usage
 You can embed this CMake project as a subdirectory or build it as every other CMake script.
@@ -10,15 +11,17 @@ dependencies in *"path/to/binary/dir/lib"* and *"path/to/binary/dir/include"*
 
 You must pass the location of the dependencies to every *TCCState** with the following 3 lines:
 ````c
-tcc_add_library_path(tccState, "lib");
-tcc_set_lib_path(tccState, "lib");
-tcc_add_include_path(tccState, "include");
+tcc_add_library_path(tccState, "path/to/lib");
+tcc_set_lib_path(tccState, "path/to/lib");
+tcc_add_include_path(tccState, "path/to/include");
 ````
+
+You can enable the extension which compiles libtcc1-*.a (which is required to compile some programs)
+at runtime with [LIBTCC_ENABLE_EXTENSION](#LIBTCC_ENABLE_EXTENSION).
 
 ---
 ## CMake Variables
 ##### LIBTCC_BUILD_TYPE <a name="LIBTCC_BUILD_TYPE"></a>
-
 Possible Values:
 - SHARED
 - STATIC *(Default)*
@@ -73,4 +76,4 @@ Defines the architecture to build for (should be recognized automatically if not
 
 ---
 ##### LIBTCC_ENABLE_EXTENSION <a name="LIBTCC_ENABLE_EXTENSION"></a>
-Enables the extension (for more information look [here](extension/README.md))
+Enables the extension to compile libtcc1-*.a at runtime (for more information like CMake variables look [here](extension/README.md))
