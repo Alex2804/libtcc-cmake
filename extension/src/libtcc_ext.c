@@ -12,7 +12,7 @@ int alibtcc_extension_is_compiling() {
 int tcc_make_ar(const char *name, int fileCount, char **files)
 {
     int argc = fileCount + 2;
-    char* argv[argc];
+    char** argv = (char**) tcc_malloc(argc * sizeof(char*));
     int result;
 
     argv[0] = tcc_strdup("rcs");
@@ -23,6 +23,7 @@ int tcc_make_ar(const char *name, int fileCount, char **files)
     result = tcc_tool_ar(NULL, argc, argv);
     tcc_free(argv[0]);
     tcc_free(argv[1]);
+    tcc_free(argv);
     return result;
 }
 
@@ -54,6 +55,7 @@ int tcc_build_libtcc1(const char* name, const char* destPath, const char* srcPat
 
     a_alibtcc_extension_is_compiling = 1;
 
+    printf("4\n");
     tccState = tcc_new();
 
     result = tcc_add_include_path(tccState, "/usr/include");
@@ -64,12 +66,23 @@ int tcc_build_libtcc1(const char* name, const char* destPath, const char* srcPat
     result = tcc_set_output_type(tccState, TCC_OUTPUT_OBJ);
     _ALIBTCC_BUILD_LIBTCC1_VALIDATE_RESULT_
 
+    printf("5\n");
     src_names = atcc_get_libtcc1_files();
+    printf("6\n");
     file_count = atcc_splitted_string_length(src_names);
+    printf("7\n");
     obj_names = (char**)tcc_malloc(file_count * sizeof(char*));
+    printf("8\n");
+
+    for(int i=0; i<file_count; i++) {
+        printf("%s\n", src_names[i]);
+    }
 
     for(int i = 0; i < file_count; i++) {
         splitted_file_name = atcc_split_string(src_names[i], '.');
+        for(int j=0; j<atcc_splitted_string_length(splitted_file_name); j++) {
+            printf("%s\n", splitted_file_name[j]);
+        }
         file_name = atcc_concat_path(srcPath, splitted_file_name[0], splitted_file_name[1]);
         result = tcc_add_file(tccState, file_name);
         tcc_free(file_name);

@@ -1,12 +1,20 @@
 char* atcc_concat_path(const char* prefixPath, const char* fileName, const char* fileExtension)
 {
-    char* path = (char*) tcc_malloc((strlen(prefixPath) + strlen(fileName) + 1 + strlen(fileExtension)) * sizeof(char));
+    char* path;
+    size_t extra_size;
+    size_t file_extension_size = strlen(fileExtension);
+    if(file_extension_size == 0)
+        extra_size = 1;
+    else
+        extra_size = 2;
+    path = (char*) tcc_malloc((strlen(prefixPath) + strlen(fileName) + strlen(fileExtension) + extra_size) * sizeof(char));
     strcpy(path, prefixPath);
     strcat(path, fileName);
     if(strlen(fileExtension) > 0) {
         strcat(path, ".");
         strcat(path, fileExtension);
     }
+    strcat(path, "\0");
     return path;
 }
 
@@ -27,6 +35,7 @@ char** atcc_split_string(const char* string, char delimiter)
     tmpString = (char*) tcc_malloc((size + 1) * sizeof(char));
 
     strcpy(tmpString, string);
+    tmpString[size] = '\0';
 
     for(i = 0; i < size; i++) {
         if(string[i] == delimiter) delimiterCount++;
@@ -64,33 +73,33 @@ char** atcc_get_libtcc1_files()
 {
 #ifdef TCC_TARGET_PE
     #ifdef TCC_TARGET_I386
-        return split("libtcc1.c;alloca86.S;alloca86-bt.S;chkstk.S;bcheck.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
+        return atcc_split_string("libtcc1.c;alloca86.S;alloca86-bt.S;chkstk.S;bcheck.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
     #elif defined TCC_TARGET_X86_64
-        return split("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;chkstk.S;bcheck.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
+        return atcc_split_string("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;chkstk.S;bcheck.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
     #elif defined TCC_TARGET_ARM
-        return split("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
+        return atcc_split_string("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
     #elif defined TCC_TARGET_ARM64
-        return split("lib-arm64.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
+        return atcc_split_string("lib-arm64.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
     #endif
 #elif defined(TCC_TARGET_MACHO)
     #ifdef TCC_TARGET_I386
-        return split("libtcc1.c;alloca86.S;alloca86-bt.S;bcheck.c", ';');
+        return atcc_split_string("libtcc1.c;alloca86.S;alloca86-bt.S;bcheck.c", ';');
     #elif defined TCC_TARGET_X86_64
-        return split("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;va_list.c", ';');
+        return atcc_split_string("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;va_list.c", ';');
     #elif defined TCC_TARGET_ARM
-        return split("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c", ';');
+        return atcc_split_string("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c", ';');
     #elif defined TCC_TARGET_ARM64
-        return split("lib-arm64.c", ';', pathPrefix);
+        return atcc_split_string("lib-arm64.c", ';', pathPrefix);
     #endif
 #else
     #ifdef TCC_TARGET_I386
-        return split("libtcc1.c;alloca86.S;alloca86-bt.S;bcheck.c", ';');
+        return atcc_split_string("libtcc1.c;alloca86.S;alloca86-bt.S;bcheck.c", ';');
     #elif defined TCC_TARGET_X86_64
         return atcc_split_string("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;va_list.c;bcheck.c", ';');
     #elif defined TCC_TARGET_ARM
-        return split("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c", ';');
+        return atcc_split_string("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c", ';');
     #elif defined TCC_TARGET_ARM64
-        return split("lib-arm64.c", ';');
+        return atcc_split_string("lib-arm64.c", ';');
     #endif
 #endif
 }
