@@ -3,6 +3,8 @@ This is a extension for libtcc, which builds libtcc1-\*.a at runtime and places 
 
 The name of libtcc1-\*.a depends on the architecture to build for (e.g on 32 Bit the library is called libtcc1-64.a).
 
+The extension looks every `tcc_new()` call, if libtcc-\*.a exist in [LIBTCC1_DEST_PATH](#LIBTCC1_SRC_PATH) and compiles it if this is not the case.
+
 If you use Microsofts Visual C/C++ Compiler for CMake with the extension, then you have to move *"libtcc_test.exe"* to the root of the build directory or "*lib/(libtcc1-\*.a)*" and "*include/*" to the location of *"libtcc_test.exe"* or (simplest solution) use "*Ninja*" as build system (by passing "*-G "Ninja"*" to cmake).
 
 ## How to enable the extension
