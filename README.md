@@ -18,7 +18,7 @@ tcc_add_include_path(tccState, "path/to/include");
 
 ## Extension
 There is an extension to compile *libtcc1-\*.a* at runtime (which is required to compile some programs).
-You can enable the extension [LIBTCC_ENABLE_EXTENSION](#LIBTCC_ENABLE_EXTENSION).
+You can enable or disable the extension with [LIBTCC_ENABLE_EXTENSION](#LIBTCC_ENABLE_EXTENSION).
 
 ---
 ## CMake Variables
