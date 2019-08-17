@@ -11,8 +11,13 @@ TEST(TccCompileTests, TccCompileTest1) {
     TCCState *tccState = tcc_new();
     ASSERT_TRUE(tccState);
 
+#ifdef ALIBTCC1_DEST_PATH
+    tcc_add_library_path(tccState, ALIBTCC1_DEST_PATH);
+    tcc_set_lib_path(tccState, ALIBTCC1_DEST_PATH);
+#else
     tcc_add_library_path(tccState, "lib");
     tcc_set_lib_path(tccState, "lib");
+#endif
     tcc_add_include_path(tccState, "include");
 
     tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
@@ -35,8 +40,13 @@ TEST(TccCompileTests, TccCompileTest2) {
     TCCState *tccState = tcc_new();
     ASSERT_TRUE(tccState);
 
+#ifdef ALIBTCC1_DEST_PATH
+    tcc_add_library_path(tccState, ALIBTCC1_DEST_PATH);
+    tcc_set_lib_path(tccState, ALIBTCC1_DEST_PATH);
+#else
     tcc_add_library_path(tccState, "lib");
     tcc_set_lib_path(tccState, "lib");
+#endif
     tcc_add_include_path(tccState, "include");
 
     tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);

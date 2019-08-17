@@ -89,7 +89,7 @@ if(LIBTCC_ENABLE_EXTENSION)
     include(extension/cmake/SetupExtension.cmake)
 endif()
 
-target_compile_definitions(${LIBTCC_NAME} PRIVATE "TCC_TARGET_${LIBTCC_TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-${LIBTCC_SUFFIX}.a" ${LIBTCC_COMPILE_DEFINITIONS})
+target_compile_definitions(${LIBTCC_NAME} PUBLIC "TCC_TARGET_${LIBTCC_TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-${LIBTCC_SUFFIX}.a" ${LIBTCC_COMPILE_DEFINITIONS})
 if(UNIX)
     target_link_libraries(${LIBTCC_NAME} dl)
     target_compile_options(${LIBTCC_NAME} PRIVATE -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation)

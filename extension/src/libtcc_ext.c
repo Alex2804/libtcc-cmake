@@ -54,9 +54,11 @@ int tcc_build_libtcc1(const char* name, const char* destPath, const char* srcPat
     int file_count;
     int result;
 
+    atcc_create_dir(obj_path);
+    atcc_create_dir(destPath);
+
     a_alibtcc_extension_is_compiling = 1;
 
-    printf("4\n");
     tccState = tcc_new();
 
 #ifndef WIN32

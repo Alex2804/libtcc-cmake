@@ -35,6 +35,9 @@ char** atcc_split_string(const char* string, char delimiter)
             delimiterCount++;
     }
 
+    if(size == 0)
+        return NULL;
+
     tmpString = (char*) tcc_malloc((size + 1) * sizeof(char));
     memcpy(tmpString, string, size);
     tmpString[size] = '\0';
@@ -43,8 +46,6 @@ char** atcc_split_string(const char* string, char delimiter)
 
     for(size = 0; tmpString[size] != '\0'; size++) {
         if(tmpString[size] == delimiter) {
-            if(offset == size)
-                tcc_error("There must be content between two delimiters");
             tmpString[size] = '\0';
             splitted[index++] = tmpString + (offset * sizeof(char));
             offset = size + 1;
@@ -59,7 +60,8 @@ char** atcc_split_string(const char* string, char delimiter)
 int atcc_splitted_string_length(char** s)
 {
     size_t i = 0;
-    for(; s[i] != NULL; i++);
+    if(s != NULL)
+        for(; s[i] != NULL; i++);
     return i;
 }
 
@@ -126,3 +128,78 @@ OBJ-arm-eabi = "libtcc1.c;armeabi.c;alloca-arm.S;armflush.c"
 OBJ-arm-eabihf = "libtcc1.c;armeabi.c;alloca-arm.S;armflush.c"
 OBJ-arm-wince = "libtcc1.c;armeabi.c;alloca-arm.S;armflush.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c"
  */
+
+#include <stdbool.h>
+#include "str_builder.c"
+
+#ifdef _WIN32
+# include <windows.h>
+const char SEP = '\\';
+#else
+# include <sys/stat.h>
+const char SEP = '/';
+#endif
+
+bool atcc_create_dir(const char *name)
+{
+    str_builder_t  *sb;
+    char          **parts;
+    size_t          i;
+    bool            ret = true;
+
+    if (name == NULL || *name == '\0')
+        return false;
+
+    parts = atcc_split_string(name, '/');
+    if (parts == NULL || parts[0] == NULL) {
+        atcc_free_splitted_string(parts);
+        return false;
+    }
+
+    sb = str_builder_create();
+    i  = 0;
+#ifdef _WIN32
+    /* If the first part has a ':' it's a drive. E.g 'C:'. We don't
+     * want to try creating it because we can't. We'll add it to base
+     * and move forward. The next part will be a directory we need
+     * to try creating. */
+    if (strchr(parts[0], ':')) {
+        i++;
+        str_builder_add_str(sb, parts[0], strlen(parts[0]));
+        str_builder_add_char(sb, SEP);
+    }
+#else
+    if (*name == '/') {
+        str_builder_add_char(sb, SEP);
+    }
+#endif
+
+    for ( ; parts[i] != NULL; i++) {
+        if (*(parts[i]) == '\0') {
+            continue;
+        }
+
+        str_builder_add_str(sb, parts[i], strlen(parts[i]));
+        str_builder_add_char(sb, SEP);
+
+#ifdef _WIN32
+        if (CreateDirectory(str_builder_peek(sb), NULL) == FALSE) {
+            if (GetLastError() != ERROR_ALREADY_EXISTS) {
+                ret = false;
+                goto done;
+            }
+        }
+#else
+        if (mkdir(str_builder_peek(sb), 0774) != 0)
+            if (errno != EEXIST) {
+                ret = false;
+                goto done;
+            }
+#endif
+    }
+
+    done:
+    atcc_free_splitted_string(parts);
+    str_builder_destroy(sb);
+    return ret;
+}
