@@ -28,7 +28,9 @@ TEST(TccCompileTests, TccCompileTest1) {
     int (*func)();
     func = reinterpret_cast<int(*)()>(tcc_get_symbol(tccState, "test"));
     ASSERT_TRUE(func);
+
     ASSERT_EQ(func(), 256);
+    tcc_delete(tccState);
 }
 
 TEST(TccCompileTests, TccCompileTest2) {
@@ -52,7 +54,11 @@ TEST(TccCompileTests, TccCompileTest2) {
     tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
 
     ASSERT_FALSE(tcc_compile_string(tccState, string));
-    ASSERT_FALSE(tcc_relocate(tccState, TCC_RELOCATE_AUTO));
+
+    int size = tcc_relocate(tccState, NULL);
+    void* ptr = malloc(size);
+    ASSERT_FALSE(tcc_relocate(tccState, ptr));
+    //ASSERT_FALSE(tcc_relocate(tccState, TCC_RELOCATE_AUTO));
 
     int (*func)(int, int);
     func = reinterpret_cast<int(*)(int,int)>(tcc_get_symbol(tccState, "test1"));
@@ -64,4 +70,11 @@ TEST(TccCompileTests, TccCompileTest2) {
     ASSERT_EQ(func(3, 3), 216);
     ASSERT_EQ(func(2, 3), 125);
     ASSERT_EQ(func(2010, 1), 2011);
+
+    tcc_delete(tccState);
+
+    ASSERT_EQ(func(3, 3), 216);
+    ASSERT_EQ(func(2, 3), 125);
+    ASSERT_EQ(func(2010, 1), 2011);
+    free(ptr);
 }
