@@ -58,12 +58,8 @@ TEST(TccCompileTests, TccCompileTest2) {
     int size = tcc_relocate(tccState, NULL);
     void* ptr = malloc(size);
     ASSERT_FALSE(tcc_relocate(tccState, ptr));
-    //ASSERT_FALSE(tcc_relocate(tccState, TCC_RELOCATE_AUTO));
 
     int (*func)(int, int);
-    func = reinterpret_cast<int(*)(int,int)>(tcc_get_symbol(tccState, "test1"));
-    ASSERT_FALSE(func);
-
     func = reinterpret_cast<int(*)(int,int)>(tcc_get_symbol(tccState, "test"));
     ASSERT_TRUE(func);
 
