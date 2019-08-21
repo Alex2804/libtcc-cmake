@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 
-#include "tcc/libtcc.h"
 #include "tcc/libtcc_ext.h"
 
 #include <fstream>

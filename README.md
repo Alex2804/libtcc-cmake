@@ -22,6 +22,14 @@ You can enable or disable the extension with [LIBTCC_ENABLE_EXTENSION](#LIBTCC_E
 
 ---
 ## CMake Variables
+##### LIBTCC_TEST <a name="LIBTCC_TEST"></a>
+Possible Values:
+- TRUE
+- FALSE *(Default)*
+
+Enables or disables the unit tests.
+
+---
 ##### LIBTCC_BUILD_TYPE <a name="LIBTCC_BUILD_TYPE"></a>
 Possible Values:
 - SHARED
