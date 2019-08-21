@@ -90,7 +90,7 @@ TEST(TccCompileTests, TccCompileTest2) {
 TEST(TccExtNewTests, TccExtNewTest1) {
     std::string libtcc1Path = std::string(ALIBTCC1_DEST_PATH) + TCC_LIBTCC1;
     if(!std::ifstream(libtcc1Path).good()) {
-        ASSERT_FALSE(tcc_build_libtcc1_default());
+        ASSERT_FALSE(atcc_build_libtcc1_default());
     }
 
     const char* string = "#include<math.h>\n"

@@ -13,7 +13,7 @@ if (!alibtcc_extension_is_compiling()) {
     libtcc1_file = fopen(libtcc1_path, "r");
     tcc_free(libtcc1_path);
     if (!libtcc1_file) {
-        result = tcc_build_libtcc1_default();
+        result = atcc_build_libtcc1_default();
         if (result) {
             return NULL;
         }

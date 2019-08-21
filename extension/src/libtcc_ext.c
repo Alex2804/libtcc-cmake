@@ -26,7 +26,7 @@ int alibtcc_extension_is_compiling() {
     return a_alibtcc_extension_is_compiling;
 }
 
-int tcc_make_ar(const char *name, int fileCount, char **files)
+int atcc_make_ar(const char *name, int fileCount, char **files)
 {
     int argc = fileCount + 2;
     char** argv = (char**) tcc_malloc(argc * sizeof(char*));
@@ -49,12 +49,12 @@ tcc_delete(tccState);\
 return result;\
 }
 
-int tcc_build_libtcc1_default()
+int atcc_build_libtcc1_default()
 {
-    return tcc_build_libtcc1(TCC_LIBTCC1, ALIBTCC1_DEST_PATH, ALIBTCC1_SRC_PATH);
+    return atcc_build_libtcc1(TCC_LIBTCC1, ALIBTCC1_DEST_PATH, ALIBTCC1_SRC_PATH);
 }
 
-int tcc_build_libtcc1(const char* name, const char* destPath, const char* srcPath)
+int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPath)
 {
     TCCState *tccState;
 #ifdef ALIBTCC1_OBJ_PATH
@@ -126,7 +126,7 @@ int tcc_build_libtcc1(const char* name, const char* destPath, const char* srcPat
     splitted_name = atcc_split_string(name, '.');
     file_name = atcc_concat_path(destPath, splitted_name[0], "a");
     atcc_free_splitted_string(splitted_name);
-    result = tcc_make_ar(file_name, file_count, obj_names);
+    result = atcc_make_ar(file_name, file_count, obj_names);
     tcc_free(file_name);
 
     for(int i = 0; i < file_count; i++) {
