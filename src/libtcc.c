@@ -21,12 +21,6 @@
 #include "tcc.h"
 
 /********************************************************/
-/* include if custom extension is enabled */
-#ifdef ALIBTCC_ENABLE_EXTENSION
-# include "extension/src/libtcc_ext.c"
-#endif
-
-/********************************************************/
 
 /********************************************************/
 /* global variables */

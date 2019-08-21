@@ -14,14 +14,17 @@ extern "C" {
 #error "ALIBTCC1_DEST_PATH must be defined if you wish to use the libtcc extension"
 #endif
 
-/* build ar archives */
+/* creates new TCCState and sets include/lib path if possible */
+LIBTCCAPI TCCState* atcc_new();
+
+/*****************************/
+/* build ar archives with tinyp_libmaker*/
 LIBTCCAPI int tcc_make_ar(const char *name, int fileCount, char** files);
 
 /*****************************/
 /* build libtcc1.a, returns 0 if all is ok, another value if something failed */
 LIBTCCAPI int tcc_build_libtcc1_default();
 LIBTCCAPI int tcc_build_libtcc1(const char* name, const char* destPath, const char* srcPath);
-
 
 #ifdef __cplusplus
 }

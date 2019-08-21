@@ -1,0 +1,1 @@
+list(APPEND LIBTCC_SOURCES "extension/src/libtcc_ext.c")

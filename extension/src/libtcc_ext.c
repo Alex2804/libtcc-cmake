@@ -1,7 +1,24 @@
-#include "extension/include/tcc/libtcc_ext.h"
+#include "libtcc_ext_private.h"
 
 #include "tcctools.c"
 #include "libtcc_ext_tools.c"
+
+
+TCCState *atcc_new()
+{
+    TCCState *state = tcc_new();
+#ifdef __unix__
+    tcc_add_include_path(state, "/usr/include");
+#endif
+#ifdef ALIBTCC_INCLUDE_PATH
+    tcc_add_include_path(state, ALIBTCC_INCLUDE_PATH);
+#endif
+#ifdef ALIBTCC1_DEST_PATH
+    tcc_add_library_path(state, ALIBTCC1_DEST_PATH);
+    tcc_set_lib_path(state, ALIBTCC1_DEST_PATH);
+#endif
+    return state;
+}
 
 static int a_alibtcc_extension_is_compiling = 0;
 
