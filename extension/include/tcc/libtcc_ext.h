@@ -1,7 +1,7 @@
 #ifndef ALIBTCC_LIBTCC_EXT_H
 #define ALIBTCC_LIBTCC_EXT_H
 
-#include "libtcc.h"
+#include "../../../include/tcc/libtcc.h"
 
 #ifdef __cplusplus
 extern "C" {
