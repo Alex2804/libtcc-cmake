@@ -8,8 +8,9 @@ TCCState *atcc_new()
 {
     TCCState *state = tcc_new();
 #ifdef __unix__
-    tcc_add_include_path(state, "/usr/include");
+    tcc_add_sysinclude_path(state, "/usr/include");
 #endif
+    tcc_add_include_path(state, "include");
 #ifdef ALIBTCC_INCLUDE_PATH
     tcc_add_include_path(state, ALIBTCC_INCLUDE_PATH);
 #endif
