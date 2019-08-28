@@ -1,5 +1,5 @@
 # Libtcc
-This Project aims to build libtcc for supported platforms system independent with cmake.
+This Project aims to build libtcc for supported platforms system independent with CMake.
 
 ## Usage
 You can embed this CMake project as a subdirectory or build it as every other CMake script.
