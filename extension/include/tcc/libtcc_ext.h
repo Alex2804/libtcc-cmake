@@ -18,8 +18,8 @@ extern "C" {
 LIBTCCAPI TCCState* atcc_new();
 
 /*****************************/
-/* build ar archives with tiny_libmaker*/
-LIBTCCAPI int atcc_make_ar(const char *name, int fileCount, char** files);
+/* build ar archives with tiny_libmaker. Returns 0 if all is ok, another value if something failed */
+LIBTCCAPI int atcc_make_ar(const char* name, int fileCount, char** files);
 
 /*****************************/
 /* build libtcc1.a, returns 0 if all is ok, another value if something failed */

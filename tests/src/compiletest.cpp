@@ -16,7 +16,7 @@ int deleteLibtcc1()
     return false;
 }
 
-TEST(TccCompileTests, TccCompileTest1) {
+TEST(Libtcc_Extension_Compile_libtcc1_Tests, Compile_1) {
     const char* string = "#include<math.h>\n"
                          "int test() {\n"
                          "  return pow(4, 4);\n"
@@ -46,7 +46,7 @@ TEST(TccCompileTests, TccCompileTest1) {
     ASSERT_FALSE(deleteLibtcc1());
 }
 
-TEST(TccCompileTests, TccCompileTest2) {
+TEST(Libtcc_Extension_Compile_libtcc1_Tests, Compile_2) {
     const char* string = "#include<math.h>\n"
                          "int test(int x1, int x2) {\n"
                          "  return pow(x1+x2, x2);\n"
@@ -87,7 +87,7 @@ TEST(TccCompileTests, TccCompileTest2) {
     ASSERT_FALSE(deleteLibtcc1());
 }
 
-TEST(TccExtNewTests, TccExtNewTest1) {
+TEST(Libtcc_Extension_atcc_new_Tests, atcc_new_1) {
     std::string libtcc1Path = std::string(ALIBTCC1_DEST_PATH) + TCC_LIBTCC1;
     if(!std::ifstream(libtcc1Path).good()) {
         ASSERT_FALSE(atcc_build_libtcc1_default());

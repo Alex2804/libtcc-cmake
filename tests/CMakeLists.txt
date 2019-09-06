@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 
 enable_language(CXX)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
@@ -36,6 +36,6 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LIBTCC_RUNTIME_TARGET_DIR})
-add_executable(libtcc_test compiletest.cpp)
+add_executable(libtcc_test src/compiletest.cpp)
 target_link_libraries(libtcc_test "${LIBTCC_NAME}" gtest_main)
 add_test(NAME tcc_compile_test COMMAND libtcc_test)
