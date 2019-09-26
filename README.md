@@ -40,7 +40,7 @@ Defines if the Library should be static or shared
 (**it is required to write the values in uppercase!**).
 
 ---
-#### <a name="TCC_LIB_NAME">LIBTCC_NAME</a>
+#### <a name="LIBTCC_NAME">LIBTCC_NAME</a>
 Defines the name of the library file.
 By default this is "*tcc*" or "*tcc-(Platform specific postfix)*"
 depending on whether [LIBTCC_TARGET_SPECIFIC_NAME](#LIBTCC_TARGET_SPECIFIC_NAME) is true or false.
@@ -51,7 +51,7 @@ Possible Values:
 - TRUE
 - FALSE *(Default)*
 
-Defines if the target architecture should be contained in the resulting library (**Ignored if LIBTCC_NAME is defined**!).
+Defines if the target architecture should be contained in the resulting library (**Ignored if [LIBTCC_NAME](#LIBTCC_NAME) is defined**!).
 
 ---
 #### <a name="LIBTCC_INSTALL_RUNTIME">LIBTCC_INSTALL_RUNTIME</a>
