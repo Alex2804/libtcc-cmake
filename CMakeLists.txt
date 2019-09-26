@@ -100,7 +100,6 @@ if(UNIX)
     target_compile_options(${LIBTCC_NAME} PRIVATE -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation)
 endif()
 
-set(LIBTCC_TEST TRUE)
 if(LIBTCC_TEST)
     add_subdirectory(tests)
 endif()

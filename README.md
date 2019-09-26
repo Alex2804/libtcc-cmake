@@ -23,7 +23,7 @@ For more information like CMake variables look [here](extension/README.md).
 
 ---
 ## CMake Variables
-##### <a name="LIBTCC_TEST">LIBTCC_TEST</a>
+#### <a name="LIBTCC_TEST">LIBTCC_TEST</a>
 Possible Values:
 - TRUE
 - FALSE *(Default)*
@@ -31,7 +31,7 @@ Possible Values:
 Enables or disables the unit tests.
 
 ---
-##### <a name="LIBTCC_BUILD_TYPE">LIBTCC_BUILD_TYPE</a>
+#### <a name="LIBTCC_BUILD_TYPE">LIBTCC_BUILD_TYPE</a>
 Possible Values:
 - SHARED
 - STATIC *(Default)*
@@ -40,13 +40,13 @@ Defines if the Library should be static or shared
 (**it is required to write the values in uppercase!**).
 
 ---
-##### <a name="TCC_LIB_NAME">LIBTCC_NAME</a>
+#### <a name="TCC_LIB_NAME">LIBTCC_NAME</a>
 Defines the name of the library file.
 By default this is "*tcc*" or "*tcc-(Platform specific postfix)*"
 depending on whether [LIBTCC_TARGET_SPECIFIC_NAME](#LIBTCC_TARGET_SPECIFIC_NAME) is true or false.
 
 ---
-##### <a name="LIBTCC_TARGET_SPECIFIC_NAME">LIBTCC_TARGET_SPECIFIC_NAME</a>
+#### <a name="LIBTCC_TARGET_SPECIFIC_NAME">LIBTCC_TARGET_SPECIFIC_NAME</a>
 Possible Values:
 - TRUE
 - FALSE *(Default)*
@@ -54,7 +54,7 @@ Possible Values:
 Defines if the target architecture should be contained in the resulting library (**Ignored if LIBTCC_NAME is defined**!).
 
 ---
-##### <a name="LIBTCC_INSTALL_RUNTIME">LIBTCC_INSTALL_RUNTIME</a>
+#### <a name="LIBTCC_INSTALL_RUNTIME">LIBTCC_INSTALL_RUNTIME</a>
 Possible Values:
 - TRUE *(Default)*
 - FALSE
@@ -63,12 +63,12 @@ Defines if the include headers get copied into
 "[LIBTCC_RUNTIME_TARGET_DIR](#LIBTCC_RUNTIME_TARGET_DIR)**/include/**".
 
 ---
-##### <a name="LIBTCC_RUNTIME_TARGET_DIR">LIBTCC_RUNTIME_TARGET_DIR</a>
+#### <a name="LIBTCC_RUNTIME_TARGET_DIR">LIBTCC_RUNTIME_TARGET_DIR</a>
 Defines the directory where to copy the runtime headers.
 By default this is *CMAKE_BINARY_DIR*.
 
 ---
-##### <a name="LIBTCC_INSTALL_SHARED_TO_BINARY">LIBTCC_INSTALL_SHARED</a>
+#### <a name="LIBTCC_INSTALL_SHARED_TO_BINARY">LIBTCC_INSTALL_SHARED</a>
 Possible Values:
 - TRUE *(Default)*
 - FALSE
@@ -77,15 +77,15 @@ Defines whether the resulting shared library will be copied to [LIBTCC_SHARED_TA
 assuming a shared library is created.
 
 ---
-##### <a name="LIBTCC_SHARED_TARGET_DIR">LIBTCC_SHARED_TARGET_DIR</a>
+#### <a name="LIBTCC_SHARED_TARGET_DIR">LIBTCC_SHARED_TARGET_DIR</a>
 Defines the directory where to copy the shared library into, assuming a shared library is created and [LIBTCC_INSTALL_SHARED](#LIBTCC_INSTALL_SHARED) is true.
 
 ---
-##### <a name="LIBTCC_TARGET_ARCHITECTURE">LIBTCC_TARGET_ARCHITECTURE</a>
+#### <a name="LIBTCC_TARGET_ARCHITECTURE">LIBTCC_TARGET_ARCHITECTURE</a>
 Defines the architecture to build for (should be recognized automatically if not defined).
 
 ---
-##### <a name="LIBTCC_ENABLE_EXTENSION">LIBTCC_ENABLE_EXTENSION</a>
+#### <a name="LIBTCC_ENABLE_EXTENSION">LIBTCC_ENABLE_EXTENSION</a>
 Possible Values:
 - TRUE *(Default)*
 - FALSE
