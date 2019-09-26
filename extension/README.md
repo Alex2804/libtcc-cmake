@@ -54,7 +54,7 @@ By default this is "*lib_libtcc1/*" (**This should not be changed if you have no
 
 
 ---
-#####<a name="LIBTCC1_DEST_PATH">LIBTCC1_DEST_PATH</a>
+<a name="LIBTCC1_DEST_PATH">#####LIBTCC1_DEST_PATH</a>
 Specifies the destination folder in which libtcc1-\*.a is placed.  
 In addition, the object files are also created here. These are deleted after compilation and packing.  
 By default this is "*lib/*"
