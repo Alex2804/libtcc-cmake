@@ -3,10 +3,11 @@
  * This file is part of the w64 mingw-runtime package.
  * No warranty is given; refer to the file DISCLAIMER within this package.
  */
-#ifndef _VARARGS_H
-#define _VARARGS_H
-
-#error "TinyCC no longer implements <varargs.h>."
-#error "Revise your code to use <stdarg.h>."
-
+/*
+ * This file is part of the Mingw32 package.
+ *
+ * mem.h maps to string.h
+ */
+#ifndef	__STRICT_ANSI__
+#include <string.h>
 #endif
