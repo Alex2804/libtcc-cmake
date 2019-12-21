@@ -1,12 +1,18 @@
-char* atcc_concat_path(const char* prefixPath, const char* fileName, const char* fileExtension)
+#include "extension/src/private/utility.h"
+
+#include <string.h>
+
+#include "tcc/tcc.h"
+
+char* atcc_concatenate_path(const char* prefixPath, const char* fileName, const char* fileExtension)
 {
     char* path;
     size_t extra_size;
     size_t file_extension_size = strlen(fileExtension);
     if(file_extension_size == 0)
-        extra_size = 1;
+        extra_size = 1; // only '\0'
     else
-        extra_size = 2;
+        extra_size = 2; // '.' and '\0'
     path = (char*) tcc_malloc((strlen(prefixPath) + strlen(fileName) + strlen(fileExtension) + extra_size) * sizeof(char));
     strcpy(path, prefixPath);
     strcat(path, fileName);
@@ -30,7 +36,7 @@ char** atcc_split_string(const char* string, char delimiter)
     if(string == NULL)
         return NULL;
 
-    for(size = 0; string[size] != '\0'; size++) {
+    for(size = 0; string[size] != '\0'; ++size) {
         if(string[size] == delimiter)
             delimiterCount++;
     }
@@ -44,7 +50,7 @@ char** atcc_split_string(const char* string, char delimiter)
 
     splitted = (char**) tcc_malloc((delimiterCount + 2) * sizeof(char*));
 
-    for(size = 0; tmpString[size] != '\0'; size++) {
+    for(size = 0; tmpString[size] != '\0'; ++size) {
         if(tmpString[size] == delimiter) {
             tmpString[size] = '\0';
             splitted[index++] = tmpString + (offset * sizeof(char));
@@ -57,19 +63,20 @@ char** atcc_split_string(const char* string, char delimiter)
     return splitted;
 }
 
-int atcc_splitted_string_length(char** s)
+size_t atcc_splitted_string_length(char** s)
 {
     size_t i = 0;
     if(s != NULL)
-        for(; s[i] != NULL; i++);
+        for(; s[i] != NULL; ++i);
     return i;
 }
 
 void atcc_free_splitted_string(char** splitted)
 {
-    if(splitted != NULL)
+    if(splitted != NULL) {
         tcc_free(splitted[0]);
-    tcc_free(splitted);
+        tcc_free(splitted);
+    }
 }
 
 char** atcc_get_libtcc1_files()
@@ -128,78 +135,3 @@ OBJ-arm-eabi = "libtcc1.c;armeabi.c;alloca-arm.S;armflush.c"
 OBJ-arm-eabihf = "libtcc1.c;armeabi.c;alloca-arm.S;armflush.c"
 OBJ-arm-wince = "libtcc1.c;armeabi.c;alloca-arm.S;armflush.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c"
  */
-
-#include <stdbool.h>
-#include "str_builder.c"
-
-#ifdef _WIN32
-# include <windows.h>
-const char SEP = '\\';
-#else
-# include <sys/stat.h>
-const char SEP = '/';
-#endif
-
-bool atcc_create_dir(const char *name)
-{
-    str_builder_t  *sb;
-    char          **parts;
-    size_t          i;
-    bool            ret = true;
-
-    if (name == NULL || *name == '\0')
-        return false;
-
-    parts = atcc_split_string(name, '/');
-    if (parts == NULL || parts[0] == NULL) {
-        atcc_free_splitted_string(parts);
-        return false;
-    }
-
-    sb = str_builder_create();
-    i  = 0;
-#ifdef _WIN32
-    /* If the first part has a ':' it's a drive. E.g 'C:'. We don't
-     * want to try creating it because we can't. We'll add it to base
-     * and move forward. The next part will be a directory we need
-     * to try creating. */
-    if (strchr(parts[0], ':')) {
-        i++;
-        str_builder_add_str(sb, parts[0], strlen(parts[0]));
-        str_builder_add_char(sb, SEP);
-    }
-#else
-    if (*name == '/') {
-        str_builder_add_char(sb, SEP);
-    }
-#endif
-
-    for ( ; parts[i] != NULL; i++) {
-        if (*(parts[i]) == '\0') {
-            continue;
-        }
-
-        str_builder_add_str(sb, parts[i], strlen(parts[i]));
-        str_builder_add_char(sb, SEP);
-
-#ifdef _WIN32
-        if (CreateDirectory(str_builder_peek(sb), NULL) == FALSE) {
-            if (GetLastError() != ERROR_ALREADY_EXISTS) {
-                ret = false;
-                goto done;
-            }
-        }
-#else
-        if (mkdir(str_builder_peek(sb), 0774) != 0)
-            if (errno != EEXIST) {
-                ret = false;
-                goto done;
-            }
-#endif
-    }
-
-    done:
-    atcc_free_splitted_string(parts);
-    str_builder_destroy(sb);
-    return ret;
-}

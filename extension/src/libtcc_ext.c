@@ -1,12 +1,43 @@
-#include "libtcc_ext_private.h"
+#include "tcc/libtcc_ext.h"
 
+#include <string.h>
+#include <stdio.h>
+
+#include "tcc/tcc.h"
 #include "tcctools.c"
-#include "libtcc_ext_tools.c"
 
+#include "private/utility.h"
+#include "private/filesystem.h"
 
-TCCState *atcc_new()
+TCCState* atcc_new()
 {
-    TCCState *state = tcc_new();
+    TCCState *state;
+    int result;
+    FILE *libtcc1_file;
+    char *libtcc1_path;
+    size_t path_length;
+    size_t name_length;
+
+    path_length = strlen(ALIBTCC1_DEST_PATH);
+    name_length = strlen(TCC_LIBTCC1);
+
+    libtcc1_path = (char *) tcc_malloc((path_length + name_length + 1) * sizeof(char));
+    strcpy(libtcc1_path, ALIBTCC1_DEST_PATH);
+    strcat(libtcc1_path, TCC_LIBTCC1);
+    libtcc1_file = fopen(libtcc1_path, "r");
+    tcc_free(libtcc1_path);
+
+    if (!libtcc1_file) {
+        result = atcc_build_libtcc1_default();
+        if (result) {
+            return NULL;
+        }
+    } else {
+        fclose(libtcc1_file);
+    }
+
+    state = tcc_new();
+
 #ifdef __unix__
     tcc_add_sysinclude_path(state, "/usr/include");
 #endif
@@ -18,13 +49,8 @@ TCCState *atcc_new()
     tcc_add_library_path(state, ALIBTCC1_DEST_PATH);
     tcc_set_lib_path(state, ALIBTCC1_DEST_PATH);
 #endif
+
     return state;
-}
-
-static int a_alibtcc_extension_is_compiling = 0;
-
-int alibtcc_extension_is_compiling() {
-    return a_alibtcc_extension_is_compiling;
 }
 
 int atcc_make_ar(const char *name, int fileCount, char **files)
@@ -72,10 +98,8 @@ int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPa
     int file_count;
     int result;
 
-    atcc_create_dir(obj_path);
-    atcc_create_dir(destPath);
-
-    a_alibtcc_extension_is_compiling = 1;
+    atcc_create_dir_recursive(obj_path);
+    atcc_create_dir_recursive(destPath);
 
     tccState = tcc_new();
 
@@ -95,7 +119,7 @@ int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPa
 
     for(int i = 0; i < file_count; i++) {
         splitted_file_name = atcc_split_string(src_names[i], '.');
-        file_name = atcc_concat_path(srcPath, splitted_file_name[0], splitted_file_name[1]);
+        file_name = atcc_concatenate_path(srcPath, splitted_file_name[0], splitted_file_name[1]);
         result = tcc_add_file(tccState, file_name);
         tcc_free(file_name);
         if(result) {
@@ -109,7 +133,7 @@ int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPa
             return result;
         }
 
-        file_name = atcc_concat_path(obj_path, splitted_file_name[0], "o");
+        file_name = atcc_concatenate_path(obj_path, splitted_file_name[0], "o");
         obj_names[i] = file_name;
         result = tcc_output_file(tccState, file_name);
         atcc_free_splitted_string(splitted_file_name);
@@ -125,7 +149,7 @@ int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPa
     }
 
     splitted_name = atcc_split_string(name, '.');
-    file_name = atcc_concat_path(destPath, splitted_name[0], "a");
+    file_name = atcc_concatenate_path(destPath, splitted_name[0], "a");
     atcc_free_splitted_string(splitted_name);
     result = atcc_make_ar(file_name, file_count, obj_names);
     tcc_free(file_name);
@@ -140,8 +164,6 @@ int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPa
     }
     tcc_free(obj_names);
     tcc_delete(tccState);
-
-    a_alibtcc_extension_is_compiling = 0;
 
     return result;
 }

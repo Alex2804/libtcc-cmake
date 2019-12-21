@@ -728,10 +728,6 @@ LIBTCCAPI TCCState *tcc_new(void)
 {
     TCCState *s;
 
-#if defined(ALIBTCC_ENABLE_EXTENSION)
-# include "libtcc_ext_tcc_new_implementation.c"
-#endif
-
     tcc_cleanup();
 
     s = tcc_mallocz(sizeof(TCCState));
