@@ -1,10 +1,10 @@
+#include "tcc/tcc.h" // must be included before libtcc_ext.h for correct definition of LIBTCCAPI
+#include "tcctools.c"
+
 #include "tcc/libtcc_ext.h"
 
 #include <string.h>
 #include <stdio.h>
-
-#include "tcc/tcc.h"
-#include "tcctools.c"
 
 #include "private/utility.h"
 #include "private/filesystem.h"

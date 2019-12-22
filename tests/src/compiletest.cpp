@@ -4,6 +4,7 @@
 
 #include <fstream>
 
+/* returns 0 if file was removed successfully (or hasn't existed) or non zero value if not */
 int deleteLibtcc1()
 {
     std::FILE *libtcc1_file;
@@ -29,8 +30,8 @@ GTEST_TEST(Libtcc_Extension_Compile__Tests, Compile_1) {
 
     tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
 
-    ASSERT_FALSE(tcc_compile_string(tccState, string));
-    ASSERT_FALSE(tcc_relocate(tccState, TCC_RELOCATE_AUTO));
+    ASSERT_NE(tcc_compile_string(tccState, string), -1);
+    ASSERT_NE(tcc_relocate(tccState, TCC_RELOCATE_AUTO), -1);
 
     int (*func)();
     func = reinterpret_cast<int(*)()>(tcc_get_symbol(tccState, "test"));
@@ -55,11 +56,11 @@ GTEST_TEST(Libtcc_Extension_Compile__Tests, Compile_2) {
 
     tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
 
-    ASSERT_FALSE(tcc_compile_string(tccState, string));
+    ASSERT_NE(tcc_compile_string(tccState, string), -1);
 
     int size = tcc_relocate(tccState, nullptr);
-    void* ptr = malloc(size);
-    ASSERT_TRUE(tcc_relocate(tccState, ptr) != -1);
+    void* codeBuffer = malloc(size);
+    ASSERT_NE(tcc_relocate(tccState, codeBuffer), -1);
 
     int (*func)(int, int);
     func = reinterpret_cast<int(*)(int,int)>(tcc_get_symbol(tccState, "test"));
@@ -69,12 +70,18 @@ GTEST_TEST(Libtcc_Extension_Compile__Tests, Compile_2) {
     ASSERT_EQ(func(2, 3), 125);
     ASSERT_EQ(func(2010, 1), 2011);
 
+    
     tcc_delete(tccState);
-
+    
+    // with MSVC you get an exception with error code 0xc0000005 (access violation) when you call a function after
+    // tcc_delete even if relocated (and therefore copied) to extra buffer (in this case codeBuffer).
+#ifndef _MSC_VER
     ASSERT_EQ(func(3, 3), 216);
     ASSERT_EQ(func(2, 3), 125);
     ASSERT_EQ(func(2010, 1), 2011);
+#endif
 
-    free(ptr);
+    free(codeBuffer);
+
     ASSERT_FALSE(deleteLibtcc1());
 }

@@ -17,12 +17,10 @@ extern "C" {
 /* create a new TCC compilation context and sets include and lib paths if possible */
 LIBTCCAPI TCCState* atcc_new();
 
-/*****************************/
-/* build ar archives with tiny_libmaker. Returns 0 on success, another value if something failed */
+/* build ar archives with tiny_libmaker. Returns 0 on success, another value on failure */
 LIBTCCAPI int atcc_make_ar(const char* name, int fileCount, char** files);
 
-/*****************************/
-/* build libtcc1.a, returns 0 on success, another value if something failed */
+/* build libtcc1.a, returns 0 on success, another value on failure */
 LIBTCCAPI int atcc_build_libtcc1_default();
 LIBTCCAPI int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPath);
 
