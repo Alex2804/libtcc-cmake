@@ -70,9 +70,8 @@ GTEST_TEST(Libtcc_Extension_Compile__Tests, Compile_2) {
     ASSERT_EQ(func(2, 3), 125);
     ASSERT_EQ(func(2010, 1), 2011);
 
-    
     tcc_delete(tccState);
-    
+
     // with MSVC you get an exception with error code 0xc0000005 (access violation) when you call a function after
     // tcc_delete even if relocated (and therefore copied) to extra buffer (in this case codeBuffer).
 #ifndef _MSC_VER
