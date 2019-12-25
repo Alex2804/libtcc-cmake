@@ -38,14 +38,12 @@ else()
     message(FATAL_ERROR "Unknown Architecture for TCC Library: ${LIBTCC_TARGET_ARCHITECTURE}")
 endif()
 
+list(APPEND LIBTCC_COMPILE_DEFINITIONS "TCC_TARGET_${LIBTCC_TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-${LIBTCC_SUFFIX}.a")
+
 if((NOT DEFINED LIBTCC_NAME) AND LIBTCC_TARGET_SPECIFIC_NAME)
     set(LIBTCC_NAME "libtcc_${LIBTCC_SUFFIX}")
 elseif(NOT DEFINED LIBTCC_NAME)
     set(LIBTCC_NAME libtcc)
-endif()
-
-if("${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "ARM" OR "${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "ARM64")
-    list(APPEND LIBTCC_COMPILE_DEFINITIONS TCC_ARM_EABI TCC_ARM_HARDFLOAT TCC_ARM_VFP)
 endif()
 
 if(WIN32)
@@ -62,7 +60,10 @@ elseif(UNIX)
     endif()
     set(LIBTCC_CONFIG_TRIPLET "\"${LIBTCC_CONFIG_TRIPLET_ARCHITECTURE}-${LIBTCC_CONFIG_TRIPLET_SYSTEM_NAME}-${LIBTCC_CONFIG_TRIPLET_ABI}\"")
     list(APPEND LIBTCC_COMPILE_DEFINITIONS "CONFIG_TRIPLET=${LIBTCC_CONFIG_TRIPLET}")
-    message("Libtcc Config Triplet: ${LIBTCC_CONFIG_TRIPLET}")
+endif()
+
+if("${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "ARM" OR "${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "ARM64")
+    list(APPEND LIBTCC_COMPILE_DEFINITIONS TCC_ARM_EABI TCC_ARM_HARDFLOAT TCC_ARM_VFP)
 endif()
 
 if(LIBTCC_INSTALL_RUNTIME)
@@ -111,12 +112,16 @@ if(LIBTCC_ENABLE_EXTENSION)
     include(extension/cmake/SetupExtension.cmake)
 endif()
 
-target_compile_definitions(${LIBTCC_NAME} PUBLIC "TCC_TARGET_${LIBTCC_TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-${LIBTCC_SUFFIX}.a" ${LIBTCC_COMPILE_DEFINITIONS})
+target_compile_definitions(${LIBTCC_NAME} PUBLIC ${LIBTCC_COMPILE_DEFINITIONS})
 if(UNIX)
     target_link_libraries(${LIBTCC_NAME} dl)
     target_compile_options(${LIBTCC_NAME} PRIVATE -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation)
 endif()
 
+message("Libtcc Config Triplet: ${LIBTCC_CONFIG_TRIPLET}")
+message("Libtcc Compile Definitions: ${LIBTCC_COMPILE_DEFINITIONS}")
+
+set(LIBTCC_TEST TRUE)
 if(LIBTCC_TEST)
     add_subdirectory(tests)
 endif()
