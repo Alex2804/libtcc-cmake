@@ -40,9 +40,13 @@
 
 #define CHAR_IS_UNSIGNED
 
+/* define if return values need to be extended explicitely
+   at caller side (for interfacing with non-TCC compilers) */
+#define PROMOTE_RET
 /******************************************************/
 #else /* ! TARGET_DEFS_ONLY */
 /******************************************************/
+#define USING_GLOBALS
 #include "tcc.h"
 #include <assert.h>
 
@@ -234,12 +238,6 @@ ST_FUNC void gsym_addr(int t_, int a_)
                         0x14000000 | ((a - t) >> 2 & 0x3ffffff))); // b
         t = next;
     }
-}
-
-// Patch all branches in list pointed to by t to branch to current location:
-ST_FUNC void gsym(int t)
-{
-    gsym_addr(t, ind);
 }
 
 static int arm64_type_size(int t)
@@ -446,10 +444,12 @@ static void arm64_sym(int r, Sym *sym, unsigned long addend)
     }
 }
 
+static void arm64_load_cmp(int r, SValue *sv);
+
 ST_FUNC void load(int r, SValue *sv)
 {
     int svtt = sv->type.t;
-    int svr = sv->r & ~VT_LVAL_TYPE;
+    int svr = sv->r;
     int svrv = svr & VT_VALMASK;
     uint64_t svcul = (uint32_t)sv->c.i;
     svcul = svcul >> 31 & 1 ? svcul - ((uint64_t)1 << 32) : svcul;
@@ -537,6 +537,11 @@ ST_FUNC void load(int r, SValue *sv)
         return;
     }
 
+    if (svr == VT_CMP) {
+        arm64_load_cmp(r, sv);
+        return;
+    }
+
     printf("load(%x, (%x, %x, %llx))\n", r, svtt, sv->r, (long long)svcul);
     assert(0);
 }
@@ -544,7 +549,7 @@ ST_FUNC void load(int r, SValue *sv)
 ST_FUNC void store(int r, SValue *sv)
 {
     int svtt = sv->type.t;
-    int svr = sv->r & ~VT_LVAL_TYPE;
+    int svr = sv->r;
     int svrv = svr & VT_VALMASK;
     uint64_t svcul = (uint32_t)sv->c.i;
     svcul = svcul >> 31 & 1 ? svcul - ((uint64_t)1 << 32) : svcul;
@@ -957,11 +962,7 @@ ST_FUNC void gfunc_call(int nb_args)
     {
         int rt = return_type->t;
         int bt = rt & VT_BTYPE;
-        if (bt == VT_BYTE || bt == VT_SHORT)
-            // Promote small integers:
-            o(0x13001c00 | (bt == VT_SHORT) << 13 |
-              (uint32_t)!!(rt & VT_UNSIGNED) << 30); // [su]xt[bh] w0,w0
-        else if (bt == VT_STRUCT && !(a[0] & 1)) {
+        if (bt == VT_STRUCT && !(a[0] & 1)) {
             // A struct was returned in registers, so write it out:
             gv(RC_R(8));
             --vtop;
@@ -995,8 +996,9 @@ static int arm64_func_va_list_gr_offs;
 static int arm64_func_va_list_vr_offs;
 static int arm64_func_sub_sp_offset;
 
-ST_FUNC void gfunc_prolog(CType *func_type)
+ST_FUNC void gfunc_prolog(Sym *func_sym)
 {
+    CType *func_type = &func_sym->type;
     int n = 0;
     int i = 0;
     Sym *sym;
@@ -1036,7 +1038,7 @@ ST_FUNC void gfunc_prolog(CType *func_type)
                    a[i] < 32 ? 16 + (a[i] - 16) / 2 * 16 :
                    224 + ((a[i] - 32) >> 1 << 1));
         sym_push(sym->v & ~SYM_FIELD, &sym->type,
-                 (a[i] & 1 ? VT_LLOCAL : VT_LOCAL) | lvalue_type(sym->type.t),
+                 (a[i] & 1 ? VT_LLOCAL : VT_LOCAL) | VT_LVAL,
                  off);
 
         if (a[i] < 16) {
@@ -1123,7 +1125,7 @@ ST_FUNC void gen_va_arg(CType *t)
     gaddrof();
     r0 = intr(gv(RC_INT));
     r1 = get_reg(RC_INT);
-    vtop[0].r = r1 | lvalue_type(t->t);
+    vtop[0].r = r1 | VT_LVAL;
     r1 = intr(r1);
 
     if (!hfa) {
@@ -1303,9 +1305,50 @@ ST_FUNC void gjmp_addr(int a)
     o(0x14000000 | ((a - ind) >> 2 & 0x3ffffff));
 }
 
-ST_FUNC int gtst(int inv, int t)
+ST_FUNC int gjmp_append(int n, int t)
+{
+    void *p;
+    /* insert vtop->c jump list in t */
+    if (n) {
+        uint32_t n1 = n, n2;
+        while ((n2 = read32le(p = cur_text_section->data + n1)))
+            n1 = n2;
+        write32le(p, t);
+        t = n;
+    }
+    return t;
+}
+
+void arm64_vset_VT_CMP(int op)
+{
+    if (op >= TOK_ULT && op <= TOK_GT) {
+        vtop->cmp_r = vtop->r;
+        vset_VT_CMP(0x80);
+    }
+}
+
+static void arm64_gen_opil(int op, uint32_t l);
+
+static void arm64_load_cmp(int r, SValue *sv)
+{
+    sv->r = sv->cmp_r;
+    if (sv->c.i & 1) {
+        vpushi(1);
+        arm64_gen_opil('^', 0);
+    }
+    if (r != sv->r) {
+        load(r, sv);
+        sv->r = r;
+    }
+}
+
+ST_FUNC int gjmp_cond(int op, int t)
 {
     int bt = vtop->type.t & VT_BTYPE;
+
+    int inv = op & 1;
+    vtop->r = vtop->cmp_r;
+
     if (bt == VT_LDOUBLE) {
         uint32_t a, b, f = fltr(gv(RC_FLOAT));
         a = get_reg(RC_INT);
@@ -1330,7 +1373,6 @@ ST_FUNC int gtst(int inv, int t)
         uint32_t a = intr(gv(RC_INT));
         o(0x34000040 | a | !!inv << 24 | ll << 31); // cbz/cbnz wA,.+8
     }
-    --vtop;
     return gjmp(t);
 }
 
@@ -1559,11 +1601,13 @@ static void arm64_gen_opil(int op, uint32_t l)
 ST_FUNC void gen_opi(int op)
 {
     arm64_gen_opil(op, 0);
+    arm64_vset_VT_CMP(op);
 }
 
 ST_FUNC void gen_opl(int op)
 {
     arm64_gen_opil(op, 1);
+    arm64_vset_VT_CMP(op);
 }
 
 ST_FUNC void gen_opf(int op)
@@ -1663,6 +1707,7 @@ ST_FUNC void gen_opf(int op)
     default:
         assert(0);
     }
+    arm64_vset_VT_CMP(op);
 }
 
 // Generate sign extension from 32 to 64 bits:
@@ -1670,6 +1715,16 @@ ST_FUNC void gen_cvt_sxtw(void)
 {
     uint32_t r = intr(gv(RC_INT));
     o(0x93407c00 | r | r << 5); // sxtw x(r),w(r)
+}
+
+/* char/short to int conversion */
+ST_FUNC void gen_cvt_csti(int t)
+{
+    int r = intr(gv(RC_INT));
+    o(0x13001c00
+        | ((t & VT_BTYPE) == VT_SHORT) << 13
+        | (uint32_t)!!(t & VT_UNSIGNED) << 30
+        | r | r << 5); // [su]xt[bh] w(r),w(r)
 }
 
 ST_FUNC void gen_cvt_itof(int t)
@@ -1731,7 +1786,7 @@ ST_FUNC void gen_cvt_ftoi(int t)
 
 ST_FUNC void gen_cvt_ftof(int t)
 {
-    int f = vtop[0].type.t;
+    int f = vtop[0].type.t & VT_BTYPE;
     assert(t == VT_FLOAT || t == VT_DOUBLE || t == VT_LDOUBLE);
     assert(f == VT_FLOAT || f == VT_DOUBLE || f == VT_LDOUBLE);
     if (t == f)

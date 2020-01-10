@@ -41,7 +41,7 @@
 #define __MSVCRT__ 1
 #undef _MSVCRT_
 #define __MINGW_IMPORT extern __declspec(dllimport)
-#define __MINGW_ATTRIB_NORETURN
+#define __MINGW_ATTRIB_NORETURN __declspec(noreturn)
 #define __MINGW_ATTRIB_CONST
 #define __MINGW_ATTRIB_DEPRECATED
 #define __MINGW_ATTRIB_MALLOC
@@ -51,7 +51,7 @@
 #define __GNUC_VA_LIST
 
 #define _CRTIMP extern
-#define __CRT_INLINE extern __inline__
+#define __CRT_INLINE static __inline__
 
 #define _CRT_ALIGN(x) __attribute__((aligned(x)))
 #define DECLSPEC_ALIGN(x) __attribute__((aligned(x)))
@@ -76,18 +76,12 @@
 #define _M_AMD64 100 /* Visual Studio */
 #define USE_MINGW_SETJMP_TWO_ARGS
 #define mingw_getsp tinyc_getbp
-#define __TRY__
 #else
 #define __stdcall __attribute__((__stdcall__))
 #define _X86_ 1
 #define _M_IX86 300 /* Visual Studio */
 #define WIN32 1
 #define _USE_32BIT_TIME_T
-#ifdef __arm__
-#define __TRY__
-#else
-#define __TRY__ void __try__(void**), *_sehrec[6]; __try__(_sehrec);
-#endif
 #endif
 
 /* in stddef.h */
@@ -138,7 +132,7 @@ typedef struct localeinfo_struct _locale_tstruct,*_locale_t;
 /* for winapi */
 #define _ANONYMOUS_UNION
 #define _ANONYMOUS_STRUCT
-#define DECLSPEC_NORETURN
+#define DECLSPEC_NORETURN __declspec(noreturn)
 #define DECLARE_STDCALL_P(type) __stdcall type
 #define NOSERVICE 1
 #define NOMCX 1

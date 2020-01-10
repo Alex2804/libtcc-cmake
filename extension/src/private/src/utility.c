@@ -1,4 +1,4 @@
-#include "extension/src/private/utility.h"
+#include "../utility.h"
 
 #include <string.h>
 
@@ -88,28 +88,20 @@ char** atcc_get_libtcc1_files()
         return atcc_split_string("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;chkstk.S;bcheck.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
     #elif defined TCC_TARGET_ARM
         return atcc_split_string("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
-    #elif defined TCC_TARGET_ARM64
-        return atcc_split_string("lib-arm64.c;crt1.c;crt1w.c;wincrt1.c;wincrt1w.c;dllcrt1.c;dllmain.c", ';');
     #endif
 #elif defined(TCC_TARGET_MACHO)
-    #ifdef TCC_TARGET_I386
-        return atcc_split_string("libtcc1.c;alloca86.S;alloca86-bt.S;bcheck.c", ';');
-    #elif defined TCC_TARGET_X86_64
+    #ifdef TCC_TARGET_X86_64
         return atcc_split_string("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;va_list.c", ';');
-    #elif defined TCC_TARGET_ARM
-        return atcc_split_string("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c", ';');
-    #elif defined TCC_TARGET_ARM64
-        return atcc_split_string("lib-arm64.c", ';', pathPrefix);
     #endif
 #else
     #ifdef TCC_TARGET_I386
-        return atcc_split_string("libtcc1.c;alloca86.S;alloca86-bt.S;bcheck.c", ';');
+        return atcc_split_string("libtcc1.c;alloca86.S;alloca86-bt.S;bcheck.c;dsohandle.c", ';');
     #elif defined TCC_TARGET_X86_64
-        return atcc_split_string("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;va_list.c;bcheck.c", ';');
+        return atcc_split_string("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;va_list.c;bcheck.c;dsohandle.c", ';');
     #elif defined TCC_TARGET_ARM
-        return atcc_split_string("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c", ';');
+        return atcc_split_string("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c;dsohandle.c", ';');
     #elif defined TCC_TARGET_ARM64
-        return atcc_split_string("lib-arm64.c", ';');
+        return atcc_split_string("lib-arm64.c;dsohandle.c", ';');
     #endif
 #endif
 }

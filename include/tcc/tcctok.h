@@ -127,6 +127,10 @@
      DEF(TOK_REGPARM2, "__regparm__")
      DEF(TOK_CLEANUP1, "cleanup")
      DEF(TOK_CLEANUP2, "__cleanup__")
+     DEF(TOK_CONSTRUCTOR1, "constructor")
+     DEF(TOK_CONSTRUCTOR2, "__constructor__")
+     DEF(TOK_DESTRUCTOR1, "destructor")
+     DEF(TOK_DESTRUCTOR2, "__destructor__")
 
      DEF(TOK_MODE, "__mode__")
      DEF(TOK_MODE_QI, "__QI__")
@@ -158,6 +162,8 @@
 #elif defined TCC_TARGET_ARM64
      DEF(TOK___va_start, "__va_start")
      DEF(TOK___va_arg, "__va_arg")
+#elif defined TCC_TARGET_RISCV64
+     DEF(TOK_builtin_va_start, "__builtin_va_start")
 #endif
 
 /* pragma */
@@ -261,7 +267,7 @@
 #if defined TCC_TARGET_PE
      DEF(TOK___chkstk, "__chkstk")
 #endif
-#ifdef TCC_TARGET_ARM64
+#if defined TCC_TARGET_ARM64 || defined TCC_TARGET_RISCV64
      DEF(TOK___arm64_clear_cache, "__arm64_clear_cache")
      DEF(TOK___addtf3, "__addtf3")
      DEF(TOK___subtf3, "__subtf3")
@@ -300,14 +306,26 @@
      DEF(TOK___bound_local_new, "__bound_local_new")
      DEF(TOK___bound_local_delete, "__bound_local_delete")
 # ifdef TCC_TARGET_PE
+#  ifdef TCC_TARGET_X86_64
+     DEF(TOK___bound_alloca_nr, "__bound_alloca_nr")
+#  endif
      DEF(TOK_malloc, "malloc")
      DEF(TOK_free, "free")
      DEF(TOK_realloc, "realloc")
      DEF(TOK_memalign, "memalign")
      DEF(TOK_calloc, "calloc")
 # endif
+     DEF(TOK_mmap, "mmap")
+     DEF(TOK_munmap, "munmap")
+     DEF(TOK_memcmp, "memcmp")
      DEF(TOK_strlen, "strlen")
      DEF(TOK_strcpy, "strcpy")
+     DEF(TOK_strncpy, "strncpy")
+     DEF(TOK_strcmp, "strcmp")
+     DEF(TOK_strncmp, "strncmp")
+     DEF(TOK_strcat, "strcat")
+     DEF(TOK_strchr, "strchr")
+     DEF(TOK_strdup, "strdup")
 #endif
 
 /* Tiny Assembler */

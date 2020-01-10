@@ -1,5 +1,9 @@
 #include "tcc/tcc.h" // must be included before libtcc_ext.h for correct definition of LIBTCCAPI
-#include "tcctools.c"
+#if ONE_SOURCE
+# include "tcctools.c"
+#else
+ST_FUNC int tcc_tool_ar(TCCState *s, int argc, char **argv);
+#endif
 
 #include "tcc/libtcc_ext.h"
 
@@ -8,6 +12,10 @@
 
 #include "private/utility.h"
 #include "private/filesystem.h"
+
+#ifndef ALIBTCC_INCLUDE_PATH
+# define ALIBTCC_INCLUDE_PATH "include"
+#endif
 
 TCCState* atcc_new()
 {
@@ -38,13 +46,8 @@ TCCState* atcc_new()
 
     state = tcc_new();
 
-#ifdef __unix__
-    tcc_add_sysinclude_path(state, "/usr/include");
-#endif
-    tcc_add_include_path(state, "include");
-#ifdef ALIBTCC_INCLUDE_PATH
     tcc_add_include_path(state, ALIBTCC_INCLUDE_PATH);
-#endif
+
 #ifdef ALIBTCC1_DEST_PATH
     tcc_add_library_path(state, ALIBTCC1_DEST_PATH);
     tcc_set_lib_path(state, ALIBTCC1_DEST_PATH);

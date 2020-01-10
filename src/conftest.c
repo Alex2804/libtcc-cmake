@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+#if defined(_WIN32)
+#include <fcntl.h>
+#endif
+
 /* Define architecture */
 #if defined(__i386__) || defined _M_IX86
 # define TRIPLET_ARCH "i386"
@@ -9,6 +13,8 @@
 # define TRIPLET_ARCH "arm"
 #elif defined(__aarch64__)
 # define TRIPLET_ARCH "aarch64"
+#elif defined(__riscv) && defined(__LP64__)
+# define TRIPLET_ARCH "riscv64"
 #else
 # define TRIPLET_ARCH "unknown"
 #endif
@@ -49,6 +55,9 @@ int _CRT_glob = 0;
 
 int main(int argc, char *argv[])
 {
+#if defined(_WIN32)
+    _setmode(_fileno(stdout), _O_BINARY);  /* don't translate \n to \r\n */
+#endif
     switch(argc == 2 ? argv[1][0] : 0) {
         case 'b':
         {

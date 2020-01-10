@@ -14,7 +14,7 @@ int deleteLibtcc1()
         std::fclose(libtcc1_file);
         return remove(path.c_str());
     }
-    return false;
+    return 0;
 }
 
 GTEST_TEST(Libtcc_Extension_Compile__Tests, Compile_1) {

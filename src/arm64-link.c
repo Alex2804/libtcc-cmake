@@ -12,7 +12,7 @@
 #define R_NUM      R_AARCH64_NUM
 
 #define ELF_START_ADDR 0x00400000
-#define ELF_PAGE_SIZE 0x1000
+#define ELF_PAGE_SIZE 0x10000
 
 #define PCRELATIVE_DLLPLT 1
 #define RELOCATE_DLLPLT 1
@@ -46,8 +46,6 @@ int code_reloc (int reloc_type)
         case R_AARCH64_JUMP_SLOT:
             return 1;
     }
-
-    tcc_error ("Unknown relocation type: %d", reloc_type);
     return -1;
 }
 
@@ -79,8 +77,6 @@ int gotplt_entry_type (int reloc_type)
         case R_AARCH64_LD64_GOT_LO12_NC:
             return ALWAYS_GOTPLT_ENTRY;
     }
-
-    tcc_error ("Unknown relocation type: %d", reloc_type);
     return -1;
 }
 
@@ -151,8 +147,6 @@ ST_FUNC void relocate_plt(TCCState *s1)
         }
     }
 }
-
-void relocate_init(Section *sr) {}
 
 void relocate(TCCState *s1, ElfW_Rel *rel, int type, unsigned char *ptr, addr_t addr, addr_t val)
 {

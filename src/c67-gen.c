@@ -56,7 +56,7 @@
 #define RC_C67_B12    0x04000000
 #define RC_C67_B13    0x08000000
 #define RC_IRET    RC_C67_A4	/* function return: integer register */
-#define RC_LRET    RC_C67_A5	/* function return: second integer register */
+#define RC_IRE2    RC_C67_A5	/* function return: second integer register */
 #define RC_FRET    RC_C67_A4	/* function return: float register */
 
 /* pretty names for the registers */
@@ -89,7 +89,7 @@ enum {
 
 /* return registers for function */
 #define REG_IRET TREG_C67_A4	/* single word int return register */
-#define REG_LRET TREG_C67_A5	/* second word return register (for long long) */
+#define REG_IRE2 TREG_C67_A5    /* second word return register (for long long) */
 #define REG_FRET TREG_C67_A4	/* float return register */
 
 /* defined if function parameters must be evaluated in reverse order */
@@ -111,6 +111,7 @@ enum {
 /******************************************************/
 #else /* ! TARGET_DEFS_ONLY */
 /******************************************************/
+#define USING_GLOBALS
 #include "tcc.h"
 
 ST_DATA const int reg_classes[NB_REGS] = {
@@ -224,11 +225,6 @@ void gsym_addr(int t, int a)
 	}
 	t = n;
     }
-}
-
-void gsym(int t)
-{
-    gsym_addr(t, ind);
 }
 
 // these are regs that tcc doesn't really know about, 
@@ -1944,8 +1940,9 @@ void gfunc_call(int nb_args)
 // parameters are loaded and restored upon return (or if/when needed).
 
 /* generate function prolog of type 't' */
-void gfunc_prolog(CType * func_type)
+void gfunc_prolog(Sym *func_sym)
 {
+    CType *func_type = &func_sym->type;
     int addr, align, size, func_call, i;
     Sym *sym;
     CType *type;
@@ -1967,7 +1964,7 @@ void gfunc_prolog(CType * func_type)
     /* define parameters */
     while ((sym = sym->next) != NULL) {
 	type = &sym->type;
-	sym_push(sym->v & ~SYM_FIELD, type, VT_LOCAL | lvalue_type(type->t), addr);
+	sym_push(sym->v & ~SYM_FIELD, type, VT_LOCAL | VT_LVAL, addr);
 	size = type_size(type, &align);
 	size = (size + 3) & ~3;
 
@@ -2077,15 +2074,13 @@ void gjmp_addr(int a)
 }
 
 /* generate a test. set 'inv' to invert test. Stack entry is popped */
-int gtst(int inv, int t)
+ST_FUNC int gjmp_cond(int op, int t)
 {
-    int ind1, n;
-    int v, *p;
+        int ind1;
+        int inv = op & 1;
+        if (nocode_wanted)
+            return t;
 
-    v = vtop->r & VT_VALMASK;
-    if (nocode_wanted) {
-        ;
-    } else if (v == VT_CMP) {
 	/* fast case : can jump directly since flags are set */
 	// C67 uses B2 sort of as flags register
 	ind1 = ind;
@@ -2103,16 +2098,18 @@ int gtst(int inv, int t)
 	C67_NOP(5);
 	t = ind1;		//return where we need to patch
 
-    } else if (v == VT_JMP || v == VT_JMPI) {
-	/* && or || optimization */
-	if ((v & 1) == inv) {
+        return t;
+}
+
+ST_FUNC int gjmp_append(int n0, int t)
+{
+    if (n0) {
+            int n = n0, *p;
 	    /* insert vtop->c jump list in t */
 
 	    // I guess the idea is to traverse to the
 	    // null at the end of the list and store t
 	    // there
-
-	    n = vtop->c.i;
 	    while (n != 0) {
 		p = (int *) (cur_text_section->data + n);
 
@@ -2122,14 +2119,8 @@ int gtst(int inv, int t)
 	    }
 	    *p |= (t & 0xffff) << 7;
 	    *(p + 1) |= ((t >> 16) & 0xffff) << 7;
-	    t = vtop->c.i;
-
-	} else {
-	    t = gjmp(t);
-	    gsym(vtop->c.i);
-	}
+	    t = n0;
     }
-    vtop--;
     return t;
 }
 
@@ -2205,10 +2196,8 @@ void gen_opi(int op)
 	    ALWAYS_ASSERT(FALSE);
 
 	vtop--;
-	if (op >= TOK_ULT && op <= TOK_GT) {
-	    vtop->r = VT_CMP;
-	    vtop->c.i = op;
-	}
+	if (op >= TOK_ULT && op <= TOK_GT)
+            vset_VT_CMP(0x80);
 	break;
     case '-':
     case TOK_SUBC1:		/* sub with carry generation */
@@ -2364,7 +2353,7 @@ void gen_opf(int op)
 	} else {
 	    ALWAYS_ASSERT(FALSE);
 	}
-	vtop->r = VT_CMP;	// tell TCC that result is in "flags" actually B2
+        vset_VT_CMP(0x80);
     } else {
 	if (op == '+') {
 	    if ((ft & VT_BTYPE) == VT_DOUBLE) {
@@ -2403,7 +2392,7 @@ void gen_opf(int op)
 		gfunc_call(2);
 		vpushi(0);
 		vtop->r = REG_FRET;
-		vtop->r2 = REG_LRET;
+		vtop->r2 = REG_IRE2;
 
 	    } else {
 		// must call intrinsic SP floating point divide

@@ -66,7 +66,7 @@ function(get_target_architecture FLAG ACTIVATE_MESSAGE)
     endif()
 
     if(ACTIVATE_MESSAGE)
-        message("Target Architecture: ${ARCH}")
+        message(STATUS "Target Architecture: ${ARCH}")
     endif()
     set(${FLAG} "${ARCH}" PARENT_SCOPE)
 

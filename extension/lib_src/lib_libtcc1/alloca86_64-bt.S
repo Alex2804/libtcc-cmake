@@ -5,35 +5,25 @@
 __bound_alloca:
 
 #ifdef _WIN32
-    # bound checking is not implemented
-    pop     %rdx
-    mov     %rcx,%rax
-    add     $15,%rax
-    and     $-16,%rax
-    jz      p3
-
-p1:
-    cmp     $4096,%rax
-    jbe     p2
-    test    %rax,-4096(%rsp)
-    sub     $4096,%rsp
-    sub     $4096,%rax
-    jmp p1
-p2:
-
-    sub     %rax,%rsp
-    mov     %rsp,%rax
-    add     $32,%rax
-
-p3:
-    push    %rdx
+    inc %rcx            # add one extra to separate regions
+    jmp alloca
+.globl __bound_alloca_nr
+__bound_alloca_nr:
+    dec     %rcx
+    push    %rax
+    mov     %rcx,%rdx
+    mov     %rax,%rcx
+    sub     $32,%rsp
+    call    __bound_new_region
+    add     $32,%rsp
+    pop     %rax
     ret
 #else
     pop     %rdx
     mov     %rdi,%rax
     mov     %rax,%rsi	# size, a second parm to the __bound_new_region
 
-    add     $15,%rax
+    add     $15 + 1,%rax  # add one extra to separate regions
     and     $-16,%rax
     jz      p3
 

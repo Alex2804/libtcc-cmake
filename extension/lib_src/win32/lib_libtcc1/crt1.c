@@ -4,6 +4,7 @@
 // _UNICODE for tchar.h, UNICODE for API
 #include <tchar.h>
 
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,15 +34,40 @@ int __cdecl __tgetmainargs(int *pargc, _TCHAR ***pargv, _TCHAR ***penv, int glob
 void __cdecl __set_app_type(int apptype);
 unsigned int __cdecl _controlfp(unsigned int new_value, unsigned int mask);
 extern int _tmain(int argc, _TCHAR * argv[], _TCHAR * env[]);
+extern void (*__init_array_start[]) (void);
+extern void (*__init_array_end[]) (void);
+extern void (*__fini_array_start[]) (void);
+extern void (*__fini_array_end[]) (void);
+
+static int do_main (int argc, _TCHAR * argv[], _TCHAR * env[])
+{
+    int retval;
+    long i;
+
+    i = 0;
+    while (&__init_array_start[i] != __init_array_end) {
+        (*__init_array_start[i++])();
+    }
+    retval = _tmain(__argc, __targv, _tenviron);
+    i = 0;
+    while (&__fini_array_end[i] != __fini_array_start) {
+        (*__fini_array_end[--i])();
+    }
+    return retval;
+}
 
 /* Allow command-line globbing with "int _dowildcard = 1;" in the user source */
 int _dowildcard;
 
+static LONG WINAPI catch_sig(EXCEPTION_POINTERS *ex)
+{
+  return _XcptFilter(ex->ExceptionRecord->ExceptionCode, ex);
+}
+
 void _tstart(void)
 {
-    __TRY__
     _startupinfo start_info = {0};
-
+    SetUnhandledExceptionFilter(catch_sig);
     // Sets the current application type
     __set_app_type(_CONSOLE_APP);
 
@@ -52,7 +78,7 @@ void _tstart(void)
 #endif
 
     __tgetmainargs( &__argc, &__targv, &_tenviron, _dowildcard, &start_info);
-    exit(_tmain(__argc, __targv, _tenviron));
+    exit(do_main(__argc, __targv, _tenviron));
 }
 
 int _runtmain(int argc, /* as tcc passed in */ char **argv)
@@ -73,7 +99,7 @@ int _runtmain(int argc, /* as tcc passed in */ char **argv)
 #if defined __i386__ || defined __x86_64__
     _controlfp(_PC_53, _MCW_PC);
 #endif
-    return _tmain(__argc, __targv, _tenviron);
+    return do_main(__argc, __targv, _tenviron);
 }
 
 // =============================================

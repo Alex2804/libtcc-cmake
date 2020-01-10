@@ -18,8 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#define USING_GLOBALS
 #include "tcc.h"
 #ifdef CONFIG_TCC_ASM
+
+static Section *last_text_section; /* to handle .previous asm directive */
 
 ST_FUNC int asm_get_local_label_name(TCCState *s1, unsigned int n)
 {
@@ -38,7 +41,7 @@ static Sym* asm_new_label1(TCCState *s1, int label, int is_local, int sh_num, in
 static Sym *asm_label_find(int v)
 {
     Sym *sym = sym_find(v);
-    while (sym && sym->sym_scope)
+    while (sym && sym->sym_scope && !(sym->type.t & VT_STATIC))
         sym = sym->prev_tok;
     return sym;
 }
@@ -912,9 +915,6 @@ static int tcc_assemble_internal(TCCState *s1, int do_preprocess, int global)
         next();
         if (tok == TOK_EOF)
             break;
-        /* generate line number info */
-        if (global && s1->do_debug)
-            tcc_debug_line(s1);
         parse_flags |= PARSE_FLAG_LINEFEED; /* XXX: suppress that hack */
     redo:
         if (tok == '#') {
@@ -1146,8 +1146,8 @@ ST_FUNC void asm_instr(void)
     ASMOperand operands[MAX_ASM_OPERANDS];
     int nb_outputs, nb_operands, i, must_subst, out_reg;
     uint8_t clobber_regs[NB_ASM_REGS];
+    Section *sec;
 
-    next();
     /* since we always generate the asm() instruction, we can ignore
        volatile */
     if (tok == TOK_VOLATILE1 || tok == TOK_VOLATILE2 || tok == TOK_VOLATILE3) {
@@ -1220,8 +1220,15 @@ ST_FUNC void asm_instr(void)
     asm_gen_code(operands, nb_operands, nb_outputs, 0, 
                  clobber_regs, out_reg);    
 
+    /* We don't allow switching section within inline asm to
+       bleed out to surrounding code.  */
+    sec = cur_text_section;
     /* assemble the string with tcc internal assembler */
     tcc_assemble_inline(tcc_state, astr1.data, astr1.size - 1, 0);
+    if (sec != cur_text_section) {
+        tcc_warning("inline asm tries to change current section");
+        use_section1(tcc_state, sec);
+    }
 
     /* restore the current C token */
     next();

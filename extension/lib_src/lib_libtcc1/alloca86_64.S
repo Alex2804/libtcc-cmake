@@ -24,7 +24,6 @@ p1:
     jmp p1
 p2:
 #endif
-
     sub     %rax,%rsp
     mov     %rsp,%rax
 p3:

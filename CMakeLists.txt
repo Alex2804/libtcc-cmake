@@ -18,7 +18,6 @@ endif()
 
 set(CMAKE_C_STANDARD 99)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include(cmake/DefineDefaultParameter.cmake)
 
 if(NOT DEFINED LIBTCC_TARGET_ARCHITECTURE)
@@ -26,43 +25,25 @@ if(NOT DEFINED LIBTCC_TARGET_ARCHITECTURE)
     get_target_architecture(LIBTCC_TARGET_ARCHITECTURE TRUE)
 endif()
 
-if("${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "X86_64") # 64 bit
-    set(LIBTCC_SUFFIX "x86_64")
-elseif("${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "I386") # 32 bit
-    set(LIBTCC_SUFFIX "i386")
-elseif("${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "ARM64") # arm64
+if("${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "ARM64")
     set(LIBTCC_SUFFIX "aarch64")
-elseif("${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "ARM") # arm
-    set(LIBTCC_SUFFIX "arm")
+elseif("${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "X86_64" OR "${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "I386" OR "${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "ARM")
+    string(TOLOWER ${LIBTCC_TARGET_ARCHITECTURE} LOWERCASE_LIBTCC_TARGET_ARCHITECTURE)
+    set(LIBTCC_SUFFIX "${LOWERCASE_LIBTCC_TARGET_ARCHITECTURE}")
 else()
-    message(FATAL_ERROR "Unknown Architecture for TCC Library: ${LIBTCC_TARGET_ARCHITECTURE}")
+    message(FATAL_ERROR "Unknown architecture for libtcc: ${LIBTCC_TARGET_ARCHITECTURE}")
 endif()
 
-list(APPEND LIBTCC_COMPILE_DEFINITIONS "TCC_TARGET_${LIBTCC_TARGET_ARCHITECTURE}" ONE_SOURCE=1 TCC_LIBTCC1="libtcc1-${LIBTCC_SUFFIX}.a")
+include(cmake/DetectArmFeatures.cmake)
+detect_arm_features(LIBTCC_TARGET_ARCHITECTURE HAS_EABI HAS_VFP HAS_HARDFLOAT TRUE)
+
+include(cmake/DefineLibtccDefinitions.cmake)
+define_libtcc_definitions(LIBTCC_TARGET_ARCHITECTURE HAS_EABI HAS_VFP HAS_HARDFLOAT LIBTCC_COMPILE_DEFINITIONS TRUE)
 
 if((NOT DEFINED LIBTCC_NAME) AND LIBTCC_TARGET_SPECIFIC_NAME)
     set(LIBTCC_NAME "libtcc_${LIBTCC_SUFFIX}")
 elseif(NOT DEFINED LIBTCC_NAME)
     set(LIBTCC_NAME libtcc)
-endif()
-
-if(WIN32)
-    list(APPEND LIBTCC_COMPILE_DEFINITIONS "TCC_TARGET_PE")
-elseif(APPLE)
-    list(APPEND LIBTCC_COMPILE_DEFINITIONS "TCC_TARGET_MACHO")
-elseif(UNIX)
-    string(TOLOWER ${CMAKE_SYSTEM_NAME} LIBTCC_CONFIG_TRIPLET_SYSTEM_NAME)
-    if("${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "ARM")
-        set(LIBTCC_CONFIG_TRIPLET_ABI gnueabihf)
-    else()
-        set(LIBTCC_CONFIG_TRIPLET_ABI gnu)
-    endif()
-    set(LIBTCC_CONFIG_TRIPLET "\"${LIBTCC_SUFFIX}-${LIBTCC_CONFIG_TRIPLET_SYSTEM_NAME}-${LIBTCC_CONFIG_TRIPLET_ABI}\"")
-    list(APPEND LIBTCC_COMPILE_DEFINITIONS "CONFIG_TRIPLET=${LIBTCC_CONFIG_TRIPLET}")
-endif()
-
-if("${LIBTCC_TARGET_ARCHITECTURE}" STREQUAL "ARM")
-    list(APPEND LIBTCC_COMPILE_DEFINITIONS TCC_ARM_EABI TCC_ARM_HARDFLOAT TCC_ARM_VFP)
 endif()
 
 if(LIBTCC_INSTALL_RUNTIME)
@@ -77,26 +58,19 @@ if(LIBTCC_INSTALL_RUNTIME)
 endif()
 
 # Generate config.h
-message("generating tcc config.h in \"${LIBTCC_CONFIG_PATH}\" ...")
+message(STATUS "Generating tcc config.h in \"${LIBTCC_CONFIG_PATH}\" ...")
 file(WRITE ${LIBTCC_CONFIG_PATH} "#define TCC_VERSION \"${LIBTCC_VERSION}\"")
-message("generated tcc config.h!")
+message(STATUS "Generated tcc config.h!")
 
-include_directories(include/tcc src)
-
-set(LIBTCC_SOURCES "src/libtcc.c")
-if(LIBTCC_ENABLE_EXTENSION)
-    include(extension/cmake/SetupExtensionSources.cmake)
-endif()
+include(cmake/DefineLibtccSources.cmake)
+define_libtcc_sources(LIBTCC_TARGET_ARCHITECTURE LIBTCC_SOURCES TRUE)
 
 if("${LIBTCC_BUILD_TYPE}" STREQUAL "STATIC")
     add_library(${LIBTCC_NAME} STATIC ${LIBTCC_SOURCES})
 elseif("${LIBTCC_BUILD_TYPE}" STREQUAL "SHARED")
-    if(WIN32)
-        list(APPEND LIBTCC_COMPILE_DEFINITIONS "LIBTCC_AS_DLL")
-    endif()
     add_library(${LIBTCC_NAME} SHARED ${LIBTCC_SOURCES})
 else()
-    message(FATAL_ERROR "build type ${LIBTCC_BUILD_TYPE} not available (Build types must be written in uppercase)!")
+    message(FATAL_ERROR "Build type ${LIBTCC_BUILD_TYPE} not available (Build types must be written in uppercase)!")
 endif()
 set_target_properties(${LIBTCC_NAME} PROPERTIES PREFIX "")
 
@@ -117,9 +91,7 @@ if(UNIX)
     target_compile_options(${LIBTCC_NAME} PRIVATE -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation)
 endif()
 
-message("Libtcc Config Triplet: ${LIBTCC_CONFIG_TRIPLET}")
-message("Libtcc Compile Definitions: ${LIBTCC_COMPILE_DEFINITIONS}")
-
+set(LIBTCC_TEST TRUE)
 if(LIBTCC_TEST)
     add_subdirectory(tests)
 endif()
