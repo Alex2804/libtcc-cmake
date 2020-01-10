@@ -14,7 +14,7 @@ function(define_libtcc_sources __TARGET_ARCHITECTURE__ __LIBTCC_SOURCES__ __STAT
     else()
         list(APPEND __SOURCES__ src/libtcc.c src/tccpp.c src/tccgen.c src/tccelf.c src/tccasm.c src/tccrun.c)
         if("${${__TARGET_ARCHITECTURE__}}" STREQUAL "I386")
-            list(APPEND __SOURCES__ src/i386-gen.c src/i386-link.c src/i386-asm.c src/i386-asm.h src/i386-tok.h)
+            list(APPEND __SOURCES__ src/i386-gen.c src/i386-link.c src/i386-asm.c src/i386-asm.c)
         elseif("${${__TARGET_ARCHITECTURE__}}" STREQUAL "X86_64")
             list(APPEND __SOURCES__ src/x86_64-gen.c src/x86_64-link.c src/i386-asm.c)
         elseif("${${__TARGET_ARCHITECTURE__}}" STREQUAL "ARM")
