@@ -423,9 +423,10 @@ $var macro_name = [[$if i==0 [[ACTION]] $elif i==1 [[ACTION_P]]
                                         $else [[ACTION_P$i]]]]
 
 #define $macro_name(name$for j [[, p$j]])\$template
-  class $class_name {\
+  class $class_name : public ::testing::internal::ActionImpl<$class_name$param_types> {\
+    using base_type = ::testing::internal::ActionImpl<$class_name>;\
    public:\
-    [[$if i==1 [[explicit ]]]]$class_name($ctor_param_list)$inits {}\
+    using base_type::base_type;\
     template <typename F>\
     class gmock_Impl : public ::testing::ActionInterface<F> {\
      public:\
@@ -444,9 +445,6 @@ $arg_types_and_names) const;\$param_field_decls
      private:\
       GTEST_DISALLOW_ASSIGN_(gmock_Impl);\
     };\
-    template <typename F> operator ::testing::Action<F>() const {\
-      return ::testing::Action<F>(new gmock_Impl<F>($params));\
-    }\$param_field_decls2
    private:\
     GTEST_DISALLOW_ASSIGN_($class_name);\
   };\$template
@@ -506,32 +504,6 @@ namespace testing {
 //   InvokeArgument action from temporary values and have it performed
 //   later.
 
-namespace internal {
-namespace invoke_argument {
-
-// Appears in InvokeArgumentAdl's argument list to help avoid
-// accidental calls to user functions of the same name.
-struct AdlTag {};
-
-// InvokeArgumentAdl - a helper for InvokeArgument.
-// The basic overloads are provided here for generic functors.
-// Overloads for other custom-callables are provided in the
-// internal/custom/gmock-generated-actions.h header.
-
-$range i 0..n
-$for i
-[[
-$range j 1..i
-
-template <typename R, typename F[[$for j [[, typename A$j]]]]>
-R InvokeArgumentAdl(AdlTag, F f[[$for j [[, A$j a$j]]]]) {
-  return f([[$for j, [[a$j]]]]);
-}
-]]
-
-}  // namespace invoke_argument
-}  // namespace internal
-
 $range i 0..n
 $for i [[
 $range j 0..i-1
@@ -540,9 +512,8 @@ ACTION_TEMPLATE(InvokeArgument,
                 HAS_1_TEMPLATE_PARAMS(int, k),
                 AND_$i[[]]_VALUE_PARAMS($for j, [[p$j]])) {
   using internal::invoke_argument::InvokeArgumentAdl;
-  return InvokeArgumentAdl<return_type>(
-      internal::invoke_argument::AdlTag(),
-      ::std::get<k>(args)$for j [[, p$j]]);
+  return InvokeArgumentAdl(internal::invoke_argument::AdlTag(),
+                           ::std::get<k>(args)$for j[[, p$j]]);
 }
 
 ]]
