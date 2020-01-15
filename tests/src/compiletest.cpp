@@ -84,3 +84,51 @@ GTEST_TEST(Libtcc_Extension_Compile__Tests, Compile_2) {
 
     ASSERT_FALSE(deleteLibtcc1());
 }
+
+std::string errorString;
+
+void errorStringErrorFunction(void *opaque, const char *msg)
+{
+    errorString.append("an error occured: ").append(msg).append("!!!\n");
+}
+
+GTEST_TEST(Libtcc_Extension_atcc_set_error_func_Tests, Compile_2) {
+    const char* string = "#include<math.h>\n"
+                         "int test(int x1, int x2) {\n"
+                         "  return pow(x1+x2, x2);\n"
+                         "}";
+
+    atcc_set_error_func(nullptr, errorStringErrorFunction);
+    TCCState* tccState = atcc_new();
+    ASSERT_TRUE(tccState);
+    ASSERT_FALSE(deleteLibtcc1());
+
+    ASSERT_TRUE(errorString.empty());
+
+    tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
+    tcc_compile_string(tccState, string);
+    ASSERT_EQ(tcc_relocate(tccState, TCC_RELOCATE_AUTO), -1);
+
+    ASSERT_FALSE(errorString.empty());
+
+    tcc_delete(tccState);
+
+
+    errorString.clear();
+    atcc_set_error_func(reinterpret_cast<void*>(32), nullptr);
+    tccState = atcc_new();
+    ASSERT_TRUE(tccState);
+    ASSERT_FALSE(deleteLibtcc1());
+
+    ASSERT_TRUE(errorString.empty());
+
+    tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
+    tcc_compile_string(tccState, string);
+    ASSERT_EQ(tcc_relocate(tccState, TCC_RELOCATE_AUTO), -1);
+
+    ASSERT_TRUE(errorString.empty());
+
+    tcc_delete(tccState);
+
+    ASSERT_FALSE(deleteLibtcc1());
+}

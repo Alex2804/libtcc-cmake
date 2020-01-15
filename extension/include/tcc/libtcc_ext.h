@@ -24,6 +24,9 @@ LIBTCCAPI int atcc_make_ar(const char* name, int fileCount, char** files);
 LIBTCCAPI int atcc_build_libtcc1_default();
 LIBTCCAPI int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPath);
 
+/* set error/warning display callback for every TCCState created with atcc_new */
+LIBTCCAPI void atcc_set_error_func(void *error_opaque, TCCErrorFunc error_func);
+
 #ifdef __cplusplus
 }
 #endif

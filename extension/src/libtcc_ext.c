@@ -17,9 +17,12 @@ ST_FUNC int tcc_tool_ar(TCCState *s, int argc, char **argv);
 # define ALIBTCC_INCLUDE_PATH "include"
 #endif
 
+TCCErrorFunc atccErrorFunction = NULL;
+void* atccErrorOpaque = NULL;
+
 TCCState* atcc_new()
 {
-    TCCState *state;
+    TCCState *tccState;
     int result;
     FILE *libtcc1_file;
     char *libtcc1_path;
@@ -44,27 +47,30 @@ TCCState* atcc_new()
         fclose(libtcc1_file);
     }
 
-    state = tcc_new();
+    tccState = tcc_new();
+    if(atccErrorFunction != NULL)
+        tcc_set_error_func(tccState, atccErrorOpaque, atccErrorFunction);
 
-    tcc_add_include_path(state, ALIBTCC_INCLUDE_PATH);
+    tcc_add_include_path(tccState, ALIBTCC_INCLUDE_PATH);
 
 #ifdef ALIBTCC1_DEST_PATH
-    tcc_add_library_path(state, ALIBTCC1_DEST_PATH);
-    tcc_set_lib_path(state, ALIBTCC1_DEST_PATH);
+    tcc_add_library_path(tccState, ALIBTCC1_DEST_PATH);
+    tcc_set_lib_path(tccState, ALIBTCC1_DEST_PATH);
 #endif
 
-    return state;
+    return tccState;
 }
 
 int atcc_make_ar(const char *name, int fileCount, char **files)
 {
+    size_t i;
     int argc = fileCount + 2;
-    char** argv = (char**) tcc_malloc(argc * sizeof(char*));
     int result;
+    char** argv = (char**) tcc_malloc(argc * sizeof(char*));
 
     argv[0] = tcc_strdup("rcs");
     argv[1] = tcc_strdup(name);
-    for(int i = 0; i < fileCount; i++) {
+    for(i = 0; i < fileCount; i++) {
         argv[i + 2] = files[i];
     }
     result = tcc_tool_ar(NULL, argc, argv);
@@ -100,11 +106,15 @@ int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPa
     char* file_name;
     int file_count;
     int result;
+    size_t i;
+    size_t j;
 
     atcc_create_dir_recursive(obj_path);
     atcc_create_dir_recursive(destPath);
 
     tccState = tcc_new();
+    if(atccErrorFunction != NULL)
+        tcc_set_error_func(tccState, atccErrorOpaque, atccErrorFunction);
 
 #ifndef WIN32
     result = tcc_add_include_path(tccState, "/usr/include");
@@ -120,7 +130,7 @@ int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPa
     file_count = atcc_splitted_string_length(src_names);
     obj_names = (char**) tcc_malloc(file_count * sizeof(char*));
 
-    for(int i = 0; i < file_count; i++) {
+    for(i = 0; i < file_count; i++) {
         splitted_file_name = atcc_split_string(src_names[i], '.');
         file_name = atcc_concatenate_path(srcPath, splitted_file_name[0], splitted_file_name[1]);
         result = tcc_add_file(tccState, file_name);
@@ -128,7 +138,7 @@ int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPa
         if(result) {
             atcc_free_splitted_string(splitted_file_name);
             atcc_free_splitted_string(src_names);
-            for(int j = 0; j < i; j++) {
+            for(j = 0; j < i; j++) {
                 tcc_free(obj_names[j]);
             }
             tcc_free(obj_names);
@@ -142,7 +152,7 @@ int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPa
         atcc_free_splitted_string(splitted_file_name);
         if(result) {
             atcc_free_splitted_string(src_names);
-            for(int j = 0; j < i+1; j++) {
+            for(j = 0; j < i+1; j++) {
                 tcc_free(obj_names[j]);
             }
             tcc_free(obj_names);
@@ -157,16 +167,22 @@ int atcc_build_libtcc1(const char* name, const char* destPath, const char* srcPa
     result = atcc_make_ar(file_name, file_count, obj_names);
     tcc_free(file_name);
 
-    for(int i = 0; i < file_count; i++) {
+    for(i = 0; i < file_count; i++) {
         remove(obj_names[i]);
     }
 
     atcc_free_splitted_string(src_names);
-    for(int i = 0; i < file_count; i++) {
+    for(i = 0; i < file_count; i++) {
         tcc_free(obj_names[i]);
     }
     tcc_free(obj_names);
     tcc_delete(tccState);
 
     return result;
+}
+
+void atcc_set_error_func(void* error_opaque, TCCErrorFunc error_func)
+{
+    atccErrorFunction = error_func;
+    atccErrorOpaque = error_opaque;
 }

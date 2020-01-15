@@ -16,8 +16,6 @@ else()
     PROJECT(libtcc VERSION "${LIBTCC_VERSION}" LANGUAGES C)
 endif()
 
-set(CMAKE_C_STANDARD 99)
-
 include(cmake/DefineDefaultParameter.cmake)
 
 if(NOT DEFINED LIBTCC_TARGET_ARCHITECTURE)
@@ -91,7 +89,6 @@ if(UNIX)
     target_compile_options(${LIBTCC_NAME} PRIVATE -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation)
 endif()
 
-set(LIBTCC_TEST TRUE)
 if(LIBTCC_TEST)
     add_subdirectory(tests)
 endif()
