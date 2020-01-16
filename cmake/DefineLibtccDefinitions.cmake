@@ -27,7 +27,7 @@ function(define_libtcc_definitions __TARGET_ARCHITECTURE__ __ARM_EABI__ __HAS_VF
         if(NOT "${${__TARGET_ARCHITECTURE__}}" STREQUAL "X86_64")
             message(FATAL_ERROR "Libtcc only supports x86_64 on macOS X!")
         endif()
-        list(APPEND __DEFINITIONS__ "TCC_TARGET_MACHO")
+        list(APPEND __DEFINITIONS__ TCC_TARGET_MACHO)
     elseif(UNIX)
         string(TOLOWER ${CMAKE_SYSTEM_NAME} LIBTCC_CONFIG_TRIPLET_SYSTEM_NAME)
         if(${__ARM_EABI__})

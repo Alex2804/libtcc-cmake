@@ -46,13 +46,12 @@ endif()
 
 if(LIBTCC_INSTALL_RUNTIME)
     # copy include directories
-    if(WIN32)
-        file(COPY "runtime/win32/include" DESTINATION "${LIBTCC_RUNTIME_TARGET_DIR}")
-    elseif(APPLE)
-        file(COPY "runtime/osx/include" DESTINATION "${LIBTCC_RUNTIME_TARGET_DIR}")
+    if(WIN32 OR APPLE)
+        string(TOLOWER ${CMAKE_SYSTEM_NAME} RUNTIME_SYSTEM_DIR)
     else()
-        file(COPY "runtime/include" DESTINATION "${LIBTCC_RUNTIME_TARGET_DIR}")
+        set(RUNTIME_SYSTEM_DIR ".")
     endif()
+    file(COPY "runtime/${RUNTIME_SYSTEM_DIR}/include" DESTINATION "${LIBTCC_RUNTIME_TARGET_DIR}")
 endif()
 
 # Generate config.h
@@ -86,7 +85,6 @@ endif()
 target_compile_definitions(${LIBTCC_NAME} PUBLIC ${LIBTCC_COMPILE_DEFINITIONS})
 if(UNIX)
     target_link_libraries(${LIBTCC_NAME} dl)
-    target_compile_options(${LIBTCC_NAME} PRIVATE -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation)
 endif()
 
 if(LIBTCC_TEST)

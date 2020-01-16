@@ -5,8 +5,8 @@ if(WIN32)
 endif()
 
 # include extension include directories
-target_include_directories(${LIBTCC_NAME} PRIVATE extension/include/tcc extension/src)
-target_include_directories(${LIBTCC_NAME} PUBLIC extension/include)
+target_include_directories(${LIBTCC_NAME} PRIVATE extension/include/tcc extension/src
+                                          PUBLIC extension/include)
 
 if(NOT DEFINED LIBTCC1_DEST_PATH)
     set(LIBTCC1_DEST_PATH lib/)
