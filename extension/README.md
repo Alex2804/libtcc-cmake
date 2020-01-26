@@ -47,23 +47,28 @@ Sets the error/warning callback for every TCCState which will be configured by
 
 ---
 #### <a name="atcc_set_include_path">void atcc_set_include_path(const char* path)</a>
-Sets [LIBTCC_INCLUDE_PATH](#LIBTCC_INCLUDE_PATH) at runtime.
+Sets [LIBTCC_INCLUDE_PATH](#LIBTCC_INCLUDE_PATH) at runtime.  
+The string will not be copied so make sure it is not deallocated during its use in libtcc!
 
 ---
 #### <a name="atcc_set_libtcc1_name">void atcc_set_libtcc1_name(const char* name)</a>
-Sets [LIBTCC1_NAME](#LIBTCC1_NAME) at runtime.
+Sets [LIBTCC1_NAME](#LIBTCC1_NAME) at runtime.  
+The string will not be copied so make sure it is not deallocated during its use in libtcc!
 
 ---
 #### <a name="atcc_set_libtcc1_src_path">void atcc_set_libtcc1_src_path(const char* path)</a>
-Sets [LIBTCC1_SRC_PATH](#LIBTCC1_SRC_PATH) at runtime.
+Sets [LIBTCC1_SRC_PATH](#LIBTCC1_SRC_PATH) at runtime.  
+The string will not be copied so make sure it is not deallocated during its use in libtcc!
 
 ---
 #### <a name="atcc_set_libtcc1_obj_path">void atcc_set_libtcc1_obj_path(const char* path)</a>
-Sets [LIBTCC1_OBJ_PATH](#LIBTCC1_OBJ_PATH) at runtime.
+Sets [LIBTCC1_OBJ_PATH](#LIBTCC1_OBJ_PATH) at runtime.  
+The string will not be copied so make sure it is not deallocated during its use in libtcc!
 
 ---
 #### <a name="atcc_set_libtcc1_dest_path">void atcc_set_libtcc1_dest_path(const char* path)</a>
-Sets [LIBTCC1_DEST_PATH](#LIBTCC1_DEST_PATH) at runtime.
+Sets [LIBTCC1_DEST_PATH](#LIBTCC1_DEST_PATH) at runtime.  
+The string will not be copied so make sure it is not deallocated during its use in libtcc!
 
 ---
 
