@@ -9,15 +9,8 @@ Make sure that you change the CMake variables according to your needs.
 The default values should be enough to build a static library to link against with the required
 dependencies in *"path/to/binary/dir/lib"* and *"path/to/binary/dir/include"*
 
-You must pass the location of the dependencies to every *TCCState** with the following 3 lines (or use **atcc_new()** from the [extension](#extension)):
-````c
-tcc_add_library_path(tccState, "path/to/lib");
-tcc_set_lib_path(tccState, "path/to/lib");
-tcc_add_include_path(tccState, "path/to/include");
-````
-
 ## <a name="extension">Extension</a>
-There is an extension to compile *libtcc1-\*.a* at runtime (which is required to compile some programs).
+There is an extension to compile *libtcc1.a* at runtime.
 You can enable or disable the extension with [LIBTCC_ENABLE_EXTENSION](#LIBTCC_ENABLE_EXTENSION).  
 For more information like CMake variables look [here](extension/README.md).
 
@@ -36,8 +29,7 @@ Possible Values:
 - SHARED
 - STATIC *(Default)*
 
-Defines if the Library should be static or shared  
-(**it is required to write the values in uppercase!**).
+Defines if the Library should be static or shared
 
 ---
 #### <a name="LIBTCC_NAME">LIBTCC_NAME</a>
@@ -59,26 +51,7 @@ Possible Values:
 - TRUE *(Default)*
 - FALSE
 
-Defines if the include headers get copied into
-"[LIBTCC_RUNTIME_TARGET_DIR](#LIBTCC_RUNTIME_TARGET_DIR)**/include/**".
-
----
-#### <a name="LIBTCC_RUNTIME_TARGET_DIR">LIBTCC_RUNTIME_TARGET_DIR</a>
-Defines the directory where to copy the runtime headers.
-By default this is *CMAKE_BINARY_DIR*.
-
----
-#### <a name="LIBTCC_INSTALL_SHARED_TO_BINARY">LIBTCC_INSTALL_SHARED</a>
-Possible Values:
-- TRUE *(Default)*
-- FALSE
-
-Defines whether the resulting shared library will be copied to [LIBTCC_SHARED_TARGET_DIR](#LIBTCC_SHARED_TARGET_DIR),
-assuming a shared library is created.
-
----
-#### <a name="LIBTCC_SHARED_TARGET_DIR">LIBTCC_SHARED_TARGET_DIR</a>
-Defines the directory where to copy the shared library into, assuming a shared library is created and [LIBTCC_INSTALL_SHARED](#LIBTCC_INSTALL_SHARED) is true.
+Defines if the include headers get copied into "${CMAKE_BINARY_DIR}**/include/**".
 
 ---
 #### <a name="LIBTCC_TARGET_ARCHITECTURE">LIBTCC_TARGET_ARCHITECTURE</a>
@@ -90,4 +63,4 @@ Possible Values:
 - TRUE *(Default)*
 - FALSE
 
-Enables the [extension](#extension) to compile libtcc1-*.a at runtime.
+Enables the [extension](#extension).

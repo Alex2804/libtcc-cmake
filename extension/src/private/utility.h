@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-/* creates a new string and concatenates the passed to prefixPath + fileName + "." + fileExtension + "\0"  */
-char* atcc_concatenate_path(const char* prefixPath, const char* fileName, const char* fileExtension);
+/* creates a new string and concatenates the passed to path + file + "." + extension + "\0" */
+char* atcc_concatenate_path(const char* path, const char* file, const char* extension);
 
 /* returns a NULL terminated array with the passed string splitted at delimiter (delimiters are excluded) */
 char** atcc_split_string(const char* string, char delimiter);

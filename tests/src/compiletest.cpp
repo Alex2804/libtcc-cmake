@@ -2,8 +2,6 @@
 
 #include "tcc/libtcc_ext.h"
 
-#include <fstream>
-
 /* returns 0 if file was removed successfully (or hasn't existed) or non zero value if not */
 int deleteLibtcc1()
 {
@@ -17,10 +15,9 @@ int deleteLibtcc1()
     return 0;
 }
 
-GTEST_TEST(Libtcc_Extension_Compile__Tests, Compile_1) {
-    const char* string = "#include<math.h>\n"
-                         "int test() {\n"
-                         "  return pow(4, 4);\n"
+GTEST_TEST(Libtcc_Extension_Tests, compile1) {
+    const char* string = "int test() {\n"
+                         "  return 4*4*4*4;\n"
                          "}";
 
     ASSERT_FALSE(deleteLibtcc1());
@@ -43,7 +40,7 @@ GTEST_TEST(Libtcc_Extension_Compile__Tests, Compile_1) {
     ASSERT_FALSE(deleteLibtcc1());
 }
 
-GTEST_TEST(Libtcc_Extension_Compile__Tests, Compile_2) {
+GTEST_TEST(Libtcc_Extension_Tests, compile2) {
     const char* string = "#include<math.h>\n"
                          "int test(int x1, int x2) {\n"
                          "  return pow(x1+x2, x2);\n"
@@ -92,7 +89,7 @@ void errorStringErrorFunction(void *opaque, const char *msg)
     errorString.append("an error occured: ").append(msg).append("!!!\n");
 }
 
-GTEST_TEST(Libtcc_Extension_atcc_set_error_func_Tests, Compile_2) {
+GTEST_TEST(Libtcc_Extension_Tests, set_error_func) {
     const char* string = "#include<math.h>\n"
                          "int test(int x1, int x2) {\n"
                          "  return pow(x1+x2, x2);\n"

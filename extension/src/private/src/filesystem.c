@@ -22,7 +22,10 @@
 **
 ****************************************************************************/
 
+#include "../filesystem.h"
+
 #include <string.h>
+#include <stdio.h>
 
 #include "../str_builder.h"
 #include "../utility.h"
@@ -36,17 +39,17 @@ const char SEP = '\\';
 const char SEP = '/';
 #endif
 
-int atcc_create_dir_recursive(const char* name)
+int atcc_create_dir_recursive(const char* path)
 {
     str_builder_t* sb;
     char** parts;
     size_t i;
     int ret = 0;
 
-    if (name == NULL || *name == '\0')
+    if (path == NULL || *path == '\0')
         return -1;
 
-    parts = atcc_split_string(name, '/');
+    parts = atcc_split_string(path, '/');
     if (parts == NULL || parts[0] == NULL) {
         atcc_free_splitted_string(parts);
         return -1;
@@ -65,7 +68,7 @@ int atcc_create_dir_recursive(const char* name)
         str_builder_add_char(sb, SEP);
     }
 #else
-    if (*name == '/') {
+    if (*path == '/') {
         str_builder_add_char(sb, SEP);
     }
 #endif
@@ -98,4 +101,27 @@ int atcc_create_dir_recursive(const char* name)
     atcc_free_splitted_string(parts);
     str_builder_destroy(sb);
     return ret;
+}
+
+char* atcc_get_file_content(const char* path)
+{
+    FILE* infile;
+    char* buffer;
+    size_t numbytes;
+
+    infile = fopen(path, "r");
+    if(infile == NULL)
+        return NULL;
+
+    fseek(infile, 0, SEEK_END);
+    numbytes = ftell(infile);
+    fseek(infile, 0L, SEEK_SET);
+    buffer = (char*) malloc((sizeof(char) * numbytes) + 1); /* +1 for '\0' */
+
+    if(buffer != NULL) {
+        fread(buffer, sizeof(char), numbytes, infile);
+        buffer[numbytes] = '\0';
+    }
+    fclose(infile);
+    return buffer;
 }

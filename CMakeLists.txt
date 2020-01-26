@@ -51,7 +51,7 @@ if(LIBTCC_INSTALL_RUNTIME)
     else()
         set(RUNTIME_SYSTEM_DIR ".")
     endif()
-    file(COPY "runtime/${RUNTIME_SYSTEM_DIR}/include" DESTINATION "${LIBTCC_RUNTIME_TARGET_DIR}")
+    file(COPY "runtime/${RUNTIME_SYSTEM_DIR}/include" DESTINATION "${CMAKE_BINARY_DIR}")
 endif()
 
 # Generate config.h
@@ -62,6 +62,7 @@ message(STATUS "Generated tcc config.h!")
 include(cmake/DefineLibtccSources.cmake)
 define_libtcc_sources(LIBTCC_TARGET_ARCHITECTURE LIBTCC_SOURCES TRUE)
 
+string(TOUPPER ${LIBTCC_BUILD_TYPE} LIBTCC_BUILD_TYPE)
 if("${LIBTCC_BUILD_TYPE}" STREQUAL "STATIC")
     add_library(${LIBTCC_NAME} STATIC ${LIBTCC_SOURCES})
 elseif("${LIBTCC_BUILD_TYPE}" STREQUAL "SHARED")
@@ -70,10 +71,6 @@ else()
     message(FATAL_ERROR "Build type ${LIBTCC_BUILD_TYPE} not available (Build types must be written in uppercase)!")
 endif()
 set_target_properties(${LIBTCC_NAME} PROPERTIES PREFIX "")
-
-if(${LIBTCC_BUILD_TYPE} MATCHES "SHARED" AND ((NOT DEFINED LIBTCC_INSTALL_SHARED_TO_BINARY AND LIBTCC_INSTALL_SHARED_TO_BINARY_DEFAULT) OR (DEFINED LIBTCC_INSTALL_SHARED_TO_BINARY AND LIBTCC_INSTALL_SHARED_TO_BINARY)))
-    set_target_properties(${LIBTCC_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${LIBTCC_SHARED_TARGET_DIR})
-endif()
 
 target_include_directories(${LIBTCC_NAME} PRIVATE include/tcc src)
 target_include_directories(${LIBTCC_NAME} PUBLIC include)

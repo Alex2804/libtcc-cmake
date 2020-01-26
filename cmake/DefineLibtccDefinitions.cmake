@@ -9,7 +9,10 @@ function(define_libtcc_definitions __TARGET_ARCHITECTURE__ __ARM_EABI__ __HAS_VF
         list(APPEND __DEFINITIONS__ "${${__LIBTCC_COMPILE_DEFINITIONS__}}")
     endif()
 
-    list(APPEND __DEFINITIONS__ TCC_LIBTCC1="libtcc1-${LIBTCC_SUFFIX}.a")
+    if(NOT DEFINED LIBTCC1_NAME)
+        set(LIBTCC1_NAME "libtcc1-${LIBTCC_SUFFIX}.a")
+    endif()
+    list(APPEND __DEFINITIONS__ TCC_LIBTCC1="${LIBTCC1_NAME}")
     list(APPEND __DEFINITIONS__ TCC_TARGET_${${__TARGET_ARCHITECTURE__}})
 
     if(LIBTCC_ONE_SOURCE)
