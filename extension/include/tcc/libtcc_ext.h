@@ -7,14 +7,14 @@
 #error "ALIBTCC1_SRC_PATH must be defined if you wish to use the libtcc extension"
 #endif
 #ifndef ALIBTCC1_DEST_PATH
-# define AALIBTCC1_DEST_PATH "lib/"
+# define ALIBTCC1_DEST_PATH "lib/"
 #endif
 #ifndef ALIBTCC1_OBJ_PATH
 # define ALIBTCC1_OBJ_PATH ALIBTCC1_DEST_PATH
 #endif
 
 #ifndef ALIBTCC_INCLUDE_PATH
-# define ALIBTCC_INCLUDE_PATH "include"
+# define ALIBTCC_INCLUDE_PATH "include/"
 #endif
 
 #ifdef __cplusplus
@@ -32,8 +32,10 @@ LIBTCCAPI int atcc_make_ar(const char* name, int file_count, char** files);
 /* build libtcc1.a, returns 0 on success, another value on failure */
 LIBTCCAPI int atcc_build_libtcc1();
 
-/* set error/warning callback for every TCCState created with atcc_new */
+/* set error/warning callback for every TCCState that will be configured with atcc_configure */
 LIBTCCAPI void atcc_set_error_func(void* error_opaque, TCCErrorFunc error_func);
+/* set include path of every TCCState that will be configured with atcc_configure */
+LIBTCCAPI void atcc_set_include_path(const char* path);
 
 /* set name of libtcc1, pass NULL to reset this to default */
 LIBTCCAPI void atcc_set_libtcc1_name(const char* name);

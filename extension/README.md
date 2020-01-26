@@ -46,28 +46,34 @@ Sets the error/warning callback for every TCCState which will be configured by
 [atcc_configure_state](#atcc_configure_state).
 
 ---
+#### <a name="atcc_set_include_path">void atcc_set_include_path(const char* path)</a>
+Sets [LIBTCC_INCLUDE_PATH](#LIBTCC_INCLUDE_PATH) at runtime.
+
+---
 #### <a name="atcc_set_libtcc1_name">void atcc_set_libtcc1_name(const char* name)</a>
-Sets **TCC_LIBTCC1** at runtime for every TCCState which will be configured by
-[atcc_configure_state](#atcc_configure_state).
+Sets [LIBTCC1_NAME](#LIBTCC1_NAME) at runtime.
 
 ---
 #### <a name="atcc_set_libtcc1_src_path">void atcc_set_libtcc1_src_path(const char* path)</a>
-Sets [LIBTCC1_SRC_PATH](#LIBTCC1_SRC_PATH) at runtime for every TCCState which will be configured by
-[atcc_configure_state](#atcc_configure_state).
+Sets [LIBTCC1_SRC_PATH](#LIBTCC1_SRC_PATH) at runtime.
 
 ---
 #### <a name="atcc_set_libtcc1_obj_path">void atcc_set_libtcc1_obj_path(const char* path)</a>
-Sets [LIBTCC1_OBJ_PATH](#LIBTCC1_OBJ_PATH) at runtime for every TCCState which will be configured by
-[atcc_configure_state](#atcc_configure_state).
+Sets [LIBTCC1_OBJ_PATH](#LIBTCC1_OBJ_PATH) at runtime.
 
 ---
 #### <a name="atcc_set_libtcc1_dest_path">void atcc_set_libtcc1_dest_path(const char* path)</a>
-Sets [LIBTCC1_DEST_PATH](#LIBTCC1_DEST_PATH) at runtime for every TCCState which will be configured by
-[atcc_configure_state](#atcc_configure_state).
+Sets [LIBTCC1_DEST_PATH](#LIBTCC1_DEST_PATH) at runtime.
 
 ---
 
 ## CMake Variables
+#### <a name="LIBTCC_INCLUDE_PATH">LIBTCC_INCLUDE_PATH</a>
+Specifies the include path of libtcc for every TCCState which will be configured which will be configured by
+[atcc_configure_state](#atcc_configure_state).  
+By default this is "*include/*".
+
+---
 #### <a name="LIBTCC1_NAME">LIBTCC1_NAME</a>
 Specifies the name of libtcc1.  
 By default this is "libtcc1-\*.a" where "\*" is target specific (e.g. on x86_64 the library is called libtcc1-x86_64.a).

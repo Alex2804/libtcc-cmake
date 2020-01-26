@@ -194,32 +194,24 @@ void atcc_set_error_func(void* error_opaque, TCCErrorFunc error_func)
     aTccExtensionVariables.error_function = error_func;
     aTccExtensionVariables.error_opaque = error_opaque;
 }
+void atcc_set_include_path(const char* path)
+{
+    aTccExtensionVariables.include_path = path == NULL ? ALIBTCC_INCLUDE_PATH : path;
+}
 
 void atcc_set_libtcc1_name(const char* name)
 {
-    if(name == NULL)
-        aTccExtensionVariables.libtcc1_name = TCC_LIBTCC1;
-    else
-        aTccExtensionVariables.libtcc1_name = name;
+    aTccExtensionVariables.libtcc1_name = name == NULL ? TCC_LIBTCC1 : name;
 }
 void atcc_set_libtcc1_src_path(const char* path)
 {
-    if(path == NULL)
-        aTccExtensionVariables.libtcc1_src_path = ALIBTCC1_SRC_PATH;
-    else
-        aTccExtensionVariables.libtcc1_src_path = path;
+    aTccExtensionVariables.libtcc1_src_path = path == NULL ? ALIBTCC1_SRC_PATH : path;
 }
 void atcc_set_libtcc1_obj_path(const char* path)
 {
-    if(path == NULL)
-        aTccExtensionVariables.libtcc1_obj_path = ALIBTCC1_OBJ_PATH;
-    else
-        aTccExtensionVariables.libtcc1_obj_path = path;
+    aTccExtensionVariables.libtcc1_obj_path = path == NULL ? ALIBTCC1_OBJ_PATH : path;
 }
 void atcc_set_libtcc1_dest_path(const char* path)
 {
-    if(path == NULL)
-        aTccExtensionVariables.libtcc1_dest_path = ALIBTCC1_DEST_PATH;
-    else
-        aTccExtensionVariables.libtcc1_dest_path = path;
+    aTccExtensionVariables.libtcc1_dest_path = path == NULL ? ALIBTCC1_DEST_PATH : path;
 }
