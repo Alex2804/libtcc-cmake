@@ -1,10 +1,10 @@
 
-if(__get_target_architecture)
+if(__detect_target_architecture)
     return()
 endif()
-set(__get_target_architecture INCLUDED)
+set(__detect_target_architecture INCLUDED)
 
-function(get_target_architecture FLAG ACTIVATE_MESSAGE)
+function(detect_target_architecture FLAG ACTIVATE_MESSAGE)
     if(CMAKE_CL_64)
         set(MSVC64 1)
     endif()

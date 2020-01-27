@@ -109,6 +109,16 @@ char** atcc_get_libtcc1_files()
     #ifdef TCC_TARGET_X86_64
         return atcc_split_string("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;va_list.c", ';');
     #endif
+#elif defined(__ANDROID__)
+    #ifdef TCC_TARGET_I386
+        return atcc_split_string("libtcc1.c;alloca86.S;alloca86-bt.S;dsohandle.c", ';');
+    #elif defined TCC_TARGET_X86_64
+        return atcc_split_string("libtcc1.c;alloca86_64.S;alloca86_64-bt.S;va_list.c;dsohandle.c", ';');
+    #elif defined TCC_TARGET_ARM
+        return atcc_split_string("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c;dsohandle.c", ';');
+    #elif defined TCC_TARGET_ARM64
+        return atcc_split_string("lib-arm64.c;dsohandle.c", ';');
+#endif
 #else
     #ifdef TCC_TARGET_I386
         return atcc_split_string("libtcc1.c;alloca86.S;alloca86-bt.S;bcheck.c;dsohandle.c", ';');

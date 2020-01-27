@@ -5,7 +5,7 @@ endif()
 set(__detect_arm_features INCLUDED)
 
 function(detect_arm_features __TARGET_ARCHITECTURE__ __HAS_EABI__ __HAS_VFP__ __HAS_HARDFLOAT__ __STATUS_MESSAGE__)
-    if("${${__TARGET_ARCHITECTURE__}}" STREQUAL "ARM")
+    if(${${__TARGET_ARCHITECTURE__}} STREQUAL ARM)
         set(__ARCHITECTURE_HAS_EABI__ TRUE)
         set(__ARCHITECTURE_HAS_VFP__ TRUE)
         set(__ARCHITECTURE_HAS_HARDFLOAT__ TRUE)
