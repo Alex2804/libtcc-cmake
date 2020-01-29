@@ -66,8 +66,13 @@ enum {
 #define PTR_SIZE 4
 
 /* long double size and alignment, in bytes */
-#define LDOUBLE_SIZE  12
-#define LDOUBLE_ALIGN 4
+#ifdef __ANDROID__
+# define LDOUBLE_SIZE  8
+# define LDOUBLE_ALIGN 0
+#else
+# define LDOUBLE_SIZE  12
+# define LDOUBLE_ALIGN 4
+#endif
 /* maximum alignment (for aligned attribute support) */
 #define MAX_ALIGN     8
 

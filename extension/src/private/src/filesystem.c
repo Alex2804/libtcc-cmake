@@ -39,6 +39,12 @@ const char SEP = '\\';
 const char SEP = '/';
 #endif
 
+#ifdef __ANDROID__
+    #include <android/asset_manager.h>
+    #include <android/asset_manager_jni.h>
+    AAssetManager* assetManager = NULL;
+#endif
+
 int atcc_create_dir_recursive(const char* path)
 {
     str_builder_t* sb;
@@ -103,25 +109,50 @@ int atcc_create_dir_recursive(const char* path)
     return ret;
 }
 
+#ifdef __ANDROID__
+int atcc_set_asset_manager(JNIEnv *env, jobject manager)
+{
+    if((assetManager = AAssetManager_fromJava(env, manager)) != NULL)
+        return 0;
+    return -1;
+}
+#endif
+
 char* atcc_get_file_content(const char* path)
 {
     FILE* infile;
-    char* buffer;
-    size_t numbytes;
+    char* buffer = NULL;
+    size_t file_size;
+#ifdef __ANDROID__
+    AAsset* asset_file;
+    off64_t asset_file_size;
+#endif
 
     infile = fopen(path, "r");
-    if(infile == NULL)
-        return NULL;
-
-    fseek(infile, 0, SEEK_END);
-    numbytes = ftell(infile);
-    fseek(infile, 0L, SEEK_SET);
-    buffer = (char*) malloc((sizeof(char) * numbytes) + 1); /* +1 for '\0' */
-
-    if(buffer != NULL) {
-        fread(buffer, sizeof(char), numbytes, infile);
-        buffer[numbytes] = '\0';
+    if(infile != NULL) {
+        fseek(infile, 0, SEEK_END);
+        file_size = (size_t) ftell(infile);
+        fseek(infile, 0L, SEEK_SET);
+        buffer = (char*)malloc((sizeof(char) * file_size) + 1); /* +1 for '\0' */
+        if (buffer != NULL) {
+            fread(buffer, sizeof(char), file_size, infile);
+            buffer[file_size] = '\0';
+        }
+        fclose(infile);
     }
-    fclose(infile);
+#ifdef __ANDROID__
+    else if(assetManager != NULL) {
+        asset_file = AAssetManager_open(assetManager, path, AASSET_MODE_BUFFER);
+        if(asset_file == NULL)
+            return NULL;
+        file_size = (size_t)AAsset_getLength(asset_file);
+        buffer = (char*)malloc((sizeof(char) * file_size) + 1);
+        if(buffer != NULL) {
+            AAsset_read(asset_file, buffer, file_size);
+            buffer[file_size] = '\0';
+        }
+        AAsset_close(asset_file);
+    }
+#endif
     return buffer;
 }
