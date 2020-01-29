@@ -652,8 +652,9 @@ ST_FUNC int atcc_file_handle_is_valid(AFileHandle handle)
 {
     return handle.fd >= 0
 #ifdef __ANDROID__
-        || handle.asset != NULL;
+        || handle.asset != NULL
 #endif
+    ;
 }
 
 ST_FUNC ssize_t atcc_read(AFileHandle fh, void * const buf, size_t count)
@@ -679,10 +680,12 @@ ST_FUNC off_t atcc_lseek(AFileHandle fh, off_t offset, int whence)
     return ret;
 }
 
+#ifdef __ANDROID__
 ST_FUNC void tcc_set_asset_manager(AAssetManager* manager)
 {
     asset_manager = manager;
 }
+#endif
 
 ST_FUNC void tcc_open_bf(TCCState *s1, const char *filename, int initlen)
 {

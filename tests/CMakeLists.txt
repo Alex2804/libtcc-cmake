@@ -23,6 +23,6 @@ endif()
 FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/test DESTINATION ${CMAKE_BINARY_DIR})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-add_executable(libtcc_test src/compiletest.cpp src/utilitytest.cpp src/filesystemtest.cpp)
+add_executable(libtcc_test src/compiletest.cpp src/utilitytest.cpp)
 target_link_libraries(libtcc_test "${LIBTCC_NAME}" gtest_main)
 add_test(NAME tcc_compile_test COMMAND libtcc_test)
