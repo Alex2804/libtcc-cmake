@@ -614,6 +614,76 @@ PUB_FUNC void _tcc_warning(const char *fmt, ...)
 /********************************************************/
 /* I/O layer */
 
+ST_FUNC AFileHandle atcc_open_file_handle(const char* filename, int flags)
+{
+    AFileHandle fh;
+    fh.fd = open(filename, flags);
+#ifdef __ANDROID__
+    if(fh.fd < 0 && asset_manager != NULL) {
+        fh.asset = AAssetManager_open(asset_manager, filename, AASSET_MODE_UNKNOWN);
+    } else {
+        fh.asset = NULL;
+    }
+#endif
+    return fh;
+}
+ST_FUNC void atcc_close_file_handle(AFileHandle fh)
+{
+    if(fh.fd > 0) {
+        close(fh.fd);
+    }
+#ifdef __ANDROID__
+    if(fh.asset != NULL) {
+        AAsset_close(fh.asset);
+    }
+#endif
+}
+
+ST_FUNC AFileHandle atcc_get_invalid_file_handle()
+{
+    AFileHandle fh;
+    fh.fd = -1;
+#ifdef __ANDROID__
+    fh.asset = NULL;
+#endif
+    return fh;
+}
+ST_FUNC int atcc_file_handle_is_valid(AFileHandle handle)
+{
+    return handle.fd >= 0
+#ifdef __ANDROID__
+        || handle.asset != NULL;
+#endif
+}
+
+ST_FUNC ssize_t atcc_read(AFileHandle fh, void * const buf, size_t count)
+{
+    ssize_t read_bytes = -1;
+    if(fh.fd >= 0)
+        read_bytes = read(fh.fd, buf, count);
+#ifdef __ANDROID__
+    else if(fh.asset != NULL)
+        read_bytes = AAsset_read(fh.asset, buf, count);
+#endif
+    return read_bytes;
+}
+ST_FUNC off_t atcc_lseek(AFileHandle fh, off_t offset, int whence)
+{
+    off_t ret = -1;
+    if(fh.fd >= 0)
+        ret = lseek(fh.fd, offset, whence);
+#ifdef __ANDROID__
+    else if(fh.asset != NULL)
+        ret = AAsset_seek(fh.asset, offset, whence);
+#endif
+    return ret;
+}
+
+ST_FUNC void tcc_set_asset_manager(AAssetManager* manager)
+{
+    asset_manager = manager;
+}
+
 ST_FUNC void tcc_open_bf(TCCState *s1, const char *filename, int initlen)
 {
     BufferedFile *bf;
@@ -630,8 +700,8 @@ ST_FUNC void tcc_open_bf(TCCState *s1, const char *filename, int initlen)
     bf->true_filename = bf->filename;
     bf->line_num = 1;
     bf->ifdef_stack_ptr = s1->ifdef_stack_ptr;
-    bf->fd = -1;
     bf->prev = file;
+    bf->fh = atcc_get_invalid_file_handle();
     file = bf;
     tok_flags = TOK_FLAG_BOL | TOK_FLAG_BOF;
 }
@@ -640,8 +710,8 @@ ST_FUNC void tcc_close(void)
 {
     TCCState *s1 = tcc_state;
     BufferedFile *bf = file;
-    if (bf->fd > 0) {
-        close(bf->fd);
+    if (atcc_file_handle_is_valid(bf->fh)) {
+        atcc_close_file_handle(bf->fh);
         total_lines += bf->line_num;
     }
     if (bf->true_filename != bf->filename)
@@ -650,31 +720,31 @@ ST_FUNC void tcc_close(void)
     tcc_free(bf);
 }
 
-static int _tcc_open(TCCState *s1, const char *filename)
+static AFileHandle _tcc_open(TCCState *s1, const char *filename)
 {
-    int fd;
+    AFileHandle fh;
     if (strcmp(filename, "-") == 0)
-        fd = 0, filename = "<stdin>";
-    else
-        fd = open(filename, O_RDONLY | O_BINARY);
-    if ((s1->verbose == 2 && fd >= 0) || s1->verbose == 3)
-        printf("%s %*s%s\n", fd < 0 ? "nf":"->",
-               (int)(s1->include_stack_ptr - s1->include_stack), "", filename);
-    return fd;
+        fh.fd = 0, filename = "<stdin>";
+    else {
+        fh = atcc_open_file_handle(filename, O_RDONLY | O_BINARY);
+    }
+    if ((s1->verbose == 2 && atcc_file_handle_is_valid(fh)) || s1->verbose == 3)
+        printf("%s %*s%s\n", atcc_file_handle_is_valid(fh) ? "->":"nf", (int)(s1->include_stack_ptr - s1->include_stack), "", filename);
+    return fh;
 }
 
 ST_FUNC int tcc_open(TCCState *s1, const char *filename)
 {
-    int fd = _tcc_open(s1, filename);
-    if (fd < 0)
+    AFileHandle fh = _tcc_open(s1, filename);
+    if (!atcc_file_handle_is_valid(fh))
         return -1;
     tcc_open_bf(s1, filename, 0);
-    file->fd = fd;
+    file->fh = fh;
     return 0;
 }
 
 /* compile the file opened in 'file'. Return non zero if errors. */
-static int tcc_compile(TCCState *s1, int filetype, const char *str, int fd)
+static int tcc_compile(TCCState *s1, int filetype, const char *str, AFileHandle fh)
 {
     /* Here we enter the code section where we use the global variables for
        parsing and code generation (tccpp.c, tccgen.c, <target>-gen.c).
@@ -691,13 +761,13 @@ static int tcc_compile(TCCState *s1, int filetype, const char *str, int fd)
         s1->error_set_jmp_enabled = 1;
         s1->nb_errors = 0;
 
-        if (fd == -1) {
+        if (!atcc_file_handle_is_valid(fh)) {
             int len = strlen(str);
             tcc_open_bf(s1, "<string>", len);
             memcpy(file->buffer, str, len);
         } else {
             tcc_open_bf(s1, str, 0);
-            file->fd = fd;
+            file->fh = fh;
         }
 
         is_asm = !!(filetype & (AFF_TYPE_ASM|AFF_TYPE_ASMPP));
@@ -728,7 +798,7 @@ static int tcc_compile(TCCState *s1, int filetype, const char *str, int fd)
 
 LIBTCCAPI int tcc_compile_string(TCCState *s, const char *str)
 {
-    return tcc_compile(s, s->filetype, str, -1);
+    return tcc_compile(s, s->filetype, str, atcc_get_invalid_file_handle());
 }
 
 /* define a preprocessor symbol. A value can also be provided with the '=' operator */
@@ -1037,11 +1107,12 @@ LIBTCCAPI int tcc_add_sysinclude_path(TCCState *s, const char *pathname)
 
 ST_FUNC int tcc_add_file_internal(TCCState *s1, const char *filename, int flags)
 {
-    int fd, ret;
+    AFileHandle fh;
+    int ret;
 
     /* open the file */
-    fd = _tcc_open(s1, filename);
-    if (fd < 0) {
+    fh = _tcc_open(s1, filename);
+    if (!atcc_file_handle_is_valid(fh)) {
         if (flags & AFF_PRINT_ERROR)
             tcc_error_noabort("file '%s' not found", filename);
         return -1;
@@ -1055,8 +1126,8 @@ ST_FUNC int tcc_add_file_internal(TCCState *s1, const char *filename, int flags)
         ElfW(Ehdr) ehdr;
         int obj_type;
 
-        obj_type = tcc_object_type(fd, &ehdr);
-        lseek(fd, 0, SEEK_SET);
+        obj_type = tcc_object_type(fh, &ehdr);
+        atcc_lseek(fh, 0, SEEK_SET);
 
 #ifdef TCC_TARGET_MACHO
         if (0 == obj_type && 0 == strcmp(tcc_fileextension(filename), ".dylib"))
@@ -1065,7 +1136,7 @@ ST_FUNC int tcc_add_file_internal(TCCState *s1, const char *filename, int flags)
 
         switch (obj_type) {
         case AFF_BINTYPE_REL:
-            ret = tcc_load_object_file(s1, fd, 0);
+            ret = tcc_load_object_file(s1, fh, 0);
             break;
 #ifndef TCC_TARGET_PE
         case AFF_BINTYPE_DYN:
@@ -1076,13 +1147,13 @@ ST_FUNC int tcc_add_file_internal(TCCState *s1, const char *filename, int flags)
                     ret = -1;
 #endif
             } else {
-                ret = tcc_load_dll(s1, fd, filename,
+                ret = tcc_load_dll(s1, fh, filename,
                                    (flags & AFF_REFERENCED_DLL) != 0);
             }
             break;
 #endif
         case AFF_BINTYPE_AR:
-            ret = tcc_load_archive(s1, fd, !(flags & AFF_WHOLE_ARCHIVE));
+            ret = tcc_load_archive(s1, fh, !(flags & AFF_WHOLE_ARCHIVE));
             break;
 #ifdef TCC_TARGET_COFF
         case AFF_BINTYPE_C67:
@@ -1094,15 +1165,15 @@ ST_FUNC int tcc_add_file_internal(TCCState *s1, const char *filename, int flags)
             ret = pe_load_file(s1, filename, fd);
 #else
             /* as GNU ld, consider it is an ld script if not recognized */
-            ret = tcc_load_ldscript(s1, fd);
+            ret = tcc_load_ldscript(s1, fh);
 #endif
             if (ret < 0)
                 tcc_error_noabort("unrecognized file type");
             break;
         }
-        close(fd);
+        atcc_close_file_handle(fh);
     } else {
-        ret = tcc_compile(s1, flags, filename, fd);
+        ret = tcc_compile(s1, flags, filename, fh);
     }
     return ret;
 }

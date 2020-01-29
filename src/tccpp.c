@@ -609,13 +609,13 @@ static int handle_eob(void)
 
     /* only tries to read if really end of buffer */
     if (bf->buf_ptr >= bf->buf_end) {
-        if (bf->fd >= 0) {
+        if (atcc_file_handle_is_valid(bf->fh)) {
 #if defined(PARSE_DEBUG)
             len = 1;
 #else
             len = IO_BUF_SIZE;
 #endif
-            len = read(bf->fd, bf->buffer, len);
+            len = atcc_read(bf->fh, bf->buffer, len);
             if (len < 0)
                 len = 0;
         } else {
@@ -1965,7 +1965,7 @@ include_done:
                 goto _line_err;
             --n;
         }
-        if (file->fd > 0)
+        if (atcc_file_handle_is_valid(file->fh))
             total_lines += file->line_num - n;
         file->line_num = n;
         break;

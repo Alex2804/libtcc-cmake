@@ -136,15 +136,8 @@ int atcc_build_libtcc1()
     for(i = 0; i < file_count; i++) {
         splitted_file_name = atcc_split_string(src_names[i], '.');
         file_name = atcc_concatenate_path(aTccExtensionVariables.libtcc1_src_path, splitted_file_name[0], splitted_file_name[1]);
-        atcc_set_filetype(state, splitted_file_name[1]);
-        file_content = atcc_get_file_content(file_name);
+        result = tcc_add_file(state, file_name);
         tcc_free(file_name);
-        if(file_content == NULL)
-            result = -1;
-        else {
-            result = tcc_compile_string(state, file_content);
-        }
-        tcc_free(file_content);
         if(result) {
             atcc_free_splitted_string(splitted_file_name);
             atcc_free_splitted_string(src_names);

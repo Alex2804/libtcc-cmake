@@ -50,10 +50,6 @@ LIBTCCAPI void atcc_set_libtcc1_obj_path(const char* path);
 /* set path where libtcc1 should be created, pass NULL to reset this do default */
 LIBTCCAPI void atcc_set_libtcc1_dest_path(const char* path);
 
-#ifdef __ANDROID__
-LIBTCCAPI int atcc_set_asset_manager(JNIEnv* env, jobject manager);
-#endif
-
 #ifdef __cplusplus
 }
 #endif

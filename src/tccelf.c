@@ -2428,11 +2428,11 @@ LIBTCCAPI int tcc_output_file(TCCState *s, const char *filename)
     return ret;
 }
 
-ssize_t full_read(int fd, void *buf, size_t count) {
+ssize_t full_read(AFileHandle fh, void *buf, size_t count) {
     char *cbuf = buf;
     size_t rnum = 0;
     while (1) {
-        ssize_t num = read(fd, cbuf, count-rnum);
+        ssize_t num = atcc_read(fh, cbuf, count-rnum);
         if (num < 0) return num;
         if (num == 0) return rnum;
         rnum += num;
@@ -2440,13 +2440,13 @@ ssize_t full_read(int fd, void *buf, size_t count) {
     }
 }
 
-static void *load_data(int fd, unsigned long file_offset, unsigned long size)
+static void *load_data(AFileHandle fh, unsigned long file_offset, unsigned long size)
 {
     void *data;
 
     data = tcc_malloc(size);
-    lseek(fd, file_offset, SEEK_SET);
-    full_read(fd, data, size);
+    atcc_lseek(fh, file_offset, SEEK_SET);
+    full_read(fh, data, size);
     return data;
 }
 
@@ -2457,9 +2457,9 @@ typedef struct SectionMergeInfo {
     uint8_t link_once;         /* true if link once section */
 } SectionMergeInfo;
 
-ST_FUNC int tcc_object_type(int fd, ElfW(Ehdr) *h)
+ST_FUNC int tcc_object_type(AFileHandle fh, ElfW(Ehdr) *h)
 {
-    int size = full_read(fd, h, sizeof *h);
+    int size = full_read(fh, h, sizeof *h);
     if (size == sizeof *h && 0 == memcmp(h, ELFMAG, 4)) {
         if (h->e_type == ET_REL)
             return AFF_BINTYPE_REL;
@@ -2479,7 +2479,7 @@ ST_FUNC int tcc_object_type(int fd, ElfW(Ehdr) *h)
 /* load an object file and merge it with current files */
 /* XXX: handle correctly stab (debug) info */
 ST_FUNC int tcc_load_object_file(TCCState *s1,
-                                int fd, unsigned long file_offset)
+                                AFileHandle fh, unsigned long file_offset)
 {
     ElfW(Ehdr) ehdr;
     ElfW(Shdr) *shdr, *sh;
@@ -2493,8 +2493,8 @@ ST_FUNC int tcc_load_object_file(TCCState *s1,
     ElfW_Rel *rel;
     Section *s;
 
-    lseek(fd, file_offset, SEEK_SET);
-    if (tcc_object_type(fd, &ehdr) != AFF_BINTYPE_REL)
+    atcc_lseek(fh, file_offset, SEEK_SET);
+    if (tcc_object_type(fh, &ehdr) != AFF_BINTYPE_REL)
         goto fail1;
     /* test CPU specific stuff */
     if (ehdr.e_ident[5] != ELFDATA2LSB ||
@@ -2504,13 +2504,13 @@ ST_FUNC int tcc_load_object_file(TCCState *s1,
         return -1;
     }
     /* read sections */
-    shdr = load_data(fd, file_offset + ehdr.e_shoff,
+    shdr = load_data(fh, file_offset + ehdr.e_shoff,
                      sizeof(ElfW(Shdr)) * ehdr.e_shnum);
     sm_table = tcc_mallocz(sizeof(SectionMergeInfo) * ehdr.e_shnum);
 
     /* load section names */
     sh = &shdr[ehdr.e_shstrndx];
-    strsec = load_data(fd, file_offset + sh->sh_offset, sh->sh_size);
+    strsec = load_data(fh, file_offset + sh->sh_offset, sh->sh_size);
 
     /* load symtab and strtab */
     old_to_new_syms = NULL;
@@ -2530,12 +2530,12 @@ ST_FUNC int tcc_load_object_file(TCCState *s1,
                 goto the_end;
             }
             nb_syms = sh->sh_size / sizeof(ElfW(Sym));
-            symtab = load_data(fd, file_offset + sh->sh_offset, sh->sh_size);
+            symtab = load_data(fh, file_offset + sh->sh_offset, sh->sh_size);
             sm_table[i].s = symtab_section;
 
             /* now load strtab */
             sh = &shdr[sh->sh_link];
-            strtab = load_data(fd, file_offset + sh->sh_offset, sh->sh_size);
+            strtab = load_data(fh, file_offset + sh->sh_offset, sh->sh_size);
         }
 	if (sh->sh_flags & SHF_COMPRESSED)
 	    seencompressed = 1;
@@ -2614,9 +2614,9 @@ ST_FUNC int tcc_load_object_file(TCCState *s1,
         size = sh->sh_size;
         if (sh->sh_type != SHT_NOBITS) {
             unsigned char *ptr;
-            lseek(fd, file_offset + sh->sh_offset, SEEK_SET);
+            atcc_lseek(fh, file_offset + sh->sh_offset, SEEK_SET);
             ptr = section_ptr_add(s, size);
-            full_read(fd, ptr, size);
+            full_read(fh, ptr, size);
         } else {
             s->data_offset += size;
         }
@@ -2778,12 +2778,12 @@ static unsigned long long get_be(const uint8_t *b, int n)
     return ret;
 }
 
-static int read_ar_header(int fd, int offset, ArchiveHeader *hdr)
+static int read_ar_header(AFileHandle fh, int offset, ArchiveHeader *hdr)
 {
     char *p, *e;
     int len;
-    lseek(fd, offset, SEEK_SET);
-    len = full_read(fd, hdr, sizeof(ArchiveHeader));
+    atcc_lseek(fh, offset, SEEK_SET);
+    len = full_read(fh, hdr, sizeof(ArchiveHeader));
     if (len != sizeof(ArchiveHeader))
         return len ? -1 : 0;
     p = hdr->ar_name;
@@ -2795,7 +2795,7 @@ static int read_ar_header(int fd, int offset, ArchiveHeader *hdr)
 }
 
 /* load only the objects which resolve undefined symbols */
-static int tcc_load_alacarte(TCCState *s1, int fd, int size, int entrysize)
+static int tcc_load_alacarte(TCCState *s1, AFileHandle fd, int size, int entrysize)
 {
     int i, bound, nsyms, sym_index, len, ret = -1;
     unsigned long long off;
@@ -2849,7 +2849,7 @@ static int tcc_load_alacarte(TCCState *s1, int fd, int size, int entrysize)
 }
 
 /* load a '.a' file */
-ST_FUNC int tcc_load_archive(TCCState *s1, int fd, int alacarte)
+ST_FUNC int tcc_load_archive(TCCState *s1, AFileHandle fd, int alacarte)
 {
     ArchiveHeader hdr;
     /* char magic[8]; */
@@ -3024,7 +3024,7 @@ static void store_version(TCCState *s1, struct versym_info *v, char *dynstr)
 /* load a DLL and all referenced DLLs. 'level = 0' means that the DLL
    is referenced by the user (so it should be added as DT_NEEDED in
    the generated ELF file) */
-ST_FUNC int tcc_load_dll(TCCState *s1, int fd, const char *filename, int level)
+ST_FUNC int tcc_load_dll(TCCState *s1, AFileHandle fh, const char *filename, int level)
 {
     ElfW(Ehdr) ehdr;
     ElfW(Shdr) *shdr, *sh, *sh1;
@@ -3038,7 +3038,7 @@ ST_FUNC int tcc_load_dll(TCCState *s1, int fd, const char *filename, int level)
     DLLReference *dllref;
     struct versym_info v;
 
-    full_read(fd, &ehdr, sizeof(ehdr));
+    full_read(fh, &ehdr, sizeof(ehdr));
 
     /* test CPU specific stuff */
     if (ehdr.e_ident[5] != ELFDATA2LSB ||
@@ -3048,7 +3048,7 @@ ST_FUNC int tcc_load_dll(TCCState *s1, int fd, const char *filename, int level)
     }
 
     /* read sections */
-    shdr = load_data(fd, ehdr.e_shoff, sizeof(ElfW(Shdr)) * ehdr.e_shnum);
+    shdr = load_data(fh, ehdr.e_shoff, sizeof(ElfW(Shdr)) * ehdr.e_shnum);
 
     /* load dynamic section and dynamic symbols */
     nb_syms = 0;
@@ -3062,23 +3062,23 @@ ST_FUNC int tcc_load_dll(TCCState *s1, int fd, const char *filename, int level)
         switch(sh->sh_type) {
         case SHT_DYNAMIC:
             nb_dts = sh->sh_size / sizeof(ElfW(Dyn));
-            dynamic = load_data(fd, sh->sh_offset, sh->sh_size);
+            dynamic = load_data(fh, sh->sh_offset, sh->sh_size);
             break;
         case SHT_DYNSYM:
             nb_syms = sh->sh_size / sizeof(ElfW(Sym));
-            dynsym = load_data(fd, sh->sh_offset, sh->sh_size);
+            dynsym = load_data(fh, sh->sh_offset, sh->sh_size);
             sh1 = &shdr[sh->sh_link];
-            dynstr = load_data(fd, sh1->sh_offset, sh1->sh_size);
+            dynstr = load_data(fh, sh1->sh_offset, sh1->sh_size);
             break;
         case SHT_GNU_verdef:
-	    v.verdef = load_data(fd, sh->sh_offset, sh->sh_size);
+	    v.verdef = load_data(fh, sh->sh_offset, sh->sh_size);
 	    break;
         case SHT_GNU_verneed:
-	    v.verneed = load_data(fd, sh->sh_offset, sh->sh_size);
+	    v.verneed = load_data(fh, sh->sh_offset, sh->sh_size);
 	    break;
         case SHT_GNU_versym:
             v.nb_versyms = sh->sh_size / sizeof(ElfW(Half));
-	    v.versym = load_data(fd, sh->sh_offset, sh->sh_size);
+	    v.versym = load_data(fh, sh->sh_offset, sh->sh_size);
 	    break;
         default:
             break;
@@ -3175,7 +3175,7 @@ static int ld_inp(TCCState *s1)
         s1->cc = -1;
         return c;
     }
-    if (1 == read(s1->fd, &b, 1))
+    if (1 == atcc_read(s1->fh, &b, 1))
         return b;
     return CH_EOF;
 }
@@ -3388,13 +3388,13 @@ lib_parse_error:
 
 /* interpret a subset of GNU ldscripts to handle the dummy libc.so
    files */
-ST_FUNC int tcc_load_ldscript(TCCState *s1, int fd)
+ST_FUNC int tcc_load_ldscript(TCCState *s1, AFileHandle fh)
 {
     char cmd[64];
     char filename[1024];
     int t, ret;
 
-    s1->fd = fd;
+    s1->fh = fh;
     s1->cc = -1;
     for(;;) {
         t = ld_next(s1, cmd, sizeof(cmd));

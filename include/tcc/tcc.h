@@ -45,6 +45,10 @@ extern float strtof (const char *__nptr, char **__endptr);
 extern long double strtold (const char *__nptr, char **__endptr);
 #endif
 
+#ifdef __ANDROID__
+# include <android/asset_manager.h>
+#endif
+
 #ifdef _WIN32
 # include <windows.h>
 # include <io.h> /* open, close etc. */
@@ -579,10 +583,21 @@ typedef struct DLLReference {
 
 #define IO_BUF_SIZE 8192
 
+#ifdef __ANDROID__
+static AAssetManager* asset_manager = NULL;
+#endif
+
+typedef struct AFileHandle {
+    int fd;
+#ifdef __ANDROID__
+    AAsset* asset;
+#endif
+} AFileHandle;
+
 typedef struct BufferedFile {
     uint8_t *buf_ptr;
     uint8_t *buf_end;
-    int fd;
+    AFileHandle fh;
     struct BufferedFile *prev;
     int line_num;    /* current line number - here to simplify code */
     int line_ref;    /* tcc -E: last printed line */
@@ -887,7 +902,8 @@ struct TCCState {
 #endif
 #endif
 
-    int fd, cc; /* used by tcc_load_ldscript */
+    AFileHandle fh; /* used by tcc_load_ldscript */
+    int cc; /* used by tcc_load_ldscript */
 
     /* benchmark info */
     int total_idents;
@@ -1228,6 +1244,13 @@ ST_FUNC void tcc_open_bf(TCCState *s1, const char *filename, int initlen);
 ST_FUNC int tcc_open(TCCState *s1, const char *filename);
 ST_FUNC void tcc_close(void);
 
+ST_FUNC AFileHandle atcc_open_file_handle(const char* filename, int flags);
+ST_FUNC void atcc_close_file_handle(AFileHandle fh);
+ST_FUNC int atcc_file_handle_is_valid(AFileHandle handle);
+
+ST_FUNC ssize_t atcc_read(AFileHandle fh, void * const buf, size_t count);
+ST_FUNC off_t atcc_lseek(AFileHandle fh, off_t offset, int whence);
+
 ST_FUNC int tcc_add_file_internal(TCCState *s1, const char *filename, int flags);
 /* flags: */
 #define AFF_PRINT_ERROR     0x10 /* print error if file not found */
@@ -1499,9 +1522,9 @@ ST_FUNC void resolve_common_syms(TCCState *s1);
 ST_FUNC void relocate_syms(TCCState *s1, Section *symtab, int do_resolve);
 ST_FUNC void relocate_section(TCCState *s1, Section *s);
 
-ST_FUNC int tcc_object_type(int fd, ElfW(Ehdr) *h);
-ST_FUNC int tcc_load_object_file(TCCState *s1, int fd, unsigned long file_offset);
-ST_FUNC int tcc_load_archive(TCCState *s1, int fd, int alacarte);
+ST_FUNC int tcc_object_type(AFileHandle fh, ElfW(Ehdr) *h);
+ST_FUNC int tcc_load_object_file(TCCState *s1, AFileHandle fh, unsigned long file_offset);
+ST_FUNC int tcc_load_archive(TCCState *s1, AFileHandle fh, int alacarte);
 ST_FUNC void tcc_add_runtime(TCCState *s1);
 
 #ifndef ELF_OBJ_ONLY
@@ -1518,8 +1541,8 @@ ST_FUNC void *tcc_get_symbol_err(TCCState *s, const char *name);
 #endif
 
 #ifndef TCC_TARGET_PE
-ST_FUNC int tcc_load_dll(TCCState *s1, int fd, const char *filename, int level);
-ST_FUNC int tcc_load_ldscript(TCCState *s1, int fd);
+ST_FUNC int tcc_load_dll(TCCState *s1, AFileHandle fh, const char *filename, int level);
+ST_FUNC int tcc_load_ldscript(TCCState *s1, AFileHandle fh);
 #endif
 
 /* ------------ xxx-link.c ------------ */
