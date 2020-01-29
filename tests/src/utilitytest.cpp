@@ -19,6 +19,14 @@ GTEST_TEST(Utility_Tests, concatenate_path)
     path = atcc_concatenate_path("/this/is/a/path/to/", "file", "extension");
     ASSERT_STREQ(path, "/this/is/a/path/to/file.extension");
     free(path);
+
+    path = atcc_concatenate_path("////this///is//a//path/to///////", "file", "extension");
+    ASSERT_STREQ(path, "/this/is/a/path/to/file.extension");
+    free(path);
+
+    path = atcc_concatenate_path("/this/is/a/path/to", "file", "extension");
+    ASSERT_STREQ(path, "/this/is/a/path/to/file.extension");
+    free(path);
 }
 
 GTEST_TEST(Utility_Tests, split_string__splitted_string_length__free_splitted_string)

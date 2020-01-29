@@ -6,7 +6,7 @@
 int deleteLibtcc1()
 {
     std::FILE *libtcc1_file;
-    std::string path = std::string(ALIBTCC1_DEST_PATH) + TCC_LIBTCC1;
+    std::string path = std::string(ALIBTCC1_DEST_PATH) + "/" + TCC_LIBTCC1;
     libtcc1_file = std::fopen(path.c_str(), "r");
     if (libtcc1_file) {
         std::fclose(libtcc1_file);

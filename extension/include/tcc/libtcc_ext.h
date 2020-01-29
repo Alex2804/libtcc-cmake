@@ -11,14 +11,14 @@
 #error "ALIBTCC1_SRC_PATH must be defined if you wish to use the libtcc extension"
 #endif
 #ifndef ALIBTCC1_DEST_PATH
-# define ALIBTCC1_DEST_PATH "lib/"
+# define ALIBTCC1_DEST_PATH "lib"
 #endif
 #ifndef ALIBTCC1_OBJ_PATH
 # define ALIBTCC1_OBJ_PATH ALIBTCC1_DEST_PATH
 #endif
 
 #ifndef ALIBTCC_INCLUDE_PATH
-# define ALIBTCC_INCLUDE_PATH "include/"
+# define ALIBTCC_INCLUDE_PATH "include"
 #endif
 
 #ifdef __cplusplus

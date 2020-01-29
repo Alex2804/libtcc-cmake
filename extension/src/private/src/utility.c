@@ -4,36 +4,51 @@
 
 #include "tcc/tcc.h"
 
-char* atcc_concatenate_path(const char* path, const char* file, const char* extension)
+char* atcc_concatenate_path(const char* path, const char* filename, const char* extension)
 {
-    if(path == NULL || file == NULL)
+    char* fpath;
+    char* concatenated;
+    size_t length, i, fpath_length = 0;
+    size_t filename_length;
+    size_t extension_length;
+    char current_char, last_char;
+    if(path == NULL || filename == NULL)
         return NULL;
-    size_t file_extension_size = extension == NULL ? 0 : strlen(extension);
-    size_t extra_size = file_extension_size > 0 ? 2 : 1; // only '\0' if file_extension_size is zero or '.' and '\0 if not
-    char* concatenatedPath = (char*) tcc_malloc((strlen(path) + strlen(file) + file_extension_size + extra_size) * sizeof(char));
-    strcpy(concatenatedPath, path);
-    strcat(concatenatedPath, file);
-    if(file_extension_size > 0) {
-        strcat(concatenatedPath, ".");
-        strcat(concatenatedPath, extension);
+    filename_length = strlen(filename);
+    length = (extension == NULL) ? 0 : strlen(extension);
+    extension_length = (length == 0) ? 0 : length + 1;
+    // format path
+    length = strlen(path);
+    last_char = '\0';
+    fpath = (char*)tcc_malloc((length + 1) * sizeof(char));
+    for(i = 0; i < length; ++i) {
+        current_char = path[i];
+        if(current_char != '/' || last_char != '/')
+            fpath[fpath_length++] = current_char;
+        last_char = current_char;
     }
-    strcat(concatenatedPath, "\0");
-    return concatenatedPath;
+    fpath_length = fpath_length;
+    if(last_char != '/')
+        fpath[fpath_length++] = '/'; // always '/' as last char of path
+    // create new string
+    concatenated = (char*)tcc_realloc(fpath, (fpath_length + filename_length + extension_length + 1) * sizeof(char));
+    memcpy(concatenated + fpath_length, filename, filename_length);
+    if(extension_length > 0) {
+        concatenated[fpath_length + filename_length] = '.';
+        memcpy(concatenated + fpath_length + filename_length + 1, extension, extension_length - 1);
+    }
+    concatenated[fpath_length + filename_length + extension_length] = '\0';
+    return concatenated;
 }
 
 char** atcc_split_string(const char* string, char delimiter)
 {
-    size_t size;
-    size_t skippable_delimiters = 0;
+    size_t size, skippable_delimiters = 0;
     int segment_count = 0;
     char* tmp_string;
     char** splitted;
-    size_t index = 0;
-    size_t src_offset = 0;
-    size_t dest_offset = 0;
-    char current_char;
-    char last_char = delimiter;
-    size_t i;
+    size_t i, index = 0, src_offset = 0, dest_offset = 0;
+    char current_char, last_char = delimiter;
 
     if(string == NULL || string[0] == '\0')
         return NULL;
