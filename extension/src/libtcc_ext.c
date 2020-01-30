@@ -22,13 +22,13 @@ typedef struct {
     const char* libtcc1_obj_path;
     const char* libtcc1_dest_path;
 
-    const char* sys_include_path;
     const char* include_path;
 } ATccExtensionVariables;
 
-static ATccExtensionVariables aTccExtensionVariables = {NULL, NULL,
-                                                        TCC_LIBTCC1, ALIBTCC1_SRC_PATH, ALIBTCC1_OBJ_PATH, ALIBTCC1_DEST_PATH,
-                                                        "/usr/include", ALIBTCC_INCLUDE_PATH};
+static ATccExtensionVariables aTccExtensionVariables = {
+        NULL, NULL,
+        TCC_LIBTCC1, ALIBTCC1_SRC_PATH, ALIBTCC1_OBJ_PATH, ALIBTCC1_DEST_PATH,
+        ALIBTCC_INCLUDE_PATH};
 
 void atcc_set_filetype(TCCState* tccState, const char* fileExtension)
 {
@@ -50,11 +50,19 @@ void atcc_configure_state(TCCState* state)
         if(aTccExtensionVariables.error_function != NULL)
             tcc_set_error_func(state, aTccExtensionVariables.error_opaque, aTccExtensionVariables.error_function);
 
-        if(aTccExtensionVariables.libtcc1_dest_path != NULL)
+        if(aTccExtensionVariables.libtcc1_dest_path != NULL) {
+#ifdef _WIN32
+            tcc_add_library_path(state, aTccExtensionVariables.libtcc1_dest_path);
+#else
             tcc_set_lib_path(state, aTccExtensionVariables.libtcc1_dest_path);
+#endif
+        }
 
-        if(aTccExtensionVariables.sys_include_path != NULL)
-            tcc_add_sysinclude_path(state, aTccExtensionVariables.sys_include_path);
+#ifdef _WIN32
+        tcc_add_sysinclude_path(state, "include/winapi");
+#else
+        tcc_add_sysinclude_path(state, "/usr/include");
+#endif
         if(aTccExtensionVariables.include_path != NULL)
             tcc_add_include_path(state, aTccExtensionVariables.include_path);
     }
@@ -142,7 +150,7 @@ int atcc_build_libtcc1()
             atcc_free_splitted_string(splitted_file_name);
             atcc_free_splitted_string(src_names);
             for(j = 0; j < i; j++) {
-                remove(obj_names[i]);
+                remove(obj_names[j]);
                 tcc_free(obj_names[j]);
             }
             tcc_free(obj_names);
@@ -157,6 +165,7 @@ int atcc_build_libtcc1()
         if(result) {
             atcc_free_splitted_string(src_names);
             for(j = 0; j < i+1; j++) {
+                remove(obj_names[j]);
                 tcc_free(obj_names[j]);
             }
             tcc_free(obj_names);

@@ -1,3 +1,0 @@
-This is a test file for filesystem.h
-
-This should be read by the unit test

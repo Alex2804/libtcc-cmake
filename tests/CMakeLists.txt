@@ -20,8 +20,6 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
     include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
-FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/test DESTINATION ${CMAKE_BINARY_DIR})
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 add_executable(libtcc_test src/compiletest.cpp src/utilitytest.cpp)
 target_link_libraries(libtcc_test "${LIBTCC_NAME}" gtest_main)

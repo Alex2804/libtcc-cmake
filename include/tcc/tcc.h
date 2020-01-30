@@ -1248,8 +1248,8 @@ ST_FUNC AFileHandle atcc_open_file_handle(const char* filename, int flags);
 ST_FUNC void atcc_close_file_handle(AFileHandle fh);
 ST_FUNC int atcc_file_handle_is_valid(AFileHandle handle);
 
-ST_FUNC ssize_t atcc_read(AFileHandle fh, void * const buf, size_t count);
-ST_FUNC off_t atcc_lseek(AFileHandle fh, off_t offset, int whence);
+ST_FUNC ssize_t atcc_read(AFileHandle fh, void* buf, size_t count);
+ST_FUNC long atcc_lseek(AFileHandle fh, long offset, int whence);
 
 ST_FUNC int tcc_add_file_internal(TCCState *s1, const char *filename, int flags);
 /* flags: */
@@ -1708,7 +1708,7 @@ ST_FUNC void asm_clobber(uint8_t *clobber_regs, const char *str);
 
 /* ------------ tccpe.c -------------- */
 #ifdef TCC_TARGET_PE
-ST_FUNC int pe_load_file(struct TCCState *s1, const char *filename, int fd);
+ST_FUNC int pe_load_file(struct TCCState *s1, const char *filename, AFileHandle fh);
 ST_FUNC int pe_output_file(TCCState * s1, const char *filename);
 ST_FUNC int pe_putimport(TCCState *s1, int dllindex, const char *name, addr_t value);
 #if defined TCC_TARGET_I386 || defined TCC_TARGET_X86_64

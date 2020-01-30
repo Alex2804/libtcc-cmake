@@ -657,7 +657,7 @@ ST_FUNC int atcc_file_handle_is_valid(AFileHandle handle)
     ;
 }
 
-ST_FUNC ssize_t atcc_read(AFileHandle fh, void * const buf, size_t count)
+ST_FUNC ssize_t atcc_read(AFileHandle fh, void* const buf, size_t count)
 {
     ssize_t read_bytes = -1;
     if(fh.fd >= 0)
@@ -668,9 +668,9 @@ ST_FUNC ssize_t atcc_read(AFileHandle fh, void * const buf, size_t count)
 #endif
     return read_bytes;
 }
-ST_FUNC off_t atcc_lseek(AFileHandle fh, off_t offset, int whence)
+ST_FUNC long atcc_lseek(AFileHandle fh, long offset, int whence)
 {
-    off_t ret = -1;
+    long ret = -1;
     if(fh.fd >= 0)
         ret = lseek(fh.fd, offset, whence);
 #ifdef __ANDROID__
@@ -1165,7 +1165,7 @@ ST_FUNC int tcc_add_file_internal(TCCState *s1, const char *filename, int flags)
 #endif
         default:
 #ifdef TCC_TARGET_PE
-            ret = pe_load_file(s1, filename, fd);
+            ret = pe_load_file(s1, filename, fh);
 #else
             /* as GNU ld, consider it is an ld script if not recognized */
             ret = tcc_load_ldscript(s1, fh);
