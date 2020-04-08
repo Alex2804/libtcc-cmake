@@ -30,20 +30,6 @@ static ATccExtensionVariables aTccExtensionVariables = {
         TCC_LIBTCC1, ALIBTCC1_SRC_PATH, ALIBTCC1_OBJ_PATH, ALIBTCC1_DEST_PATH,
         ALIBTCC_INCLUDE_PATH};
 
-void atcc_set_filetype(TCCState* tccState, const char* fileExtension)
-{
-    if (tccState != NULL && fileExtension != NULL) {
-        if (!strcmp(fileExtension, "S"))
-            tccState->filetype = AFF_TYPE_ASMPP;
-        else if (!strcmp(fileExtension, "s"))
-            tccState->filetype = AFF_TYPE_ASM;
-        else if (!PATHCMP(fileExtension, "c") || !PATHCMP(fileExtension, "i"))
-            tccState->filetype = AFF_TYPE_C;
-        else
-            tccState->filetype |= AFF_TYPE_BIN;
-    }
-}
-
 void atcc_configure_state(TCCState* state)
 {
     if(state != NULL) {
@@ -114,16 +100,10 @@ int atcc_make_ar(const char *name, int file_count, char **files)
 int atcc_build_libtcc1()
 {
     TCCState *state;
-    char** splitted_name;
-    char** src_names;
-    char** obj_names;
-    char** splitted_file_name;
+    char **splitted_name, **src_names, **obj_names;
     char* file_name;
-    char* file_content;
-    int file_count;
-    int result;
-    size_t i;
-    size_t j;
+    int file_count, result;
+    size_t i, j;
 
     result = atcc_create_dir_recursive(aTccExtensionVariables.libtcc1_dest_path);
     if(result == 0 && strcmp(aTccExtensionVariables.libtcc1_dest_path, aTccExtensionVariables.libtcc1_obj_path) != 0)
@@ -142,7 +122,7 @@ int atcc_build_libtcc1()
     obj_names = (char**) tcc_malloc(file_count * sizeof(char*));
 
     for(i = 0; i < file_count; i++) {
-        splitted_file_name = atcc_split_string(src_names[i], '.');
+        char** splitted_file_name = atcc_split_string(src_names[i], '.');
         file_name = atcc_concatenate_path(aTccExtensionVariables.libtcc1_src_path, splitted_file_name[0], splitted_file_name[1]);
         result = tcc_add_file(state, file_name);
         tcc_free(file_name);
@@ -198,22 +178,22 @@ void atcc_set_error_func(void* error_opaque, TCCErrorFunc error_func)
 }
 void atcc_set_include_path(const char* path)
 {
-    aTccExtensionVariables.include_path = path == NULL ? ALIBTCC_INCLUDE_PATH : path;
+    aTccExtensionVariables.include_path = (path == NULL) ? ALIBTCC_INCLUDE_PATH : path;
 }
 
 void atcc_set_libtcc1_name(const char* name)
 {
-    aTccExtensionVariables.libtcc1_name = name == NULL ? TCC_LIBTCC1 : name;
+    aTccExtensionVariables.libtcc1_name = (name == NULL) ? TCC_LIBTCC1 : name;
 }
 void atcc_set_libtcc1_src_path(const char* path)
 {
-    aTccExtensionVariables.libtcc1_src_path = path == NULL ? ALIBTCC1_SRC_PATH : path;
+    aTccExtensionVariables.libtcc1_src_path = (path == NULL) ? ALIBTCC1_SRC_PATH : path;
 }
 void atcc_set_libtcc1_obj_path(const char* path)
 {
-    aTccExtensionVariables.libtcc1_obj_path = path == NULL ? ALIBTCC1_OBJ_PATH : path;
+    aTccExtensionVariables.libtcc1_obj_path = (path == NULL) ? ALIBTCC1_OBJ_PATH : path;
 }
 void atcc_set_libtcc1_dest_path(const char* path)
 {
-    aTccExtensionVariables.libtcc1_dest_path = path == NULL ? ALIBTCC1_DEST_PATH : path;
+    aTccExtensionVariables.libtcc1_dest_path = (path == NULL) ? ALIBTCC1_DEST_PATH : path;
 }
