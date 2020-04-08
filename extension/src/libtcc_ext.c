@@ -13,6 +13,10 @@ ST_FUNC int tcc_tool_ar(TCCState *s, int argc, char **argv);
 #include "private/utility.h"
 #include "private/filesystem.h"
 
+#ifndef ALIBTCC_PRIVATE_INCLUDE_PATH
+# define ALIBTCC_PRIVATE_INCLUDE_PATH ALIBTCC_INCLUDE_PATH "/tcc"
+#endif
+
 typedef struct {
     TCCErrorFunc error_function;
     void* error_opaque;
@@ -23,12 +27,13 @@ typedef struct {
     const char* libtcc1_dest_path;
 
     const char* include_path;
+    const char* private_include_path;
 } ATccExtensionVariables;
 
 static ATccExtensionVariables aTccExtensionVariables = {
         NULL, NULL,
         TCC_LIBTCC1, ALIBTCC1_SRC_PATH, ALIBTCC1_OBJ_PATH, ALIBTCC1_DEST_PATH,
-        ALIBTCC_INCLUDE_PATH};
+        ALIBTCC_INCLUDE_PATH, ALIBTCC_PRIVATE_INCLUDE_PATH};
 
 void atcc_configure_state(TCCState* state)
 {
@@ -51,6 +56,7 @@ void atcc_configure_state(TCCState* state)
 #endif
         if(aTccExtensionVariables.include_path != NULL)
             tcc_add_include_path(state, aTccExtensionVariables.include_path);
+        tcc_add_include_path(state, aTccExtensionVariables.private_include_path);
     }
 }
 

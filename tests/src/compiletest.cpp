@@ -56,6 +56,7 @@ GTEST_TEST(Libtcc_Extension_Tests, compile2) {
     ASSERT_NE(tcc_compile_string(tccState, string), -1);
 
     int size = tcc_relocate(tccState, nullptr);
+    ASSERT_NE(size, -1);
     void* codeBuffer = malloc(size);
     ASSERT_NE(tcc_relocate(tccState, codeBuffer), -1);
 
@@ -78,6 +79,45 @@ GTEST_TEST(Libtcc_Extension_Tests, compile2) {
 #endif
 
     free(codeBuffer);
+
+    ASSERT_FALSE(deleteLibtcc1());
+}
+
+GTEST_TEST(Libtcc_Extension_Tests, compile3) {
+    const char* string = "#include <stdlib.h>\n"
+                         "#include <string.h>\n"
+                         "char* test(const char* string) {\n"
+                         "    size_t length = strlen(string);\n"
+                         "    char* tmp = (char*) malloc(length * 2 + 9);\n"
+                         "    memcpy(tmp, string, length + 1);\n"
+                         "    strcat(tmp, \" <---> \");\n"
+                         "    strcat(tmp, string);\n"
+                         "    strcat(tmp, \"!\");\n"
+                         "    return tmp;\n"
+                         "}";
+
+    ASSERT_FALSE(deleteLibtcc1());
+
+    TCCState *tccState = atcc_new();
+    ASSERT_TRUE(tccState);
+
+    tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);
+
+    ASSERT_NE(tcc_compile_string(tccState, string), -1);
+    ASSERT_NE(tcc_relocate(tccState, TCC_RELOCATE_AUTO), -1);
+
+    char*(*func)(const char*);
+    func = reinterpret_cast<char*(*)(const char*)>(tcc_get_symbol(tccState, "test"));
+    ASSERT_TRUE(func);
+
+    char* tmp = func("Hello World");
+    ASSERT_STREQ(tmp, "Hello World <---> Hello World!");
+
+    tmp = func("Test");
+    ASSERT_STREQ(tmp, "Test <---> Test!");
+    free(tmp);
+
+    tcc_delete(tccState);
 
     ASSERT_FALSE(deleteLibtcc1());
 }
@@ -110,7 +150,6 @@ GTEST_TEST(Libtcc_Extension_Tests, set_error_func) {
     ASSERT_FALSE(errorString.empty());
 
     tcc_delete(tccState);
-
 
     errorString.clear();
     atcc_set_error_func(reinterpret_cast<void*>(32), nullptr);

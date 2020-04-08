@@ -1,6 +1,9 @@
 # Libtcc
 This Project aims to build libtcc for supported platforms system independent with CMake.
 
+Valgrind indicates a memory leak when memory is allocated in tcc compiled code and released in the main program
+(or vice versa). This seems to be a false positive.
+
 ## Usage
 You can embed this CMake project as a subdirectory or build it as every other CMake script.
 
