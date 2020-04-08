@@ -703,8 +703,8 @@ ST_FUNC void tcc_open_bf(TCCState *s1, const char *filename, int initlen)
     bf->true_filename = bf->filename;
     bf->line_num = 1;
     bf->ifdef_stack_ptr = s1->ifdef_stack_ptr;
-    bf->prev = file;
     bf->fh = atcc_get_invalid_file_handle();
+    bf->prev = file;
     file = bf;
     tok_flags = TOK_FLAG_BOL | TOK_FLAG_BOF;
 }
@@ -728,9 +728,8 @@ static AFileHandle _tcc_open(TCCState *s1, const char *filename)
     AFileHandle fh;
     if (strcmp(filename, "-") == 0)
         fh.fd = 0, filename = "<stdin>";
-    else {
+    else
         fh = atcc_open_file_handle(filename, O_RDONLY | O_BINARY);
-    }
     if ((s1->verbose == 2 && atcc_file_handle_is_valid(fh)) || s1->verbose == 3)
         printf("%s %*s%s\n", atcc_file_handle_is_valid(fh) ? "->":"nf", (int)(s1->include_stack_ptr - s1->include_stack), "", filename);
     return fh;
@@ -849,9 +848,6 @@ LIBTCCAPI TCCState *tcc_new(void)
     /* enable this if you want symbols with leading underscore on windows: */
 #if 0 /* def TCC_TARGET_PE */
     s->leading_underscore = 1;
-#endif
-#ifdef CONFIG_TCC_BACKTRACE
-    s->rt_num_callers = 6;
 #endif
     s->ppfp = stdout;
     /* might be used in error() before preprocess_start() */
@@ -1625,7 +1621,7 @@ static const TCCOption tcc_options[] = {
     { "l", TCC_OPTION_l, TCC_OPTION_HAS_ARG },
     { "bench", TCC_OPTION_bench, 0 },
 #ifdef CONFIG_TCC_BACKTRACE
-    { "bt", TCC_OPTION_bt, TCC_OPTION_HAS_ARG },
+    { "bt", TCC_OPTION_bt, TCC_OPTION_HAS_ARG | TCC_OPTION_NOSEP },
 #endif
 #ifdef CONFIG_TCC_BCHECK
     { "b", TCC_OPTION_b, 0 },
@@ -1878,11 +1874,14 @@ reparse:
 #ifdef CONFIG_TCC_BACKTRACE
         case TCC_OPTION_bt:
             s->rt_num_callers = atoi(optarg);
+            s->do_backtrace = 1;
+            s->do_debug = 1;
             break;
 #endif
 #ifdef CONFIG_TCC_BCHECK
         case TCC_OPTION_b:
             s->do_bounds_check = 1;
+            s->do_backtrace = 1;
             s->do_debug = 1;
             break;
 #endif

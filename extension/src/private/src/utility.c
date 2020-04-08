@@ -133,7 +133,7 @@ char** atcc_get_libtcc1_files()
         return atcc_split_string("libtcc1.c;armeabi.c;alloca-arm.S;armflush.c;dsohandle.c", ';');
     #elif defined TCC_TARGET_ARM64
         return atcc_split_string("lib-arm64.c;dsohandle.c", ';');
-#endif
+    #endif
 #else
     #ifdef TCC_TARGET_I386
         return atcc_split_string("libtcc1.c;alloca86.S;alloca86-bt.S;bcheck.c;dsohandle.c", ';');

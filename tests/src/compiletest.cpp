@@ -100,6 +100,7 @@ GTEST_TEST(Libtcc_Extension_Tests, set_error_func) {
     ASSERT_TRUE(tccState);
     ASSERT_FALSE(deleteLibtcc1());
 
+    const char* c = errorString.c_str();
     ASSERT_TRUE(errorString.empty());
 
     tcc_set_output_type(tccState, TCC_OUTPUT_MEMORY);

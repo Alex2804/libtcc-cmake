@@ -154,9 +154,12 @@ extern long double strtold (const char *__nptr, char **__endptr);
 # elif defined __arm__
 #  define TCC_TARGET_ARM
 #  define TCC_ARM_EABI
+#  define TCC_ARM_VFP
 #  define TCC_ARM_HARDFLOAT
 # elif defined __aarch64__
 #  define TCC_TARGET_ARM64
+# elif defined __riscv
+#  define TCC_TARGET_RISCV64
 # else
 #  define TCC_TARGET_I386
 # endif
@@ -475,9 +478,8 @@ struct SymAttr {
     dllexport   : 1,
     nodecorate  : 1,
     dllimport   : 1,
-    constructor : 1,
-    destructor  : 1,
-    unused      : 2;
+    addrtaken   : 1,
+    xxxx        : 3; /* not used */
 };
 
 /* function attributes or temporary attributes for parsing */
@@ -486,7 +488,8 @@ struct FuncAttr {
     func_call   : 3, /* calling convention (0..5), see below */
     func_type   : 2, /* FUNC_OLD/NEW/ELLIPSIS */
     func_noreturn : 1, /* attribute((noreturn)) */
-    xxxx        : 2,
+    func_ctor   : 1, /* attribute((constructor)) */
+    func_dtor   : 1, /* attribute((destructor)) */
     func_args   : 8; /* PE __stdcall args */
 };
 
@@ -729,6 +732,7 @@ struct TCCState {
 
     /* compile with debug symbol (and use them if error during execution) */
     unsigned char do_debug;
+    unsigned char do_backtrace;
 #ifdef CONFIG_TCC_BCHECK
     /* compile with built-in memory and bounds checker */
     unsigned char do_bounds_check;
@@ -895,11 +899,10 @@ struct TCCState {
     const char *runtime_main;
     void **runtime_mem;
     int nb_runtime_mem;
+#endif
+
 #ifdef CONFIG_TCC_BACKTRACE
     int rt_num_callers;
-    const char **rt_bound_error_msg;
-    void *rt_prog_main;
-#endif
 #endif
 
     AFileHandle fh; /* used by tcc_load_ldscript */
@@ -1278,6 +1281,9 @@ ST_FUNC int tcc_add_dll(TCCState *s, const char *filename, int flags);
 #ifdef CONFIG_TCC_BCHECK
 ST_FUNC void tcc_add_bcheck(TCCState *s1);
 #endif
+#ifdef CONFIG_TCC_BACKTRACE
+ST_FUNC void tcc_add_btstub(TCCState *s1);
+#endif
 ST_FUNC void tcc_add_pragma_libs(TCCState *s1);
 PUB_FUNC int tcc_add_library_err(TCCState *s, const char *f);
 PUB_FUNC void tcc_print_stats(TCCState *s, unsigned total_time);
@@ -1451,8 +1457,6 @@ ST_FUNC void parse_mult_str (CString *astr, const char *msg);
 ST_FUNC void parse_asm_str(CString *astr);
 ST_FUNC void indir(void);
 ST_FUNC void unary(void);
-ST_FUNC void expr_prod(void);
-ST_FUNC void expr_sum(void);
 ST_FUNC void gexpr(void);
 ST_FUNC int expr_const(void);
 #if defined CONFIG_TCC_BCHECK || defined TCC_TARGET_C67
@@ -1504,9 +1508,6 @@ ST_FUNC void greloc(Section *s, Sym *sym, unsigned long offset, int type);
 #endif
 ST_FUNC void greloca(Section *s, Sym *sym, unsigned long offset, int type, addr_t addend);
 
-ST_FUNC void add_init_array (TCCState *s1, Sym *sym);
-ST_FUNC void add_fini_array (TCCState *s1, Sym *sym);
-
 ST_FUNC int put_elf_str(Section *s, const char *sym);
 ST_FUNC int put_elf_sym(Section *s, addr_t value, unsigned long size, int info, int other, int shndx, const char *name);
 ST_FUNC int set_elf_sym(Section *s, addr_t value, unsigned long size, int info, int other, int shndx, const char *name);
@@ -1525,7 +1526,7 @@ ST_FUNC void relocate_section(TCCState *s1, Section *s);
 ST_FUNC int tcc_object_type(AFileHandle fh, ElfW(Ehdr) *h);
 ST_FUNC int tcc_load_object_file(TCCState *s1, AFileHandle fh, unsigned long file_offset);
 ST_FUNC int tcc_load_archive(TCCState *s1, AFileHandle fh, int alacarte);
-ST_FUNC void tcc_add_runtime(TCCState *s1);
+ST_FUNC void add_array(TCCState *s1, const char *sec, int c);
 
 #ifndef ELF_OBJ_ONLY
 ST_FUNC void build_got_entries(TCCState *s1);
@@ -1540,9 +1541,12 @@ ST_FUNC void list_elf_symbols(TCCState *s, void *ctx,
 ST_FUNC void *tcc_get_symbol_err(TCCState *s, const char *name);
 #endif
 
+ST_FUNC int set_global_sym(TCCState *s1, const char *name, Section *sec, long offs);
+
 #ifndef TCC_TARGET_PE
 ST_FUNC int tcc_load_dll(TCCState *s1, AFileHandle fh, const char *filename, int level);
 ST_FUNC int tcc_load_ldscript(TCCState *s1, AFileHandle fh);
+ST_FUNC void tcc_add_runtime(TCCState *s1);
 #endif
 
 /* ------------ xxx-link.c ------------ */
