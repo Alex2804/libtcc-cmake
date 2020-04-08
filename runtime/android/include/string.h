@@ -1,234 +1,164 @@
-/*
- * Copyright (C) 2008 The Android Open Source Project
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *  * Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the w64 mingw-runtime package.
+ * No warranty is given; refer to the file DISCLAIMER within this package.
  */
+#ifndef _INC_STRING
+#define _INC_STRING
 
-#ifndef _STRING_H
-#define _STRING_H
+#include <_mingw.h>
 
-#include <sys/cdefs.h>
-#include <stddef.h>
-#include <xlocale.h>
-
-#include <bits/strcasecmp.h>
-
-__BEGIN_DECLS
-
-#if defined(__USE_BSD)
-#include <strings.h>
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-void* memccpy(void* __dst, const void* __src, int __stop_char, size_t __n);
-void* memchr(const void* __s, int __ch, size_t __n) __attribute_pure__;
-#if defined(__cplusplus)
-extern "C++" void* memrchr(void* __s, int __ch, size_t __n) __RENAME(memrchr) __attribute_pure__;
-extern "C++" const void* memrchr(const void* __s, int __ch, size_t __n) __RENAME(memrchr) __attribute_pure__;
+#ifndef _NLSCMP_DEFINED
+#define _NLSCMP_DEFINED
+#define _NLSCMPERROR 2147483647
+#endif
+
+#ifndef NULL
+#ifdef __cplusplus
+#define NULL 0
 #else
-void* memrchr(const void* __s, int __ch, size_t __n) __attribute_pure__;
-#endif
-int memcmp(const void* __lhs, const void* __rhs, size_t __n) __attribute_pure__;
-void* memcpy(void*, const void*, size_t);
-#if defined(__USE_GNU)
-void* mempcpy(void* __dst, const void* __src, size_t __n) __INTRODUCED_IN(23);
-#endif
-void* memmove(void* __dst, const void* __src, size_t __n);
-void* memset(void* __dst, int __ch, size_t __n);
-void* memmem(const void* __haystack, size_t __haystack_size, const void* __needle, size_t __needle_size) __attribute_pure__;
-
-char* strchr(const char* __s, int __ch) __attribute_pure__;
-char* __strchr_chk(const char* __s, int __ch, size_t __n) __INTRODUCED_IN(18);
-#if defined(__USE_GNU)
-#if defined(__cplusplus)
-extern "C++" char* strchrnul(char* __s, int __ch) __RENAME(strchrnul) __attribute_pure__ __INTRODUCED_IN(24);
-extern "C++" const char* strchrnul(const char* __s, int __ch) __RENAME(strchrnul) __attribute_pure__ __INTRODUCED_IN(24);
-#else
-char* strchrnul(const char* __s, int __ch) __attribute_pure__ __INTRODUCED_IN(24);
+#define NULL ((void *)0)
 #endif
 #endif
 
-char* strrchr(const char* __s, int __ch) __attribute_pure__;
-char* __strrchr_chk(const char* __s, int __ch, size_t __n) __INTRODUCED_IN(18);
+#define _WConst_return _CONST_RETURN
 
-size_t strlen(const char* __s) __attribute_pure__;
-size_t __strlen_chk(const char* __s, size_t __n) __INTRODUCED_IN(17);
-
-int strcmp(const char* __lhs, const char* __rhs) __attribute_pure__;
-char* stpcpy(char* __dst, const char* __src) __INTRODUCED_IN(21);
-char* strcpy(char* __dst, const char* __src);
-char* strcat(char* __dst, const char* __src);
-char* strdup(const char* __s);
-
-char* strstr(const char* __haystack, const char* __needle) __attribute_pure__;
-#if defined(__cplusplus)
-extern "C++" char* strcasestr(char*, const char*) __RENAME(strcasestr) __attribute_pure__;
-extern "C++" const char* strcasestr(const char*, const char*) __RENAME(strcasestr) __attribute_pure__;
-#else
-char* strcasestr(const char* __haystack, const char* __needle) __attribute_pure__;
-#endif
-char* strtok(char* __s, const char* __delimiter);
-char* strtok_r(char* __s, const char* __delimiter, char** __pos_ptr);
-
-char* strerror(int __errno_value);
-char* strerror_l(int __errno_value, locale_t __l) __INTRODUCED_IN(23);
-#if defined(__USE_GNU) && __ANDROID_API__ >= 23
-char* strerror_r(int __errno_value, char* __buf, size_t __n) __RENAME(__gnu_strerror_r) __INTRODUCED_IN(23);
-#else /* POSIX */
-int strerror_r(int __errno_value, char* __buf, size_t __n);
-#endif
-
-size_t strnlen(const char* __s, size_t __n) __attribute_pure__;
-char* strncat(char* __dst, const char* __src, size_t __n);
-char* strndup(const char* __s, size_t __n);
-int strncmp(const char* __lhs, const char* __rhs, size_t __n) __attribute_pure__;
-char* stpncpy(char* __dst, const char* __src, size_t __n) __INTRODUCED_IN(21);
-char* strncpy(char* __dst, const char* __src, size_t __n);
-
-size_t strlcat(char* __dst, const char* __src, size_t __n);
-size_t strlcpy(char* __dst, const char* __src, size_t __n);
-
-size_t strcspn(const char* __s, const char* __reject) __attribute_pure__;
-char* strpbrk(const char* __s, const char* __accept) __attribute_pure__;
-char* strsep(char** __s_ptr, const char* __delimiter);
-size_t strspn(const char* __s, const char* __accept);
-
-char* strsignal(int __signal);
-
-int strcoll(const char* __lhs, const char* __rhs) __attribute_pure__;
-size_t strxfrm(char* __dst, const char* __src, size_t __n);
-
-#if __ANDROID_API__ >= 21
-int strcoll_l(const char* __lhs, const char* __rhs, locale_t __l) __attribute_pure__ __INTRODUCED_IN(21);
-size_t strxfrm_l(char* __dst, const char* __src, size_t __n, locale_t __l) __INTRODUCED_IN(21);
-#else
-// Implemented as static inlines before 21.
-#endif
-
-#if defined(__USE_GNU) && !defined(basename)
-/*
- * glibc has a basename in <string.h> that's different to the POSIX one in <libgen.h>.
- * It doesn't modify its argument, and in C++ it's const-correct.
- */
-#if defined(__cplusplus)
-extern "C++" char* basename(char* __path) __RENAME(__gnu_basename) __INTRODUCED_IN(23);
-extern "C++" const char* basename(const char* __path) __RENAME(__gnu_basename) __INTRODUCED_IN(23);
-#else
-char* basename(const char* __path) __RENAME(__gnu_basename) __INTRODUCED_IN(23);
+#ifndef _CRT_MEMORY_DEFINED
+#define _CRT_MEMORY_DEFINED
+  _CRTIMP void *__cdecl _memccpy(void *_Dst,const void *_Src,int _Val,size_t _MaxCount);
+  _CONST_RETURN void *__cdecl memchr(const void *_Buf ,int _Val,size_t _MaxCount);
+  _CRTIMP int __cdecl _memicmp(const void *_Buf1,const void *_Buf2,size_t _Size);
+  _CRTIMP int __cdecl _memicmp_l(const void *_Buf1,const void *_Buf2,size_t _Size,_locale_t _Locale);
+  int __cdecl memcmp(const void *_Buf1,const void *_Buf2,size_t _Size);
+  void *__cdecl memcpy(void *_Dst,const void *_Src,size_t _Size);
+  void *__cdecl memset(void *_Dst,int _Val,size_t _Size);
+#ifndef	NO_OLDNAMES
+  void *__cdecl memccpy(void *_Dst,const void *_Src,int _Val,size_t _Size);
+  int __cdecl memicmp(const void *_Buf1,const void *_Buf2,size_t _Size);
 #endif
 #endif
+  char *__cdecl _strset(char *_Str,int _Val);
+  char *__cdecl strcpy(char *_Dest,const char *_Source);
+  char *__cdecl strcat(char *_Dest,const char *_Source);
+  int __cdecl strcmp(const char *_Str1,const char *_Str2);
+  size_t __cdecl strlen(const char *_Str);
+#if 0
+  size_t __cdecl strnlen(const char *_Str,size_t _MaxCount);
+#endif
+  void *__cdecl memmove(void *_Dst,const void *_Src,size_t _Size);
+  _CRTIMP char *__cdecl _strdup(const char *_Src);
+  _CONST_RETURN char *__cdecl strchr(const char *_Str,int _Val);
+  _CRTIMP int __cdecl _stricmp(const char *_Str1,const char *_Str2);
+  _CRTIMP int __cdecl _strcmpi(const char *_Str1,const char *_Str2);
+  _CRTIMP int __cdecl _stricmp_l(const char *_Str1,const char *_Str2,_locale_t _Locale);
+  int __cdecl strcoll(const char *_Str1,const char *_Str2);
+  _CRTIMP int __cdecl _strcoll_l(const char *_Str1,const char *_Str2,_locale_t _Locale);
+  _CRTIMP int __cdecl _stricoll(const char *_Str1,const char *_Str2);
+  _CRTIMP int __cdecl _stricoll_l(const char *_Str1,const char *_Str2,_locale_t _Locale);
+  _CRTIMP int __cdecl _strncoll (const char *_Str1,const char *_Str2,size_t _MaxCount);
+  _CRTIMP int __cdecl _strncoll_l(const char *_Str1,const char *_Str2,size_t _MaxCount,_locale_t _Locale);
+  _CRTIMP int __cdecl _strnicoll (const char *_Str1,const char *_Str2,size_t _MaxCount);
+  _CRTIMP int __cdecl _strnicoll_l(const char *_Str1,const char *_Str2,size_t _MaxCount,_locale_t _Locale);
+  size_t __cdecl strcspn(const char *_Str,const char *_Control);
+  _CRTIMP char *__cdecl _strerror(const char *_ErrMsg);
+  char *__cdecl strerror(int);
+  _CRTIMP char *__cdecl _strlwr(char *_String);
+  char *strlwr_l(char *_String,_locale_t _Locale);
+  char *__cdecl strncat(char *_Dest,const char *_Source,size_t _Count);
+  int __cdecl strncmp(const char *_Str1,const char *_Str2,size_t _MaxCount);
+  _CRTIMP int __cdecl _strnicmp(const char *_Str1,const char *_Str2,size_t _MaxCount);
+  _CRTIMP int __cdecl _strnicmp_l(const char *_Str1,const char *_Str2,size_t _MaxCount,_locale_t _Locale);
+  char *strncpy(char *_Dest,const char *_Source,size_t _Count);
+  _CRTIMP char *__cdecl _strnset(char *_Str,int _Val,size_t _MaxCount);
+  _CONST_RETURN char *__cdecl strpbrk(const char *_Str,const char *_Control);
+  _CONST_RETURN char *__cdecl strrchr(const char *_Str,int _Ch);
+  _CRTIMP char *__cdecl _strrev(char *_Str);
+  size_t __cdecl strspn(const char *_Str,const char *_Control);
+  _CONST_RETURN char *__cdecl strstr(const char *_Str,const char *_SubStr);
+  char *__cdecl strtok(char *_Str,const char *_Delim);
+  _CRTIMP char *__cdecl _strupr(char *_String);
+  _CRTIMP char *_strupr_l(char *_String,_locale_t _Locale);
+  size_t __cdecl strxfrm(char *_Dst,const char *_Src,size_t _MaxCount);
+  _CRTIMP size_t __cdecl _strxfrm_l(char *_Dst,const char *_Src,size_t _MaxCount,_locale_t _Locale);
 
-#if defined(__BIONIC_INCLUDE_FORTIFY_HEADERS)
-#include <bits/fortify/string.h>
+#ifndef	NO_OLDNAMES
+  char *__cdecl strdup(const char *_Src);
+  int __cdecl strcmpi(const char *_Str1,const char *_Str2);
+  int __cdecl stricmp(const char *_Str1,const char *_Str2);
+  char *__cdecl strlwr(char *_Str);
+  int __cdecl strnicmp(const char *_Str1,const char *_Str,size_t _MaxCount);
+  __CRT_INLINE int __cdecl strncasecmp (const char *__sz1, const char *__sz2, size_t __sizeMaxCompare) { return _strnicmp (__sz1, __sz2, __sizeMaxCompare); }
+  __CRT_INLINE int __cdecl strcasecmp (const char *__sz1, const char *__sz2) { return _stricmp (__sz1, __sz2); }
+  char *__cdecl strnset(char *_Str,int _Val,size_t _MaxCount);
+  char *__cdecl strrev(char *_Str);
+  char *__cdecl strset(char *_Str,int _Val);
+  char *__cdecl strupr(char *_Str);
 #endif
 
-/* Const-correct overloads. Placed after FORTIFY so we call those functions, if possible. */
-#if defined(__cplusplus)
-/*
- * Use two enable_ifs so these overloads don't conflict with + are preferred over libcxx's. This can
- * be reduced to 1 after libcxx recognizes that we have const-correct overloads.
- */
-#define __prefer_this_overload __enable_if(true, "preferred overload") __enable_if(true, "")
-extern "C++" {
-inline __always_inline
-void* __bionic_memchr(const void* const s __pass_object_size, int c, size_t n) {
-    return memchr(s, c, n);
-}
+#ifndef _WSTRING_DEFINED
+#define _WSTRING_DEFINED
 
-inline __always_inline
-const void* memchr(const void* const s __pass_object_size, int c, size_t n)
-        __prefer_this_overload {
-    return __bionic_memchr(s, c, n);
-}
+  _CRTIMP wchar_t *__cdecl _wcsdup(const wchar_t *_Str);
+  wchar_t *__cdecl wcscat(wchar_t *_Dest,const wchar_t *_Source);
+  _CONST_RETURN wchar_t *__cdecl wcschr(const wchar_t *_Str,wchar_t _Ch);
+  int __cdecl wcscmp(const wchar_t *_Str1,const wchar_t *_Str2);
+  wchar_t *__cdecl wcscpy(wchar_t *_Dest,const wchar_t *_Source);
+  size_t __cdecl wcscspn(const wchar_t *_Str,const wchar_t *_Control);
+  size_t __cdecl wcslen(const wchar_t *_Str);
+  size_t __cdecl wcsnlen(const wchar_t *_Src,size_t _MaxCount);
+  wchar_t *wcsncat(wchar_t *_Dest,const wchar_t *_Source,size_t _Count);
+  int __cdecl wcsncmp(const wchar_t *_Str1,const wchar_t *_Str2,size_t _MaxCount);
+  wchar_t *wcsncpy(wchar_t *_Dest,const wchar_t *_Source,size_t _Count);
+  _CONST_RETURN wchar_t *__cdecl wcspbrk(const wchar_t *_Str,const wchar_t *_Control);
+  _CONST_RETURN wchar_t *__cdecl wcsrchr(const wchar_t *_Str,wchar_t _Ch);
+  size_t __cdecl wcsspn(const wchar_t *_Str,const wchar_t *_Control);
+  _CONST_RETURN wchar_t *__cdecl wcsstr(const wchar_t *_Str,const wchar_t *_SubStr);
+  wchar_t *__cdecl wcstok(wchar_t *_Str,const wchar_t *_Delim);
+  _CRTIMP wchar_t *__cdecl _wcserror(int _ErrNum);
+  _CRTIMP wchar_t *__cdecl __wcserror(const wchar_t *_Str);
+  _CRTIMP int __cdecl _wcsicmp(const wchar_t *_Str1,const wchar_t *_Str2);
+  _CRTIMP int __cdecl _wcsicmp_l(const wchar_t *_Str1,const wchar_t *_Str2,_locale_t _Locale);
+  _CRTIMP int __cdecl _wcsnicmp(const wchar_t *_Str1,const wchar_t *_Str2,size_t _MaxCount);
+  _CRTIMP int __cdecl _wcsnicmp_l(const wchar_t *_Str1,const wchar_t *_Str2,size_t _MaxCount,_locale_t _Locale);
+  _CRTIMP wchar_t *__cdecl _wcsnset(wchar_t *_Str,wchar_t _Val,size_t _MaxCount);
+  _CRTIMP wchar_t *__cdecl _wcsrev(wchar_t *_Str);
+  _CRTIMP wchar_t *__cdecl _wcsset(wchar_t *_Str,wchar_t _Val);
+  _CRTIMP wchar_t *__cdecl _wcslwr(wchar_t *_String);
+  _CRTIMP wchar_t *_wcslwr_l(wchar_t *_String,_locale_t _Locale);
+  _CRTIMP wchar_t *__cdecl _wcsupr(wchar_t *_String);
+  _CRTIMP wchar_t *_wcsupr_l(wchar_t *_String,_locale_t _Locale);
+  size_t __cdecl wcsxfrm(wchar_t *_Dst,const wchar_t *_Src,size_t _MaxCount);
+  _CRTIMP size_t __cdecl _wcsxfrm_l(wchar_t *_Dst,const wchar_t *_Src,size_t _MaxCount,_locale_t _Locale);
+  int __cdecl wcscoll(const wchar_t *_Str1,const wchar_t *_Str2);
+  _CRTIMP int __cdecl _wcscoll_l(const wchar_t *_Str1,const wchar_t *_Str2,_locale_t _Locale);
+  _CRTIMP int __cdecl _wcsicoll(const wchar_t *_Str1,const wchar_t *_Str2);
+  _CRTIMP int __cdecl _wcsicoll_l(const wchar_t *_Str1,const wchar_t *_Str2,_locale_t _Locale);
+  _CRTIMP int __cdecl _wcsncoll(const wchar_t *_Str1,const wchar_t *_Str2,size_t _MaxCount);
+  _CRTIMP int __cdecl _wcsncoll_l(const wchar_t *_Str1,const wchar_t *_Str2,size_t _MaxCount,_locale_t _Locale);
+  _CRTIMP int __cdecl _wcsnicoll(const wchar_t *_Str1,const wchar_t *_Str2,size_t _MaxCount);
+  _CRTIMP int __cdecl _wcsnicoll_l(const wchar_t *_Str1,const wchar_t *_Str2,size_t _MaxCount,_locale_t _Locale);
 
-inline __always_inline
-void* memchr(void* const s __pass_object_size, int c, size_t n) __prefer_this_overload {
-    return __bionic_memchr(s, c, n);
-}
-
-inline __always_inline
-char* __bionic_strchr(const char* const s __pass_object_size, int c) {
-    return strchr(s, c);
-}
-
-inline __always_inline
-const char* strchr(const char* const s __pass_object_size, int c)
-        __prefer_this_overload {
-    return __bionic_strchr(s, c);
-}
-
-inline __always_inline
-char* strchr(char* const s __pass_object_size, int c)
-        __prefer_this_overload {
-    return __bionic_strchr(s, c);
-}
-
-inline __always_inline
-char* __bionic_strrchr(const char* const s __pass_object_size, int c) {
-    return strrchr(s, c);
-}
-
-inline __always_inline
-const char* strrchr(const char* const s __pass_object_size, int c) __prefer_this_overload {
-    return __bionic_strrchr(s, c);
-}
-
-inline __always_inline
-char* strrchr(char* const s __pass_object_size, int c) __prefer_this_overload {
-    return __bionic_strrchr(s, c);
-}
-
-/* Functions with no FORTIFY counterpart. */
-inline __always_inline
-char* __bionic_strstr(const char* h, const char* n) { return strstr(h, n); }
-
-inline __always_inline
-const char* strstr(const char* h, const char* n) __prefer_this_overload {
-    return __bionic_strstr(h, n);
-}
-
-inline __always_inline
-char* strstr(char* h, const char* n) __prefer_this_overload {
-    return __bionic_strstr(h, n);
-}
-
-inline __always_inline
-char* __bionic_strpbrk(const char* h, const char* n) { return strpbrk(h, n); }
-
-inline __always_inline
-char* strpbrk(char* h, const char* n) __prefer_this_overload {
-    return __bionic_strpbrk(h, n);
-}
-
-inline __always_inline
-const char* strpbrk(const char* h, const char* n) __prefer_this_overload {
-    return __bionic_strpbrk(h, n);
-}
-}
-#undef __prefer_this_overload
+#ifndef	NO_OLDNAMES
+  wchar_t *__cdecl wcsdup(const wchar_t *_Str);
+#define wcswcs wcsstr
+  int __cdecl wcsicmp(const wchar_t *_Str1,const wchar_t *_Str2);
+  int __cdecl wcsnicmp(const wchar_t *_Str1,const wchar_t *_Str2,size_t _MaxCount);
+  wchar_t *__cdecl wcsnset(wchar_t *_Str,wchar_t _Val,size_t _MaxCount);
+  wchar_t *__cdecl wcsrev(wchar_t *_Str);
+  wchar_t *__cdecl wcsset(wchar_t *_Str,wchar_t _Val);
+  wchar_t *__cdecl wcslwr(wchar_t *_Str);
+  wchar_t *__cdecl wcsupr(wchar_t *_Str);
+  int __cdecl wcsicoll(const wchar_t *_Str1,const wchar_t *_Str2);
+#endif
 #endif
 
-__END_DECLS
+#ifdef __cplusplus
+}
+#endif
 
+#include <sec_api/string_s.h>
 #endif

@@ -1,228 +1,181 @@
-/*
- * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#pragma once
-
 /**
- * @file malloc.h
- * @brief Heap memory allocation.
- *
- * [Debugging Native Memory Use](https://source.android.com/devices/tech/debug/native-memory)
- * is the canonical source for documentation on Android's heap debugging
- * features.
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the w64 mingw-runtime package.
+ * No warranty is given; refer to the file DISCLAIMER within this package.
  */
+#ifndef _MALLOC_H_
+#define _MALLOC_H_
 
-#include <sys/cdefs.h>
-#include <stddef.h>
-#include <stdio.h>
+#include <_mingw.h>
 
-__BEGIN_DECLS
+#pragma pack(push,_CRT_PACKING)
 
-#define __BIONIC_ALLOC_SIZE(...) __attribute__((__alloc_size__(__VA_ARGS__)))
-
-/**
- * [malloc(3)](http://man7.org/linux/man-pages/man3/malloc.3.html) allocates
- * memory on the heap.
- *
- * Returns a pointer to the allocated memory on success and returns a null
- * pointer and sets `errno` on failure.
- */
-void* malloc(size_t __byte_count) __mallocfunc __BIONIC_ALLOC_SIZE(1) __wur;
-
-/**
- * [calloc(3)](http://man7.org/linux/man-pages/man3/calloc.3.html) allocates
- * and clears memory on the heap.
- *
- * Returns a pointer to the allocated memory on success and returns a null
- * pointer and sets `errno` on failure.
- */
-void* calloc(size_t __item_count, size_t __item_size) __mallocfunc __BIONIC_ALLOC_SIZE(1,2) __wur;
-
-/**
- * [realloc(3)](http://man7.org/linux/man-pages/man3/realloc.3.html) resizes
- * allocated memory on the heap.
- *
- * Returns a pointer (which may be different from `__ptr`) to the resized
- * memory on success and returns a null pointer and sets `errno` on failure.
- */
-void* realloc(void* __ptr, size_t __byte_count) __BIONIC_ALLOC_SIZE(2) __wur;
-
-/**
- * [reallocarray(3)](http://man7.org/linux/man-pages/man3/realloc.3.html) resizes
- * allocated memory on the heap.
- *
- * Equivalent to `realloc(__ptr, __item_count * __item_size)` but fails if the
- * multiplication overflows.
- *
- * Returns a pointer (which may be different from `__ptr`) to the resized
- * memory on success and returns a null pointer and sets `errno` on failure.
- */
-void* reallocarray(void* __ptr, size_t __item_count, size_t __item_size) __BIONIC_ALLOC_SIZE(2, 3) __wur __INTRODUCED_IN(29);
-
-/**
- * [free(3)](http://man7.org/linux/man-pages/man3/free.3.html) deallocates
- * memory on the heap.
- */
-void free(void* __ptr);
-
-/**
- * [memalign(3)](http://man7.org/linux/man-pages/man3/memalign.3.html) allocates
- * memory on the heap with the required alignment.
- *
- * Returns a pointer to the allocated memory on success and returns a null
- * pointer and sets `errno` on failure.
- *
- * See also posix_memalign().
- */
-void* memalign(size_t __alignment, size_t __byte_count) __mallocfunc __BIONIC_ALLOC_SIZE(2) __wur;
-
-/**
- * [malloc_usable_size(3)](http://man7.org/linux/man-pages/man3/malloc_usable_size.3.html)
- * returns the actual size of the given heap block.
- *
- * Available since API level 17.
- */
-size_t malloc_usable_size(const void* __ptr) __INTRODUCED_IN(17);
-
-#ifndef STRUCT_MALLINFO_DECLARED
-#define STRUCT_MALLINFO_DECLARED 1
-struct mallinfo {
-  /** Total number of non-mmapped bytes currently allocated from OS. */
-  size_t arena;
-  /** Number of free chunks. */
-  size_t ordblks;
-  /** (Unused.) */
-  size_t smblks;
-  /** (Unused.) */
-  size_t hblks;
-  /** Total number of bytes in mmapped regions. */
-  size_t hblkhd;
-  /** Maximum total allocated space; greater than total if trimming has occurred. */
-  size_t usmblks;
-  /** (Unused.) */
-  size_t fsmblks;
-  /** Total allocated space (normal or mmapped.) */
-  size_t uordblks;
-  /** Total free space. */
-  size_t fordblks;
-  /** Upper bound on number of bytes releasable by a trim operation. */
-  size_t keepcost;
-};
+#ifndef _MM_MALLOC_H_INCLUDED
+#define _MM_MALLOC_H_INCLUDED
 #endif
 
-/**
- * [mallinfo(3)](http://man7.org/linux/man-pages/man3/mallinfo.3.html) returns
- * information about the current state of the heap. Note that mallinfo() is
- * inherently unreliable and consider using malloc_info() instead.
- */
-struct mallinfo mallinfo(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/**
- * [malloc_info(3)](http://man7.org/linux/man-pages/man3/malloc_info.3.html)
- * writes information about the current state of the heap to the given stream.
- *
- * The XML structure for malloc_info() is as follows:
- * ```
- * <malloc version="jemalloc-1">
- *   <heap nr="INT">
- *     <allocated-large>INT</allocated-large>
- *     <allocated-huge>INT</allocated-huge>
- *     <allocated-bins>INT</allocated-bins>
- *     <bins-total>INT</bins-total>
- *     <bin nr="INT">
- *       <allocated>INT</allocated>
- *       <nmalloc>INT</nmalloc>
- *       <ndalloc>INT</ndalloc>
- *     </bin>
- *     <!-- more bins -->
- *   </heap>
- *   <!-- more heaps -->
- * </malloc>
- * ```
- *
- * Available since API level 23.
- */
-int malloc_info(int __must_be_zero, FILE* __fp) __INTRODUCED_IN(23);
+#ifdef _WIN64
+#define _HEAP_MAXREQ 0xFFFFFFFFFFFFFFE0
+#else
+#define _HEAP_MAXREQ 0xFFFFFFE0
+#endif
 
-/**
- * mallopt() option to set the decay time. Valid values are 0 and 1.
- *
- * Available since API level 27.
- */
-#define M_DECAY_TIME -100
-/**
- * mallopt() option to immediately purge any memory not in use. This
- * will release the memory back to the kernel. The value is ignored.
- *
- * Available since API level 28.
- */
-#define M_PURGE -101
+#ifndef _STATIC_ASSERT
+#define _STATIC_ASSERT(expr) extern void __static_assert_t(int [(expr)?1:-1])
+#endif
 
-/**
- * [mallopt(3)](http://man7.org/linux/man-pages/man3/mallopt.3.html) modifies
- * heap behavior. Values of `__option` are the `M_` constants from this header.
- *
- * Returns 1 on success, 0 on error.
- *
- * Available since API level 26.
- */
-int mallopt(int __option, int __value) __INTRODUCED_IN(26);
+/* Return codes for _heapwalk()  */
+#define _HEAPEMPTY (-1)
+#define _HEAPOK (-2)
+#define _HEAPBADBEGIN (-3)
+#define _HEAPBADNODE (-4)
+#define _HEAPEND (-5)
+#define _HEAPBADPTR (-6)
 
-/**
- * [__malloc_hook(3)](http://man7.org/linux/man-pages/man3/__malloc_hook.3.html)
- * is called to implement malloc(). By default this points to the system's
- * implementation.
- *
- * Available since API level 28.
- *
- * See also: [extra documentation](https://android.googlesource.com/platform/bionic/+/master/libc/malloc_hooks/README.md)
- */
-extern void* (*volatile __malloc_hook)(size_t __byte_count, const void* __caller) __INTRODUCED_IN(28);
+/* Values for _heapinfo.useflag */
+#define _FREEENTRY 0
+#define _USEDENTRY 1
 
-/**
- * [__realloc_hook(3)](http://man7.org/linux/man-pages/man3/__realloc_hook.3.html)
- * is called to implement realloc(). By default this points to the system's
- * implementation.
- *
- * Available since API level 28.
- *
- * See also: [extra documentation](https://android.googlesource.com/platform/bionic/+/master/libc/malloc_hooks/README.md)
- */
-extern void* (*volatile __realloc_hook)(void* __ptr, size_t __byte_count, const void* __caller) __INTRODUCED_IN(28);
+#ifndef _HEAPINFO_DEFINED
+#define _HEAPINFO_DEFINED
+ /* The structure used to walk through the heap with _heapwalk.  */
+  typedef struct _heapinfo {
+    int *_pentry;
+    size_t _size;
+    int _useflag;
+  } _HEAPINFO;
+#endif
 
-/**
- * [__free_hook(3)](http://man7.org/linux/man-pages/man3/__free_hook.3.html)
- * is called to implement free(). By default this points to the system's
- * implementation.
- *
- * Available since API level 28.
- *
- * See also: [extra documentation](https://android.googlesource.com/platform/bionic/+/master/libc/malloc_hooks/README.md)
- */
-extern void (*volatile __free_hook)(void* __ptr, const void* __caller) __INTRODUCED_IN(28);
+  extern unsigned int _amblksiz;
 
-/**
- * [__memalign_hook(3)](http://man7.org/linux/man-pages/man3/__memalign_hook.3.html)
- * is called to implement memalign(). By default this points to the system's
- * implementation.
- *
- * Available since API level 28.
- *
- * See also: [extra documentation](https://android.googlesource.com/platform/bionic/+/master/libc/malloc_hooks/README.md)
- */
-extern void* (*volatile __memalign_hook)(size_t __alignment, size_t __byte_count, const void* __caller) __INTRODUCED_IN(28);
+#define _mm_free(a) _aligned_free(a)
+#define _mm_malloc(a,b) _aligned_malloc(a,b)
 
-__END_DECLS
+#ifndef _CRT_ALLOCATION_DEFINED
+#define _CRT_ALLOCATION_DEFINED
+  void *__cdecl calloc(size_t _NumOfElements,size_t _SizeOfElements);
+  void __cdecl free(void *_Memory);
+  void *__cdecl malloc(size_t _Size);
+  void *__cdecl realloc(void *_Memory,size_t _NewSize);
+  _CRTIMP void *__cdecl _recalloc(void *_Memory,size_t _Count,size_t _Size);
+  /*	_CRTIMP void __cdecl _aligned_free(void *_Memory);
+  _CRTIMP void *__cdecl _aligned_malloc(size_t _Size,size_t _Alignment); */
+  _CRTIMP void *__cdecl _aligned_offset_malloc(size_t _Size,size_t _Alignment,size_t _Offset);
+  _CRTIMP void *__cdecl _aligned_realloc(void *_Memory,size_t _Size,size_t _Alignment);
+  _CRTIMP void *__cdecl _aligned_recalloc(void *_Memory,size_t _Count,size_t _Size,size_t _Alignment);
+  _CRTIMP void *__cdecl _aligned_offset_realloc(void *_Memory,size_t _Size,size_t _Alignment,size_t _Offset);
+  _CRTIMP void *__cdecl _aligned_offset_recalloc(void *_Memory,size_t _Count,size_t _Size,size_t _Alignment,size_t _Offset);
+#endif
+
+#define _MAX_WAIT_MALLOC_CRT 60000
+
+  _CRTIMP int __cdecl _resetstkoflw (void);
+  _CRTIMP unsigned long __cdecl _set_malloc_crt_max_wait(unsigned long _NewValue);
+
+  _CRTIMP void *__cdecl _expand(void *_Memory,size_t _NewSize);
+  _CRTIMP size_t __cdecl _msize(void *_Memory);
+#ifdef __GNUC__
+#undef _alloca
+#define _alloca(x) __builtin_alloca((x))
+#else
+  /* tcc implements alloca internally and exposes it (since commit d778bde7).
+  /* alloca is declared at include/stddef.h (which is distributed with tcc).
+   */
+#ifdef _alloca
+#undef _alloca
+#endif
+#define _alloca(x) alloca((x))
+#endif
+  _CRTIMP size_t __cdecl _get_sbh_threshold(void);
+  _CRTIMP int __cdecl _set_sbh_threshold(size_t _NewValue);
+  _CRTIMP errno_t __cdecl _set_amblksiz(size_t _Value);
+  _CRTIMP errno_t __cdecl _get_amblksiz(size_t *_Value);
+  _CRTIMP int __cdecl _heapadd(void *_Memory,size_t _Size);
+  _CRTIMP int __cdecl _heapchk(void);
+  _CRTIMP int __cdecl _heapmin(void);
+  _CRTIMP int __cdecl _heapset(unsigned int _Fill);
+  _CRTIMP int __cdecl _heapwalk(_HEAPINFO *_EntryInfo);
+  _CRTIMP size_t __cdecl _heapused(size_t *_Used,size_t *_Commit);
+  _CRTIMP intptr_t __cdecl _get_heap_handle(void);
+
+#define _ALLOCA_S_THRESHOLD 1024
+#define _ALLOCA_S_STACK_MARKER 0xCCCC
+#define _ALLOCA_S_HEAP_MARKER 0xDDDD
+
+#if(defined(_X86_) && !defined(__x86_64))
+#define _ALLOCA_S_MARKER_SIZE 8
+#elif defined(__ia64__) || defined(__x86_64)
+#define _ALLOCA_S_MARKER_SIZE 16
+#endif
+
+#if !defined(RC_INVOKED)
+  static __inline void *_MarkAllocaS(void *_Ptr,unsigned int _Marker) {
+    if(_Ptr) {
+      *((unsigned int*)_Ptr) = _Marker;
+      _Ptr = (char*)_Ptr + _ALLOCA_S_MARKER_SIZE;
+    }
+    return _Ptr;
+  }
+#endif
+
+#undef _malloca
+#define _malloca(size) \
+  ((((size) + _ALLOCA_S_MARKER_SIZE) <= _ALLOCA_S_THRESHOLD) ? \
+    _MarkAllocaS(_alloca((size) + _ALLOCA_S_MARKER_SIZE),_ALLOCA_S_STACK_MARKER) : \
+    _MarkAllocaS(malloc((size) + _ALLOCA_S_MARKER_SIZE),_ALLOCA_S_HEAP_MARKER))
+#undef _FREEA_INLINE
+#define _FREEA_INLINE
+
+#ifndef RC_INVOKED
+#undef _freea
+  static __inline void __cdecl _freea(void *_Memory) {
+    unsigned int _Marker;
+    if(_Memory) {
+      _Memory = (char*)_Memory - _ALLOCA_S_MARKER_SIZE;
+      _Marker = *(unsigned int *)_Memory;
+      if(_Marker==_ALLOCA_S_HEAP_MARKER) {
+	free(_Memory);
+      }
+#ifdef _ASSERTE
+      else if(_Marker!=_ALLOCA_S_STACK_MARKER) {
+	_ASSERTE(("Corrupted pointer passed to _freea",0));
+      }
+#endif
+    }
+  }
+#endif /* RC_INVOKED */
+
+#ifndef	NO_OLDNAMES
+#ifdef __GNUC__
+#undef alloca
+#define alloca(x) __builtin_alloca((x))
+#endif
+#endif
+
+#ifdef HEAPHOOK
+#ifndef _HEAPHOOK_DEFINED
+#define _HEAPHOOK_DEFINED
+  typedef int (__cdecl *_HEAPHOOK)(int,size_t,void *,void **);
+#endif
+
+  _CRTIMP _HEAPHOOK __cdecl _setheaphook(_HEAPHOOK _NewHook);
+
+#define _HEAP_MALLOC 1
+#define _HEAP_CALLOC 2
+#define _HEAP_FREE 3
+#define _HEAP_REALLOC 4
+#define _HEAP_MSIZE 5
+#define _HEAP_EXPAND 6
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#pragma pack(pop)
+
+#endif /* _MALLOC_H_ */

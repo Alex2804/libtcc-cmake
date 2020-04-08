@@ -1,81 +1,160 @@
-/*	$OpenBSD: setjmp.h,v 1.5 2005/12/13 00:35:22 millert Exp $	*/
-/*	$NetBSD: setjmp.h,v 1.11 1994/12/20 10:35:44 cgd Exp $	*/
-
-/*-
- * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
- * (c) UNIX System Laboratories, Inc.
- * All or some portions of this file are derived from material licensed
- * to the University of California by American Telephone and Telegraph
- * Co. or Unix System Laboratories, Inc. and are reproduced herein with
- * the permission of UNIX System Laboratories, Inc.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- *	@(#)setjmp.h	8.2 (Berkeley) 1/21/94
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the w64 mingw-runtime package.
+ * No warranty is given; refer to the file DISCLAIMER within this package.
  */
+#ifndef _INC_SETJMP
+#define _INC_SETJMP
 
-#ifndef _SETJMP_H_
-#define _SETJMP_H_
+#include <_mingw.h>
 
-#include <sys/cdefs.h>
+#pragma pack(push,_CRT_PACKING)
 
-#if defined(__aarch64__)
-#define _JBLEN 32
-#elif defined(__arm__)
-#define _JBLEN 64
-#elif defined(__i386__)
-#define _JBLEN 10
-#elif defined(__mips__)
-  #if defined(__LP64__)
-  #define _JBLEN 25
-  #else
-  #define _JBLEN 157
-  #endif
-#elif defined(__x86_64__)
-#define _JBLEN 11
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-typedef long sigjmp_buf[_JBLEN + 1];
-typedef long jmp_buf[_JBLEN];
+#if (defined(_X86_) && !defined(__x86_64))
 
-#undef _JBLEN
+#define _JBLEN 16
+#define _JBTYPE int
 
-__BEGIN_DECLS
+  typedef struct __JUMP_BUFFER {
+    unsigned long Ebp;
+    unsigned long Ebx;
+    unsigned long Edi;
+    unsigned long Esi;
+    unsigned long Esp;
+    unsigned long Eip;
+    unsigned long Registration;
+    unsigned long TryLevel;
+    unsigned long Cookie;
+    unsigned long UnwindFunc;
+    unsigned long UnwindData[6];
+  } _JUMP_BUFFER;
+#elif defined(__ia64__)
+  typedef _CRT_ALIGN(16) struct _SETJMP_FLOAT128 {
+    __int64 LowPart;
+    __int64 HighPart;
+  } SETJMP_FLOAT128;
 
-int _setjmp(jmp_buf __env) __returns_twice;
-__noreturn void _longjmp(jmp_buf __env, int __value);
+#define _JBLEN 33
+  typedef SETJMP_FLOAT128 _JBTYPE;
 
-int setjmp(jmp_buf __env) __returns_twice;
-__noreturn void longjmp(jmp_buf __env, int __value);
+  typedef struct __JUMP_BUFFER {
 
-#define setjmp(__env) setjmp(__env)
+    unsigned long iAReserved[6];
 
-int sigsetjmp(sigjmp_buf __env, int __save_signal_mask);
-__noreturn void siglongjmp(sigjmp_buf __env, int __value);
+    unsigned long Registration;
+    unsigned long TryLevel;
+    unsigned long Cookie;
+    unsigned long UnwindFunc;
 
-__END_DECLS
+    unsigned long UnwindData[6];
 
+    SETJMP_FLOAT128 FltS0;
+    SETJMP_FLOAT128 FltS1;
+    SETJMP_FLOAT128 FltS2;
+    SETJMP_FLOAT128 FltS3;
+    SETJMP_FLOAT128 FltS4;
+    SETJMP_FLOAT128 FltS5;
+    SETJMP_FLOAT128 FltS6;
+    SETJMP_FLOAT128 FltS7;
+    SETJMP_FLOAT128 FltS8;
+    SETJMP_FLOAT128 FltS9;
+    SETJMP_FLOAT128 FltS10;
+    SETJMP_FLOAT128 FltS11;
+    SETJMP_FLOAT128 FltS12;
+    SETJMP_FLOAT128 FltS13;
+    SETJMP_FLOAT128 FltS14;
+    SETJMP_FLOAT128 FltS15;
+    SETJMP_FLOAT128 FltS16;
+    SETJMP_FLOAT128 FltS17;
+    SETJMP_FLOAT128 FltS18;
+    SETJMP_FLOAT128 FltS19;
+    __int64 FPSR;
+    __int64 StIIP;
+    __int64 BrS0;
+    __int64 BrS1;
+    __int64 BrS2;
+    __int64 BrS3;
+    __int64 BrS4;
+    __int64 IntS0;
+    __int64 IntS1;
+    __int64 IntS2;
+    __int64 IntS3;
+    __int64 RsBSP;
+    __int64 RsPFS;
+    __int64 ApUNAT;
+    __int64 ApLC;
+    __int64 IntSp;
+    __int64 IntNats;
+    __int64 Preds;
+
+  } _JUMP_BUFFER;
+#elif defined(__x86_64)
+  typedef _CRT_ALIGN(16) struct _SETJMP_FLOAT128 {
+    unsigned __int64 Part[2];
+  } SETJMP_FLOAT128;
+
+#define _JBLEN 16
+  typedef SETJMP_FLOAT128 _JBTYPE;
+
+  typedef struct _JUMP_BUFFER {
+    unsigned __int64 Frame;
+    unsigned __int64 Rbx;
+    unsigned __int64 Rsp;
+    unsigned __int64 Rbp;
+    unsigned __int64 Rsi;
+    unsigned __int64 Rdi;
+    unsigned __int64 R12;
+    unsigned __int64 R13;
+    unsigned __int64 R14;
+    unsigned __int64 R15;
+    unsigned __int64 Rip;
+    unsigned __int64 Spare;
+    SETJMP_FLOAT128 Xmm6;
+    SETJMP_FLOAT128 Xmm7;
+    SETJMP_FLOAT128 Xmm8;
+    SETJMP_FLOAT128 Xmm9;
+    SETJMP_FLOAT128 Xmm10;
+    SETJMP_FLOAT128 Xmm11;
+    SETJMP_FLOAT128 Xmm12;
+    SETJMP_FLOAT128 Xmm13;
+    SETJMP_FLOAT128 Xmm14;
+    SETJMP_FLOAT128 Xmm15;
+  } _JUMP_BUFFER;
+#endif
+#ifndef _JMP_BUF_DEFINED
+  typedef _JBTYPE jmp_buf[_JBLEN];
+#define _JMP_BUF_DEFINED
+#endif
+
+  void * __cdecl __attribute__ ((__nothrow__)) mingw_getsp(void);
+
+#ifdef USE_MINGW_SETJMP_TWO_ARGS
+#ifndef _INC_SETJMPEX
+#define setjmp(BUF) _setjmp((BUF),mingw_getsp())
+  int __cdecl __attribute__ ((__nothrow__)) _setjmp(jmp_buf _Buf,void *_Ctx);
+#else
+#undef setjmp
+#define setjmp(BUF) _setjmpex((BUF),mingw_getsp())
+#define setjmpex(BUF) _setjmpex((BUF),mingw_getsp())
+  int __cdecl __attribute__ ((__nothrow__)) _setjmpex(jmp_buf _Buf,void *_Ctx);
+#endif
+#else
+#ifndef _INC_SETJMPEX
+#define setjmp _setjmp
+#endif
+  int __cdecl __attribute__ ((__nothrow__)) setjmp(jmp_buf _Buf);
+#endif
+
+  __declspec(noreturn) __attribute__ ((__nothrow__)) void __cdecl ms_longjmp(jmp_buf _Buf,int _Value)/* throw(...)*/;
+  __declspec(noreturn) __attribute__ ((__nothrow__)) void __cdecl longjmp(jmp_buf _Buf,int _Value);
+
+#ifdef __cplusplus
+}
+#endif
+
+#pragma pack(pop)
 #endif

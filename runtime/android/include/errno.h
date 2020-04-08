@@ -1,62 +1,75 @@
-/*
- * Copyright (C) 2008 The Android Open Source Project
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *  * Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-
-#pragma once
-
 /**
- * @file errno.h
- * @brief Standard C error handling.
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the w64 mingw-runtime package.
+ * No warranty is given; refer to the file DISCLAIMER within this package.
  */
+#ifndef _INC_ERRNO
+#define _INC_ERRNO
 
-#include <sys/cdefs.h>
-#include <linux/errno.h>
+#include <_mingw.h>
 
-__BEGIN_DECLS
-
-#ifndef ENOTSUP
-/** On Linux, ENOTSUP and EOPNOTSUPP are the same despite POSIX saying they should be distinct. */
-#define ENOTSUP EOPNOTSUPP
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-/**
- * Returns the address of the calling thread's `errno` storage.
- * Non-portable and should not be used directly. Use `errno` instead.
- *
- * @private
- */
-int* __errno(void) __attribute_const__;
+#ifndef _CRT_ERRNO_DEFINED
+#define _CRT_ERRNO_DEFINED
+  _CRTIMP extern int *__cdecl _errno(void);
+#define errno (*_errno())
 
-/**
- * [errno(3)](http://man7.org/linux/man-pages/man3/errno.3.html) is the last error on the calling
- * thread.
- */
-#define errno (*__errno())
+  errno_t __cdecl _set_errno(int _Value);
+  errno_t __cdecl _get_errno(int *_Value);
+#endif
 
-__END_DECLS
+#define EPERM 1
+#define ENOENT 2
+#define ESRCH 3
+#define EINTR 4
+#define EIO 5
+#define ENXIO 6
+#define E2BIG 7
+#define ENOEXEC 8
+#define EBADF 9
+#define ECHILD 10
+#define EAGAIN 11
+#define ENOMEM 12
+#define EACCES 13
+#define EFAULT 14
+#define EBUSY 16
+#define EEXIST 17
+#define EXDEV 18
+#define ENODEV 19
+#define ENOTDIR 20
+#define EISDIR 21
+#define ENFILE 23
+#define EMFILE 24
+#define ENOTTY 25
+#define EFBIG 27
+#define ENOSPC 28
+#define ESPIPE 29
+#define EROFS 30
+#define EMLINK 31
+#define EPIPE 32
+#define EDOM 33
+#define EDEADLK 36
+#define ENAMETOOLONG 38
+#define ENOLCK 39
+#define ENOSYS 40
+#define ENOTEMPTY 41
 
-#include <android/legacy_errno_inlines.h>
+#ifndef RC_INVOKED
+#if !defined(_SECURECRT_ERRCODE_VALUES_DEFINED)
+#define _SECURECRT_ERRCODE_VALUES_DEFINED
+#define EINVAL 22
+#define ERANGE 34
+#define EILSEQ 42
+#define STRUNCATE 80
+#endif
+#endif
+
+#define EDEADLOCK EDEADLK
+
+#ifdef __cplusplus
+}
+#endif
+#endif

@@ -1,412 +1,737 @@
-/*
- * ====================================================
- * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
- *
- * Developed at SunPro, a Sun Microsystems, Inc. business.
- * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice
- * is preserved.
- * ====================================================
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the w64 mingw-runtime package.
+ * No warranty is given; refer to the file DISCLAIMER within this package.
  */
-
-/*
- * from: @(#)fdlibm.h 5.1 93/09/24
- * $FreeBSD$
- */
-
 #ifndef _MATH_H_
 #define _MATH_H_
 
-#include <sys/cdefs.h>
-#include <limits.h>
-
-__BEGIN_DECLS
-
-/* C11. */
-
-typedef double __double_t;
-typedef __double_t double_t;
-typedef float __float_t;
-typedef __float_t float_t;
-
-#define HUGE_VAL __builtin_huge_val()
-#define HUGE_VALF __builtin_huge_valf()
-#define HUGE_VALL __builtin_huge_vall()
-
-#define INFINITY __builtin_inff()
-
-#define NAN __builtin_nanf("")
-
-#define FP_INFINITE 0x01
-#define FP_NAN 0x02
-#define FP_NORMAL 0x04
-#define FP_SUBNORMAL 0x08
-#define FP_ZERO 0x10
-
-#if defined(__FP_FAST_FMA)
-#define FP_FAST_FMA 1
-#endif
-#if defined(__FP_FAST_FMAF)
-#define FP_FAST_FMAF 1
-#endif
-#if defined(__FP_FAST_FMAL)
-#define FP_FAST_FMAL 1
+#if __GNUC__ >= 3
+#pragma GCC system_header
 #endif
 
-#define FP_ILOGB0 (-INT_MAX)
-#define FP_ILOGBNAN INT_MAX
-
-#define MATH_ERRNO 1
-#define MATH_ERREXCEPT 2
-#define math_errhandling MATH_ERREXCEPT
-
-#define fpclassify(x) __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x)
-
-#define isfinite(x) __builtin_isfinite(x)
-
-#define isinf(x) __builtin_isinf(x)
-
-#define isnan(x) __builtin_isnan(x)
-
-#define isnormal(x) __builtin_isnormal(x)
-
-#define signbit(x) \
-    ((sizeof(x) == sizeof(float)) ? __builtin_signbitf(x) \
-    : (sizeof(x) == sizeof(double)) ? __builtin_signbit(x) \
-    : __builtin_signbitl(x))
-
-double acos(double __x);
-float acosf(float __x);
-long double acosl(long double __x) __RENAME_LDBL(acos, 3, 21);
-
-double asin(double __x);
-float asinf(float __x);
-long double asinl(long double __x) __RENAME_LDBL(asin, 3, 21);
-
-double atan(double __x);
-float atanf(float __x);
-long double atanl(long double __x) __RENAME_LDBL(atan, 3, 21);
-
-double atan2(double __y, double __x);
-float atan2f(float __y, float __x);
-long double atan2l(long double __y, long double __x) __RENAME_LDBL(atan2, 3, 21);
-
-double cos(double __x);
-float cosf(float __x);
-long double cosl(long double __x) __RENAME_LDBL(cos, 3, 21);
-
-double sin(double __x);
-float sinf(float __x);
-long double sinl(long double __x) __RENAME_LDBL(sin, 3, 21);
-
-double tan(double __x);
-float tanf(float __x);
-long double tanl(long double __x) __RENAME_LDBL(tan, 3, 21);
-
-double acosh(double __x);
-float acoshf(float __x);
-long double acoshl(long double __x) __RENAME_LDBL(acosh, 3, 21);
-
-double asinh(double __x);
-float asinhf(float __x);
-long double asinhl(long double __x) __RENAME_LDBL(asinh, 3, 21);
-
-double atanh(double __x);
-float atanhf(float __x);
-long double atanhl(long double __x) __RENAME_LDBL(atanh, 3, 21);
-
-double cosh(double __x);
-float coshf(float __x);
-long double coshl(long double __x) __RENAME_LDBL(cosh, 3, 21);
-
-double sinh(double __x);
-float sinhf(float __x);
-long double sinhl(long double __x) __RENAME_LDBL(sinh, 3, 21);
-
-double tanh(double __x);
-float tanhf(float __x);
-long double tanhl(long double __x) __RENAME_LDBL(tanh, 3, 21);
-
-double exp(double __x);
-float expf(float __x);
-long double expl(long double __x) __RENAME_LDBL(exp, 3, 21);
-
-double exp2(double __x);
-float exp2f(float __x);
-long double exp2l(long double __x) __RENAME_LDBL(exp2, 3, 21);
-
-double expm1(double __x);
-float expm1f(float __x);
-long double expm1l(long double __x) __RENAME_LDBL(expm1, 3, 21);
-
-double frexp(double __x, int* __exponent);
-float frexpf(float __x, int* __exponent);
-long double frexpl(long double __x, int* __exponent) __RENAME_LDBL(frexp, 3, 21);
-
-int ilogb(double __x) __attribute_const__;
-int ilogbf(float __x) __attribute_const__;
-int ilogbl(long double __x) __RENAME_LDBL(ilogb, 3, 3) __attribute_const__;
-
-double ldexp(double __x, int __exponent);
-float ldexpf(float __x, int __exponent);
-long double ldexpl(long double __x, int __exponent) __RENAME_LDBL(ldexp, 3, 3);
-
-double log(double __x);
-float logf(float __x);
-long double logl(long double __x) __RENAME_LDBL(log, 3, 21);
-
-double log10(double __x);
-float log10f(float __x);
-long double log10l(long double __x) __RENAME_LDBL(log10, 3, 21);
-
-double log1p(double __x);
-float log1pf(float __x);
-long double log1pl(long double __x) __RENAME_LDBL(log1p, 3, 21);
-
-double log2(double __x) __INTRODUCED_IN(18);
-float log2f(float __x) __INTRODUCED_IN(18);
-long double log2l(long double __x) __RENAME_LDBL(log2, 18, 18);
-
-double logb(double __x);
-float logbf(float __x);
-long double logbl(long double __x) __RENAME_LDBL(logb, 3, 18);
-
-double modf(double __x, double* __integral_part);
-float modff(float __x, float* __integral_part);
-long double modfl(long double __x, long double* __integral_part) __RENAME_LDBL(modf, 3, 21);
-
-double scalbn(double __x, int __exponent);
-float scalbnf(float __x, int __exponent);
-long double scalbnl(long double __x, int __exponent) __RENAME_LDBL(scalbn, 3, 3);
-
-/* TODO: once the NDK only supports >= 18, use __RENAME_LDBL here too. */
-double scalbln(double __x, long __exponent) __INTRODUCED_IN_X86(18) __VERSIONER_NO_GUARD;
-float scalblnf(float __x, long __exponent) __INTRODUCED_IN_X86(18) __VERSIONER_NO_GUARD;
-long double scalblnl(long double __x, long __exponent) __INTRODUCED_IN_X86(18) __VERSIONER_NO_GUARD;
-
-double cbrt(double __x);
-float cbrtf(float __x);
-long double cbrtl(long double __x) __RENAME_LDBL(cbrt, 3, 21);
-
-double fabs(double __x) __attribute_const__;
-float fabsf(float __x) __attribute_const__;
-long double fabsl(long double __x) __RENAME_LDBL(fabs, 3, 3) __attribute_const__;
-
-double hypot(double __x, double __y);
-float hypotf(float __x, float __y);
-long double hypotl(long double __x, long double __y) __RENAME_LDBL(hypot, 3, 21);
-
-double pow(double __x, double __y);
-float powf(float __x, float __y);
-long double powl(long double __x, long double __y) __RENAME_LDBL(pow, 3, 21);
-
-double sqrt(double __x);
-float sqrtf(float __x);
-long double sqrtl(long double __x) __RENAME_LDBL(sqrt, 3, 21);
-
-double erf(double __x);
-float erff(float __x);
-long double erfl(long double __x) __RENAME_LDBL(erf, 3, 21);
-
-double erfc(double __x);
-float erfcf(float __x);
-long double erfcl(long double __x) __RENAME_LDBL(erfc, 3, 21);
-
-double lgamma(double __x);
-float lgammaf(float __x);
-long double lgammal(long double __x) __RENAME_LDBL(lgamma, 3, 21);
-
-double tgamma(double __x);
-float tgammaf(float __x);
-long double tgammal(long double __x) __RENAME_LDBL(tgamma, 3, 21);
-
-double ceil(double __x);
-float ceilf(float __x);
-long double ceill(long double __x) __RENAME_LDBL(ceil, 3, 3);
-
-double floor(double __x);
-float floorf(float __x);
-long double floorl(long double __x) __RENAME_LDBL(floor, 3, 3);
-
-double nearbyint(double __x);
-float nearbyintf(float __x);
-long double nearbyintl(long double __x) __RENAME_LDBL(nearbyint, 3, 21);
-
-double rint(double __x);
-float rintf(float __x);
-long double rintl(long double __x) __RENAME_LDBL(rint, 3, 21);
-
-long lrint(double __x);
-long lrintf(float __x);
-long lrintl(long double __x) __RENAME_LDBL(lrint, 3, 21);
-
-long long llrint(double __x);
-long long llrintf(float __x);
-long long llrintl(long double __x) __RENAME_LDBL(llrint, 3, 21);
-
-double round(double __x);
-float roundf(float __x);
-long double roundl(long double __x) __RENAME_LDBL(roundl, 3, 3);
-
-long lround(double __x);
-long lroundf(float __x);
-long lroundl(long double __x) __RENAME_LDBL(lround, 3, 3);
-
-long long llround(double __x);
-long long llroundf(float __x);
-long long llroundl(long double __x) __RENAME_LDBL(llround, 3, 3);
-
-double trunc(double __x);
-float truncf(float __x);
-long double truncl(long double __x) __RENAME_LDBL(trunc, 3, 3);
-
-double fmod(double __x, double __y);
-float fmodf(float __x, float __y);
-long double fmodl(long double __x, long double __y) __RENAME_LDBL(fmod, 3, 21);
-
-double remainder(double __x, double __y);
-float remainderf(float __x, float __y);
-long double remainderl(long double __x, long double __y) __RENAME_LDBL(remainder, 3, 21);
-
-double remquo(double __x, double __y, int* __quotient_bits);
-float remquof(float __x, float __y, int* __quotient_bits);
-long double remquol(long double __x, long double __y, int* __quotient_bits) __RENAME_LDBL(remquo, 3, 21);
-
-double copysign(double __value, double __sign) __attribute_const__;
-float copysignf(float __value, float __sign) __attribute_const__;
-long double copysignl(long double __value, long double __sign) __RENAME_LDBL(copysign, 3, 3) __attribute_const__;
-
-double nan(const char* __kind) __attribute_const__;
-float nanf(const char* __kind) __attribute_const__;
-long double nanl(const char* __kind) __RENAME_LDBL(nan, 13, 13) __attribute_const__;
-
-double nextafter(double __x, double __y);
-float nextafterf(float __x, float __y);
-long double nextafterl(long double __x, long double __y) __RENAME_LDBL(nextafter, 3, 21) __VERSIONER_NO_GUARD;
-
-double nexttoward(double __x, long double __y) __INTRODUCED_IN(18) __VERSIONER_NO_GUARD;
-float nexttowardf(float __x, long double __y);
-long double nexttowardl(long double __x, long double __y) __RENAME_LDBL(nexttoward, 18, 18) __VERSIONER_NO_GUARD;
-
-double fdim(double __x, double __y);
-float fdimf(float __x, float __y);
-long double fdiml(long double __x, long double __y) __RENAME_LDBL(fdim, 3, 3);
-
-double fmax(double __x, double __y) __attribute_const__;
-float fmaxf(float __x, float __y) __attribute_const__;
-long double fmaxl(long double __x, long double __y) __RENAME_LDBL(fmax, 3, 3) __attribute_const__;
-
-double fmin(double __x, double __y) __attribute_const__;
-float fminf(float __x, float __y) __attribute_const__;
-long double fminl(long double __x, long double __y) __RENAME_LDBL(fmin, 3, 3) __attribute_const__;
-
-double fma(double __x, double __y, double __z);
-float fmaf(float __x, float __y, float __z);
-long double fmal(long double __x, long double __y, long double __z) __RENAME_LDBL(fma, 3, 21) __VERSIONER_NO_GUARD;
-
-#define isgreater(x, y) __builtin_isgreater((x), (y))
-#define isgreaterequal(x, y) __builtin_isgreaterequal((x), (y))
-#define isless(x, y) __builtin_isless((x), (y))
-#define islessequal(x, y) __builtin_islessequal((x), (y))
-#define islessgreater(x, y) __builtin_islessgreater((x), (y))
-#define isunordered(x, y) __builtin_isunordered((x), (y))
-
-/*
- * https://code.google.com/p/android/issues/detail?id=271629
- * To be fully compliant with C++, we need to not define these (C doesn't
- * specify them either). Exposing these means that isinf and isnan will have a
- * return type of int in C++ rather than bool like they're supposed to be.
- *
- * GNU libstdc++ 4.9 isn't able to handle a standard compliant C library. Its
- * <cmath> will `#undef isnan` from math.h and only adds the function overloads
- * to the std namespace, making it impossible to use both <cmath> (which gets
- * included by a lot of other standard headers) and ::isnan.
+#include <_mingw.h>
+
+struct exception;
+
+#pragma pack(push,_CRT_PACKING)
+
+#define _DOMAIN 1
+#define _SING 2
+#define _OVERFLOW 3
+#define _UNDERFLOW 4
+#define _TLOSS 5
+#define _PLOSS 6
+
+#ifndef __STRICT_ANSI__
+#ifndef	NO_OLDNAMES
+#define DOMAIN _DOMAIN
+#define SING _SING
+#define OVERFLOW _OVERFLOW
+#define UNDERFLOW _UNDERFLOW
+#define TLOSS _TLOSS
+#define PLOSS _PLOSS
+#endif
+#endif
+
+#ifndef __STRICT_ANSI__
+#define M_E 2.71828182845904523536
+#define M_LOG2E 1.44269504088896340736
+#define M_LOG10E 0.434294481903251827651
+#define M_LN2 0.693147180559945309417
+#define M_LN10 2.30258509299404568402
+#define M_PI 3.14159265358979323846
+#define M_PI_2 1.57079632679489661923
+#define M_PI_4 0.785398163397448309616
+#define M_1_PI 0.318309886183790671538
+#define M_2_PI 0.636619772367581343076
+#define M_2_SQRTPI 1.12837916709551257390
+#define M_SQRT2 1.41421356237309504880
+#define M_SQRT1_2 0.707106781186547524401
+#endif
+
+#ifndef __STRICT_ANSI__
+/* See also float.h  */
+#ifndef __MINGW_FPCLASS_DEFINED
+#define __MINGW_FPCLASS_DEFINED 1
+#define	_FPCLASS_SNAN	0x0001	/* Signaling "Not a Number" */
+#define	_FPCLASS_QNAN	0x0002	/* Quiet "Not a Number" */
+#define	_FPCLASS_NINF	0x0004	/* Negative Infinity */
+#define	_FPCLASS_NN	0x0008	/* Negative Normal */
+#define	_FPCLASS_ND	0x0010	/* Negative Denormal */
+#define	_FPCLASS_NZ	0x0020	/* Negative Zero */
+#define	_FPCLASS_PZ	0x0040	/* Positive Zero */
+#define	_FPCLASS_PD	0x0080	/* Positive Denormal */
+#define	_FPCLASS_PN	0x0100	/* Positive Normal */
+#define	_FPCLASS_PINF	0x0200	/* Positive Infinity */
+#endif
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef _EXCEPTION_DEFINED
+#define _EXCEPTION_DEFINED
+  struct _exception {
+    int type;
+    char *name;
+    double arg1;
+    double arg2;
+    double retval;
+  };
+#endif
+
+#ifndef _COMPLEX_DEFINED
+#define _COMPLEX_DEFINED
+  struct _complex {
+    double x,y;
+  };
+#endif
+
+#define EDOM 33
+#define ERANGE 34
+
+#ifndef _HUGE
+#ifdef _MSVCRT_
+  extern double *_HUGE;
+#else
+  extern double *_imp___HUGE;
+#define _HUGE	(*_imp___HUGE)
+#endif
+#endif
+
+#define HUGE_VAL _HUGE
+
+#ifndef _CRT_ABS_DEFINED
+#define _CRT_ABS_DEFINED
+  int __cdecl abs(int _X);
+  long __cdecl labs(long _X);
+#endif
+  double __cdecl acos(double _X);
+  double __cdecl asin(double _X);
+  double __cdecl atan(double _X);
+  double __cdecl atan2(double _Y,double _X);
+#ifndef _SIGN_DEFINED
+#define _SIGN_DEFINED
+  _CRTIMP double __cdecl _copysign (double _Number,double _Sign);
+  _CRTIMP double __cdecl _chgsign (double _X);
+#endif
+  double __cdecl cos(double _X);
+  double __cdecl cosh(double _X);
+  double __cdecl exp(double _X);
+  double __cdecl expm1(double _X);
+  double __cdecl fabs(double _X);
+  double __cdecl fmod(double _X,double _Y);
+  double __cdecl log(double _X);
+  double __cdecl log10(double _X);
+  double __cdecl pow(double _X,double _Y);
+  double __cdecl sin(double _X);
+  double __cdecl sinh(double _X);
+  double __cdecl tan(double _X);
+  double __cdecl tanh(double _X);
+  double __cdecl sqrt(double _X);
+#ifndef _CRT_ATOF_DEFINED
+#define _CRT_ATOF_DEFINED
+  double __cdecl atof(const char *_String);
+  double __cdecl _atof_l(const char *_String,_locale_t _Locale);
+#endif
+
+  _CRTIMP double __cdecl _cabs(struct _complex _ComplexA);
+  double __cdecl ceil(double _X);
+  double __cdecl floor(double _X);
+  double __cdecl frexp(double _X,int *_Y);
+  double __cdecl _hypot(double _X,double _Y);
+  _CRTIMP double __cdecl _j0(double _X);
+  _CRTIMP double __cdecl _j1(double _X);
+  _CRTIMP double __cdecl _jn(int _X,double _Y);
+  double __cdecl ldexp(double _X,int _Y);
+#ifndef _CRT_MATHERR_DEFINED
+#define _CRT_MATHERR_DEFINED
+  int __cdecl _matherr(struct _exception *_Except);
+#endif
+  double __cdecl modf(double _X,double *_Y);
+  _CRTIMP double __cdecl _y0(double _X);
+  _CRTIMP double __cdecl _y1(double _X);
+  _CRTIMP double __cdecl _yn(int _X,double _Y);
+
+#if(defined(_X86_) && !defined(__x86_64))
+  _CRTIMP int __cdecl _set_SSE2_enable(int _Flag);
+  /* from libmingwex */
+  float __cdecl _hypotf(float _X,float _Y);
+#endif
+
+  float frexpf(float _X,int *_Y);
+  float __cdecl ldexpf(float _X,int _Y);
+  long double __cdecl ldexpl(long double _X,int _Y);
+  float __cdecl acosf(float _X);
+  float __cdecl asinf(float _X);
+   float __cdecl atanf(float _X);
+   float __cdecl atan2f(float _X,float _Y);
+   float __cdecl cosf(float _X);
+   float __cdecl sinf(float _X);
+   float __cdecl tanf(float _X);
+   float __cdecl coshf(float _X);
+   float __cdecl sinhf(float _X);
+   float __cdecl tanhf(float _X);
+   float __cdecl expf(float _X);
+   float __cdecl expm1f(float _X);
+   float __cdecl logf(float _X);
+   float __cdecl log10f(float _X);
+   float __cdecl modff(float _X,float *_Y);
+   float __cdecl powf(float _X,float _Y);
+   float __cdecl sqrtf(float _X);
+   float __cdecl ceilf(float _X);
+   float __cdecl floorf(float _X);
+  float __cdecl fmodf(float _X,float _Y);
+   float __cdecl _hypotf(float _X,float _Y);
+  float __cdecl fabsf(float _X);
+#if !defined(__ia64__)
+   /* from libmingwex */
+   float __cdecl _copysignf (float _Number,float _Sign);
+   float __cdecl _chgsignf (float _X);
+   float __cdecl _logbf(float _X);
+   float __cdecl _nextafterf(float _X,float _Y);
+   int __cdecl _finitef(float _X);
+   int __cdecl _isnanf(float _X);
+   int __cdecl _fpclassf(float _X);
+#endif
+
+#ifndef __cplusplus
+  __CRT_INLINE long double __cdecl fabsl (long double x)
+  {
+    long double res;
+    __asm__ ("fabs;" : "=t" (res) : "0" (x));
+    return res;
+  }
+#define _hypotl(x,y) ((long double)_hypot((double)(x),(double)(y)))
+#define _matherrl _matherr
+  __CRT_INLINE long double _chgsignl(long double _Number) { return _chgsign((double)(_Number)); }
+  __CRT_INLINE long double _copysignl(long double _Number,long double _Sign) { return _copysign((double)(_Number),(double)(_Sign)); }
+  __CRT_INLINE float frexpf(float _X,int *_Y) { return ((float)frexp((double)_X,_Y)); }
+
+#if !defined (__ia64__)
+  __CRT_INLINE float __cdecl fabsf (float x)
+  {
+    float res;
+    __asm__ ("fabs;" : "=t" (res) : "0" (x));
+    return res;
+  }
+
+  __CRT_INLINE float __cdecl ldexpf (float x, int expn) { return (float) ldexp (x, expn); }
+#endif
+#else
+  // cplusplus
+  __CRT_INLINE long double __cdecl fabsl (long double x)
+  {
+    long double res;
+    __asm__ ("fabs;" : "=t" (res) : "0" (x));
+    return res;
+  }
+  __CRT_INLINE long double modfl(long double _X,long double *_Y) {
+    double _Di,_Df = modf((double)_X,&_Di);
+    *_Y = (long double)_Di;
+    return (_Df);
+  }
+  __CRT_INLINE long double _chgsignl(long double _Number) { return _chgsign(static_cast<double>(_Number)); }
+  __CRT_INLINE long double _copysignl(long double _Number,long double _Sign) { return _copysign(static_cast<double>(_Number),static_cast<double>(_Sign)); }
+  __CRT_INLINE float frexpf(float _X,int *_Y) { return ((float)frexp((double)_X,_Y)); }
+#ifndef __ia64__
+  __CRT_INLINE float __cdecl fabsf (float x)
+  {
+    float res;
+    __asm__ ("fabs;" : "=t" (res) : "0" (x));
+    return res;
+  }
+  __CRT_INLINE float __cdecl ldexpf (float x, int expn) { return (float) ldexp (x, expn); }
+#ifndef __x86_64
+  __CRT_INLINE float acosf(float _X) { return ((float)acos((double)_X)); }
+  __CRT_INLINE float asinf(float _X) { return ((float)asin((double)_X)); }
+  __CRT_INLINE float atanf(float _X) { return ((float)atan((double)_X)); }
+  __CRT_INLINE float atan2f(float _X,float _Y) { return ((float)atan2((double)_X,(double)_Y)); }
+  __CRT_INLINE float ceilf(float _X) { return ((float)ceil((double)_X)); }
+  __CRT_INLINE float cosf(float _X) { return ((float)cos((double)_X)); }
+  __CRT_INLINE float coshf(float _X) { return ((float)cosh((double)_X)); }
+  __CRT_INLINE float expf(float _X) { return ((float)exp((double)_X)); }
+  __CRT_INLINE float floorf(float _X) { return ((float)floor((double)_X)); }
+  __CRT_INLINE float fmodf(float _X,float _Y) { return ((float)fmod((double)_X,(double)_Y)); }
+  __CRT_INLINE float logf(float _X) { return ((float)log((double)_X)); }
+  __CRT_INLINE float log10f(float _X) { return ((float)log10((double)_X)); }
+  __CRT_INLINE float modff(float _X,float *_Y) {
+    double _Di,_Df = modf((double)_X,&_Di);
+    *_Y = (float)_Di;
+    return ((float)_Df);
+  }
+  __CRT_INLINE float powf(float _X,float _Y) { return ((float)pow((double)_X,(double)_Y)); }
+  __CRT_INLINE float sinf(float _X) { return ((float)sin((double)_X)); }
+  __CRT_INLINE float sinhf(float _X) { return ((float)sinh((double)_X)); }
+  __CRT_INLINE float sqrtf(float _X) { return ((float)sqrt((double)_X)); }
+  __CRT_INLINE float tanf(float _X) { return ((float)tan((double)_X)); }
+  __CRT_INLINE float tanhf(float _X) { return ((float)tanh((double)_X)); }
+#endif
+#endif
+#endif
+
+#ifndef	NO_OLDNAMES
+#define matherr _matherr
+
+#define HUGE	_HUGE
+  /*	double __cdecl cabs(struct _complex _X); */
+  double __cdecl hypot(double _X,double _Y);
+  _CRTIMP double __cdecl j0(double _X);
+  _CRTIMP double __cdecl j1(double _X);
+  _CRTIMP double __cdecl jn(int _X,double _Y);
+  _CRTIMP double __cdecl y0(double _X);
+  _CRTIMP double __cdecl y1(double _X);
+  _CRTIMP double __cdecl yn(int _X,double _Y);
+#endif
+
+#ifndef __NO_ISOCEXT
+#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
+  || !defined __STRICT_ANSI__ || defined __GLIBCPP__
+
+#define NAN (0.0F/0.0F)
+#define HUGE_VALF (1.0F/0.0F)
+#define HUGE_VALL (1.0L/0.0L)
+#define INFINITY (1.0F/0.0F)
+
+
+#define FP_NAN		0x0100
+#define FP_NORMAL	0x0400
+#define FP_INFINITE	(FP_NAN | FP_NORMAL)
+#define FP_ZERO		0x4000
+#define FP_SUBNORMAL	(FP_NORMAL | FP_ZERO)
+  /* 0x0200 is signbit mask */
+
+
+  /*
+  We can't __CRT_INLINE float or double, because we want to ensure truncation
+  to semantic type before classification. 
+  (A normal long double value might become subnormal when 
+  converted to double, and zero when converted to float.)
+  */
+
+  extern int __cdecl __fpclassifyf (float);
+  extern int __cdecl __fpclassify (double);
+  extern int __cdecl __fpclassifyl (long double);
+
+/* Implemented at tcc/tcc_libm.h */
+#define fpclassify(x) (sizeof (x) == sizeof (float) ? __fpclassifyf (x)	  \
+  : sizeof (x) == sizeof (double) ? __fpclassify (x) \
+  : __fpclassifyl (x))
+
+  /* 7.12.3.2 */
+#define isfinite(x) ((fpclassify(x) & FP_NAN) == 0)
+
+  /* 7.12.3.3 */
+#define isinf(x) (fpclassify(x) == FP_INFINITE)
+
+  /* 7.12.3.4 */
+  /* We don't need to worry about truncation here:
+  A NaN stays a NaN. */
+#define isnan(x) (fpclassify(x) == FP_NAN)
+
+  /* 7.12.3.5 */
+#define isnormal(x) (fpclassify(x) == FP_NORMAL)
+
+  /* 7.12.3.6 The signbit macro */
+
+  extern int __cdecl __signbitf (float);
+  extern int __cdecl __signbit (double);
+  extern int __cdecl __signbitl (long double);
+
+/* Implemented at tcc/tcc_libm.h */
+#define signbit(x) (sizeof (x) == sizeof (float) ? __signbitf (x)	\
+  : sizeof (x) == sizeof (double) ? __signbit (x)	\
+  : __signbitl (x))
+
+  extern double __cdecl exp2(double);
+  extern float __cdecl exp2f(float);
+  extern long double __cdecl exp2l(long double);
+
+#define FP_ILOGB0 ((int)0x80000000)
+#define FP_ILOGBNAN ((int)0x80000000)
+  extern int __cdecl ilogb (double);
+  extern int __cdecl ilogbf (float);
+  extern int __cdecl ilogbl (long double);
+
+  extern double __cdecl log1p(double);
+  extern float __cdecl log1pf(float);
+  extern long double __cdecl log1pl(long double);
+
+  extern double __cdecl log2 (double);
+  extern float __cdecl log2f (float);
+  extern long double __cdecl log2l (long double);
+
+  extern double __cdecl logb (double);
+  extern float __cdecl logbf (float);
+  extern long double __cdecl logbl (long double);
+
+  __CRT_INLINE double __cdecl logb (double x)
+  {
+    double res;
+    __asm__ ("fxtract\n\t"
+      "fstp	%%st" : "=t" (res) : "0" (x));
+    return res;
+  }
+
+  __CRT_INLINE float __cdecl logbf (float x)
+  {
+    float res;
+    __asm__ ("fxtract\n\t"
+      "fstp	%%st" : "=t" (res) : "0" (x));
+    return res;
+  }
+
+  __CRT_INLINE long double __cdecl logbl (long double x)
+  {
+    long double res;
+    __asm__ ("fxtract\n\t"
+      "fstp	%%st" : "=t" (res) : "0" (x));
+    return res;
+  }
+
+  extern long double __cdecl modfl (long double, long double*);
+
+  /* 7.12.6.13 */
+  extern double __cdecl scalbn (double, int);
+  extern float __cdecl scalbnf (float, int);
+  extern long double __cdecl scalbnl (long double, int);
+
+  extern double __cdecl scalbln (double, long);
+  extern float __cdecl scalblnf (float, long);
+  extern long double __cdecl scalblnl (long double, long);
+
+  /* 7.12.7.1 */
+  /* Implementations adapted from Cephes versions */ 
+  extern double __cdecl cbrt (double);
+  extern float __cdecl cbrtf (float);
+  extern long double __cdecl cbrtl (long double);
+
+  __CRT_INLINE float __cdecl hypotf (float x, float y)
+  { return (float) hypot (x, y);}
+  extern long double __cdecl hypotl (long double, long double);
+
+  extern long double __cdecl powl (long double, long double);
+  extern long double __cdecl expl(long double);
+  extern long double __cdecl expm1l(long double);
+  extern long double __cdecl coshl(long double);
+  extern long double __cdecl fabsl (long double);
+  extern long double __cdecl acosl(long double);
+  extern long double __cdecl asinl(long double);
+  extern long double __cdecl atanl(long double);
+  extern long double __cdecl atan2l(long double,long double);
+  extern long double __cdecl sinhl(long double);
+  extern long double __cdecl tanhl(long double);
+
+  /* 7.12.8.1 The erf functions  */
+  extern double __cdecl erf (double);
+  extern float __cdecl erff (float);
+  /* TODO
+  extern long double __cdecl erfl (long double);
+  */ 
+
+  /* 7.12.8.2 The erfc functions  */
+  extern double __cdecl erfc (double);
+  extern float __cdecl erfcf (float);
+  /* TODO
+  extern long double __cdecl erfcl (long double);
+  */ 
+
+  /* 7.12.8.3 The lgamma functions */
+  extern double __cdecl lgamma (double);
+  extern float __cdecl lgammaf (float);
+  extern long double __cdecl lgammal (long double);
+
+  /* 7.12.8.4 The tgamma functions */
+  extern double __cdecl tgamma (double);
+  extern float __cdecl tgammaf (float);
+  extern long double __cdecl tgammal (long double);
+
+  extern long double __cdecl ceill (long double);
+  extern long double __cdecl floorl (long double);
+  extern long double __cdecl frexpl(long double,int *);
+  extern long double __cdecl log10l(long double);
+  extern long double __cdecl logl(long double);
+  extern long double __cdecl cosl(long double);
+  extern long double __cdecl sinl(long double);
+  extern long double __cdecl tanl(long double);
+  extern long double sqrtl(long double);
+
+  /* 7.12.9.3 */
+  extern double __cdecl nearbyint ( double);
+  extern float __cdecl nearbyintf (float);
+  extern long double __cdecl nearbyintl (long double);
+
+  /* 7.12.9.4 */
+  /* round, using fpu control word settings */
+  __CRT_INLINE double __cdecl rint (double x)
+  {
+    double retval;
+    __asm__ (
+      "fldl    %1\n"
+      "frndint   \n"
+      "fstl    %0\n" : "=m" (retval) : "m" (x));
+    return retval;
+  }
+
+  __CRT_INLINE float __cdecl rintf (float x)
+  {
+    float retval;
+    __asm__ (
+      "flds    %1\n"
+      "frndint   \n"
+      "fsts    %0\n" : "=m" (retval) : "m" (x));
+    return retval;
+  }
+
+  __CRT_INLINE long double __cdecl rintl (long double x)
+  {
+    long double retval;
+    __asm__ (
+      "fldt    %1\n"
+      "frndint   \n"
+      "fstt    %0\n" : "=m" (retval) : "m" (x));
+    return retval;
+  }
+
+  /* 7.12.9.5 */
+  __CRT_INLINE long __cdecl lrint (double x) 
+  {
+    long retval;  
+    __asm__ __volatile__                         \
+      ("fldl   %1\n"                             \
+       "fistpl %0"  : "=m" (retval) : "m" (x));  \
+      return retval;
+  }
+
+  __CRT_INLINE long __cdecl lrintf (float x) 
+  {
+    long retval;
+    __asm__ __volatile__                         \
+      ("flds   %1\n"                             \
+       "fistpl %0"  : "=m" (retval) : "m" (x));  \
+      return retval;
+  }
+
+  __CRT_INLINE long __cdecl lrintl (long double x) 
+  {
+    long retval;
+    __asm__ __volatile__                         \
+      ("fldt   %1\n"                             \
+       "fistpl %0"  : "=m" (retval) : "m" (x));  \
+      return retval;
+  }
+
+  __CRT_INLINE long long __cdecl llrint (double x) 
+  {
+    long long retval;
+    __asm__ __volatile__                         \
+      ("fldl    %1\n"                            \
+       "fistpll %0"  : "=m" (retval) : "m" (x)); \
+      return retval;
+  }
+
+  __CRT_INLINE long long __cdecl llrintf (float x) 
+  {
+    long long retval;
+    __asm__ __volatile__                         \
+      ("flds   %1\n"                             \
+       "fistpll %0"  : "=m" (retval) : "m" (x)); \
+      return retval;
+  }
+
+  __CRT_INLINE long long __cdecl llrintl (long double x) 
+  {
+    long long retval;
+    __asm__ __volatile__                         \
+      ("fldt    %1\n"                            \
+       "fistpll %0"  : "=m" (retval) : "m" (x)); \
+      return retval;
+  }
+
+  #define FE_TONEAREST	0x0000
+  #define FE_DOWNWARD	0x0400
+  #define FE_UPWARD	0x0800
+  #define FE_TOWARDZERO	0x0c00
+
+  __CRT_INLINE double trunc (double _x)
+  {
+    double retval;
+    unsigned short saved_cw;
+    unsigned short tmp_cw;
+    __asm__ ("fnstcw %0;" : "=m" (saved_cw)); /* save FPU control word */
+    tmp_cw = (saved_cw & ~(FE_TONEAREST | FE_DOWNWARD | FE_UPWARD | FE_TOWARDZERO))
+	    | FE_TOWARDZERO;
+    __asm__ ("fldcw %0;" : : "m" (tmp_cw));
+    __asm__ ("fldl  %1;"
+             "frndint;"
+             "fstl  %0;" : "=m" (retval)  : "m" (_x)); /* round towards zero */
+    __asm__ ("fldcw %0;" : : "m" (saved_cw) ); /* restore saved control word */
+    return retval;
+  }
+
+  /* 7.12.9.6 */
+  /* round away from zero, regardless of fpu control word settings */
+  extern double __cdecl round (double);
+  extern float __cdecl roundf (float);
+  extern long double __cdecl roundl (long double);
+
+  /* 7.12.9.7  */
+  extern long __cdecl lround (double);
+  extern long __cdecl lroundf (float);
+  extern long __cdecl lroundl (long double);
+
+  extern long long __cdecl llround (double);
+  extern long long __cdecl llroundf (float);
+  extern long long __cdecl llroundl (long double);
+
+  /* 7.12.9.8 */
+  /* round towards zero, regardless of fpu control word settings */
+  extern double __cdecl trunc (double);
+  extern float __cdecl truncf (float);
+  extern long double __cdecl truncl (long double);
+
+  extern long double __cdecl fmodl (long double, long double);
+
+  /* 7.12.10.2 */ 
+  extern double __cdecl remainder (double, double);
+  extern float __cdecl remainderf (float, float);
+  extern long double __cdecl remainderl (long double, long double);
+
+  /* 7.12.10.3 */
+  extern double __cdecl remquo(double, double, int *);
+  extern float __cdecl remquof(float, float, int *);
+  extern long double __cdecl remquol(long double, long double, int *);
+
+  /* 7.12.11.1 */
+  extern double __cdecl copysign (double, double); /* in libmoldname.a */
+  extern float __cdecl copysignf (float, float);
+  extern long double __cdecl copysignl (long double, long double);
+
+  /* 7.12.11.2 Return a NaN */
+  extern double __cdecl nan(const char *tagp);
+  extern float __cdecl nanf(const char *tagp);
+  extern long double __cdecl nanl(const char *tagp);
+
+#ifndef __STRICT_ANSI__
+#define _nan() nan("")
+#define _nanf() nanf("")
+#define _nanl() nanl("")
+#endif
+
+  /* 7.12.11.3 */
+  extern double __cdecl nextafter (double, double); /* in libmoldname.a */
+  extern float __cdecl nextafterf (float, float);
+  extern long double __cdecl nextafterl (long double, long double);
+
+  /* 7.12.11.4 The nexttoward functions: TODO */
+
+  /* 7.12.12.1 */
+  /*  x > y ? (x - y) : 0.0  */
+  extern double __cdecl fdim (double x, double y);
+  extern float __cdecl fdimf (float x, float y);
+  extern long double __cdecl fdiml (long double x, long double y);
+
+  /* fmax and fmin.
+  NaN arguments are treated as missing data: if one argument is a NaN
+  and the other numeric, then these functions choose the numeric
+  value. */
+
+  /* 7.12.12.2 */
+  extern double __cdecl fmax  (double, double);
+  extern float __cdecl fmaxf (float, float);
+  extern long double __cdecl fmaxl (long double, long double);
+
+  /* 7.12.12.3 */
+  extern double __cdecl fmin (double, double);
+  extern float __cdecl fminf (float, float);
+  extern long double __cdecl fminl (long double, long double);
+
+  /* 7.12.13.1 */
+  /* return x * y + z as a ternary op */ 
+  extern double __cdecl fma (double, double, double);
+  extern float __cdecl fmaf (float, float, float);
+  extern long double __cdecl fmal (long double, long double, long double);
+
+
+#if 0 // gr: duplicate, see below
+  /* 7.12.14 */
+  /* 
+  *  With these functions, comparisons involving quiet NaNs set the FP
+  *  condition code to "unordered".  The IEEE floating-point spec
+  *  dictates that the result of floating-point comparisons should be
+  *  false whenever a NaN is involved, with the exception of the != op, 
+  *  which always returns true: yes, (NaN != NaN) is true).
+  */
+
+#if __GNUC__ >= 3
+
+#define isgreater(x, y) __builtin_isgreater(x, y)
+#define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
+#define isless(x, y) __builtin_isless(x, y)
+#define islessequal(x, y) __builtin_islessequal(x, y)
+#define islessgreater(x, y) __builtin_islessgreater(x, y)
+#define isunordered(x, y) __builtin_isunordered(x, y)
+
+#else
+  /*  helper  */
+  __CRT_INLINE int  __cdecl
+    __fp_unordered_compare (long double x, long double y){
+      unsigned short retval;
+      __asm__ ("fucom %%st(1);"
+	"fnstsw;": "=a" (retval) : "t" (x), "u" (y));
+      return retval;
+  }
+
+#define isgreater(x, y) ((__fp_unordered_compare(x, y) \
+  & 0x4500) == 0)
+#define isless(x, y) ((__fp_unordered_compare (y, x) \
+  & 0x4500) == 0)
+#define isgreaterequal(x, y) ((__fp_unordered_compare (x, y) \
+  & FP_INFINITE) == 0)
+#define islessequal(x, y) ((__fp_unordered_compare(y, x) \
+  & FP_INFINITE) == 0)
+#define islessgreater(x, y) ((__fp_unordered_compare(x, y) \
+  & FP_SUBNORMAL) == 0)
+#define isunordered(x, y) ((__fp_unordered_compare(x, y) \
+  & 0x4500) == 0x4500)
+
+#endif
+#endif //0
+
+
+#endif /* __STDC_VERSION__ >= 199901L */
+#endif /* __NO_ISOCEXT */
+
+#ifdef __cplusplus
+}
+extern "C++" {
+  template<class _Ty> inline _Ty _Pow_int(_Ty _X,int _Y) {
+    unsigned int _N;
+    if(_Y >= 0) _N = (unsigned int)_Y;
+    else _N = (unsigned int)(-_Y);
+    for(_Ty _Z = _Ty(1);;_X *= _X) {
+      if((_N & 1)!=0) _Z *= _X;
+      if((_N >>= 1)==0) return (_Y < 0 ? _Ty(1) / _Z : _Z); 
+    }
+  }
+}
+#endif
+
+#pragma pack(pop)
+
+/* 7.12.14 */
+/* 
+ *  With these functions, comparisons involving quiet NaNs set the FP
+ *  condition code to "unordered".  The IEEE floating-point spec
+ *  dictates that the result of floating-point comparisons should be
+ *  false whenever a NaN is involved, with the exception of the != op, 
+ *  which always returns true: yes, (NaN != NaN) is true).
  */
-int (isinf)(double __x) __attribute_const__ __INTRODUCED_IN(21);
-int (isnan)(double __x) __attribute_const__;
 
-/* POSIX extensions. */
+/* Mini libm (inline __fpclassify*, __signbit* and variants) */
+#include "tcc/tcc_libm.h"
 
-extern int signgam;
+#endif /* End _MATH_H_ */
 
-double j0(double __x);
-double j1(double __x);
-double jn(int __n, double __x);
-double y0(double __x);
-double y1(double __x);
-double yn(int __n, double __x);
-
-#define M_E		2.7182818284590452354	/* e */
-#define M_LOG2E		1.4426950408889634074	/* log 2e */
-#define M_LOG10E	0.43429448190325182765	/* log 10e */
-#define M_LN2		0.69314718055994530942	/* log e2 */
-#define M_LN10		2.30258509299404568402	/* log e10 */
-#define M_PI		3.14159265358979323846	/* pi */
-#define M_PI_2		1.57079632679489661923	/* pi/2 */
-#define M_PI_4		0.78539816339744830962	/* pi/4 */
-#define M_1_PI		0.31830988618379067154	/* 1/pi */
-#define M_2_PI		0.63661977236758134308	/* 2/pi */
-#define M_2_SQRTPI	1.12837916709551257390	/* 2/sqrt(pi) */
-#define M_SQRT2		1.41421356237309504880	/* sqrt(2) */
-#define M_SQRT1_2	0.70710678118654752440	/* 1/sqrt(2) */
-
-#define MAXFLOAT	((float)3.40282346638528860e+38)
-
-/* BSD extensions. */
-
-#if defined(__USE_BSD)
-#define HUGE MAXFLOAT
-#endif
-
-/* Extensions in both BSD and GNU. */
-
-#if defined(__USE_BSD) || defined(__USE_GNU)
-double gamma(double __x);
-double scalb(double __x, double __exponent);
-double drem(double __x, double __y);
-int finite(double __x) __attribute_const__;
-int isnanf(float __x) __attribute_const__;
-double gamma_r(double __x, int* __sign);
-double lgamma_r(double __x, int* __sign);
-double significand(double __x);
-long double lgammal_r(long double __x, int* __sign) __INTRODUCED_IN(23);
-long double significandl(long double __x) __INTRODUCED_IN(21);
-float dremf(float __x, float __y);
-int finitef(float __x) __attribute_const__;
-float gammaf(float __x);
-float j0f(float __x);
-float j1f(float __x);
-float jnf(int __n, float __x);
-float scalbf(float __x, float __exponent);
-float y0f(float __x);
-float y1f(float __x);
-float ynf(int __n, float __x);
-float gammaf_r(float __x, int* __sign);
-float lgammaf_r(float __x, int* __sign);
-float significandf(float __x);
-void sincos(double __x, double* __sin, double* __cos);
-void sincosf(float __x, float* __sin, float* __cos);
-void sincosl(long double __x, long double* __sin, long double* __cos);
-#endif
-
-/* GNU extensions. */
-
-#if defined(__USE_GNU)
-#define M_El            2.718281828459045235360287471352662498L /* e */
-#define M_LOG2El        1.442695040888963407359924681001892137L /* log 2e */
-#define M_LOG10El       0.434294481903251827651128918916605082L /* log 10e */
-#define M_LN2l          0.693147180559945309417232121458176568L /* log e2 */
-#define M_LN10l         2.302585092994045684017991454684364208L /* log e10 */
-#define M_PIl           3.141592653589793238462643383279502884L /* pi */
-#define M_PI_2l         1.570796326794896619231321691639751442L /* pi/2 */
-#define M_PI_4l         0.785398163397448309615660845819875721L /* pi/4 */
-#define M_1_PIl         0.318309886183790671537767526745028724L /* 1/pi */
-#define M_2_PIl         0.636619772367581343075535053490057448L /* 2/pi */
-#define M_2_SQRTPIl     1.128379167095512573896158903121545172L /* 2/sqrt(pi) */
-#define M_SQRT2l        1.414213562373095048801688724209698079L /* sqrt(2) */
-#define M_SQRT1_2l      0.707106781186547524400844362104849039L /* 1/sqrt(2) */
-#endif
-
-__END_DECLS
-
-#endif

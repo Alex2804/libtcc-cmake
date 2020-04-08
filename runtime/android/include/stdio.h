@@ -1,321 +1,429 @@
-/*	$OpenBSD: stdio.h,v 1.35 2006/01/13 18:10:09 miod Exp $	*/
-/*	$NetBSD: stdio.h,v 1.18 1996/04/25 18:29:21 jtc Exp $	*/
-
-/*-
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * This code is derived from software contributed to Berkeley by
- * Chris Torek.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- *	@(#)stdio.h	5.17 (Berkeley) 6/3/91
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the w64 mingw-runtime package.
+ * No warranty is given; refer to the file DISCLAIMER within this package.
  */
+#ifndef _INC_STDIO
+#define _INC_STDIO
 
-#ifndef	_STDIO_H_
-#define	_STDIO_H_
+#include <_mingw.h>
 
-#include <sys/cdefs.h>
-#include <sys/types.h>
+#pragma pack(push,_CRT_PACKING)
 
-#include <stdarg.h>
-#include <stddef.h>
-
-#include <bits/seek_constants.h>
-
-#if __ANDROID_API__ < 24
-#include <bits/struct_file.h>
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-__BEGIN_DECLS
+#define BUFSIZ 512
+#define _NFILE _NSTREAM_
+#define _NSTREAM_ 512
+#define _IOB_ENTRIES 20
+#define EOF (-1)
 
-typedef off_t fpos_t;
-typedef off64_t fpos64_t;
+#ifndef _FILE_DEFINED
+  struct _iobuf {
+    char *_ptr;
+    int _cnt;
+    char *_base;
+    int _flag;
+    int _file;
+    int _charbuf;
+    int _bufsiz;
+    char *_tmpfname;
+  };
+  typedef struct _iobuf FILE;
+#define _FILE_DEFINED
+#endif
 
-struct __sFILE;
-typedef struct __sFILE FILE;
-
-#if __ANDROID_API__ >= 23
-extern FILE* stdin __INTRODUCED_IN(23);
-extern FILE* stdout __INTRODUCED_IN(23);
-extern FILE* stderr __INTRODUCED_IN(23);
-
-/* C99 and earlier plus current C++ standards say these must be macros. */
-#define stdin stdin
-#define stdout stdout
-#define stderr stderr
+#ifdef _POSIX_
+#define _P_tmpdir "/"
+#define _wP_tmpdir L"/"
 #else
-/* Before M the actual symbols for stdin and friends had different names. */
-extern FILE __sF[] __REMOVED_IN(23);
-
-#define stdin (&__sF[0])
-#define stdout (&__sF[1])
-#define stderr (&__sF[2])
+#define _P_tmpdir "\\"
+#define _wP_tmpdir L"\\"
 #endif
 
-/*
- * The following three definitions are for ANSI C, which took them
- * from System V, which brilliantly took internal interface macros and
- * made them official arguments to setvbuf(), without renaming them.
- * Hence, these ugly _IOxxx names are *supposed* to appear in user code.
- *
- * Although numbered as their counterparts above, the implementation
- * does not rely on this.
- */
-#define	_IOFBF	0		/* setvbuf should set fully buffered */
-#define	_IOLBF	1		/* setvbuf should set line buffered */
-#define	_IONBF	2		/* setvbuf should set unbuffered */
+#define L_tmpnam (sizeof(_P_tmpdir) + 12)
 
-#define	BUFSIZ	1024		/* size of buffer used by setbuf */
-#define	EOF	(-1)
+#ifdef _POSIX_
+#define L_ctermid 9
+#define L_cuserid 32
+#endif
 
-/*
- * FOPEN_MAX is a minimum maximum, and is the number of streams that
- * stdio can provide without attempting to allocate further resources
- * (which could fail).  Do not use this for anything.
- */
+#define SEEK_CUR 1
+#define SEEK_END 2
+#define SEEK_SET 0
+
+#define STDIN_FILENO    0
+#define STDOUT_FILENO   1
+#define STDERR_FILENO   2
+
+#define FILENAME_MAX 260
 #define FOPEN_MAX 20
-#define FILENAME_MAX 4096
+#define _SYS_OPEN 20
+#define TMP_MAX 32767
 
-#define L_tmpnam 4096
-#define TMP_MAX 308915776
-
-void clearerr(FILE* __fp);
-int fclose(FILE* __fp);
-int feof(FILE* __fp);
-int ferror(FILE* __fp);
-int fflush(FILE* __fp);
-int fgetc(FILE* __fp);
-char* fgets(char* __buf, int __size, FILE* __fp);
-int fprintf(FILE* __fp , const char* __fmt, ...) __printflike(2, 3);
-int fputc(int __ch, FILE* __fp);
-int fputs(const char* __s, FILE* __fp);
-size_t fread(void* __buf, size_t __size, size_t __count, FILE* __fp);
-int fscanf(FILE* __fp, const char* __fmt, ...) __scanflike(2, 3);
-size_t fwrite(const void* __buf, size_t __size, size_t __count, FILE* __fp);
-int getc(FILE* __fp);
-int getchar(void);
-ssize_t getdelim(char** __line_ptr, size_t* __line_length_ptr, int __delimiter, FILE* __fp) __INTRODUCED_IN(18);
-ssize_t getline(char** __line_ptr, size_t* __line_length_ptr, FILE* __fp) __INTRODUCED_IN(18);
-
-void perror(const char* __msg);
-int printf(const char* __fmt, ...) __printflike(1, 2);
-int putc(int __ch, FILE* __fp);
-int putchar(int __ch);
-int puts(const char* __s);
-int remove(const char* __path);
-void rewind(FILE* __fp);
-int scanf(const char* __fmt, ...) __scanflike(1, 2);
-void setbuf(FILE* __fp, char* __buf);
-int setvbuf(FILE* __fp, char* __buf, int __mode, size_t __size);
-int sscanf(const char* __s, const char* __fmt, ...) __scanflike(2, 3);
-int ungetc(int __ch, FILE* __fp);
-int vfprintf(FILE* __fp, const char* __fmt, va_list __args) __printflike(2, 0);
-int vprintf(const char* __fp, va_list __args) __printflike(1, 0);
-
-#if __ANDROID_API__ >= 21
-int dprintf(int __fd, const char* __fmt, ...) __printflike(2, 3) __INTRODUCED_IN(21);
-int vdprintf(int __fd, const char* __fmt, va_list __args) __printflike(2, 0) __INTRODUCED_IN(21);
+#ifndef NULL
+#ifdef __cplusplus
+#define NULL 0
 #else
-/*
- * Old versions of Android called these fdprintf and vfdprintf out of fears that the glibc names
- * would collide with user debug printfs.
- *
- * Allow users to just use dprintf and vfdprintf on any version by renaming those calls to their
- * legacy equivalents if needed.
- */
-int dprintf(int __fd, const char* __fmt, ...) __RENAME(fdprintf) __printflike(2, 3);
-int vdprintf(int __fd, const char* __fmt, va_list __args) __RENAME(vfdprintf) __printflike(2, 0);
+#define NULL ((void *)0)
+#endif
 #endif
 
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ < 201112L) || \
-    (defined(__cplusplus) && __cplusplus <= 201103L)
-char* gets(char* __buf) __attribute__((deprecated("gets is unsafe, use fgets instead")));
+#ifndef _OFF_T_DEFINED
+#define _OFF_T_DEFINED
+#ifndef _OFF_T_
+#define _OFF_T_
+  typedef long _off_t;
+#if !defined(NO_OLDNAMES) || defined(_POSIX)
+  typedef long off_t;
 #endif
-int sprintf(char* __s, const char* __fmt, ...)
-    __printflike(2, 3) __warnattr_strict("sprintf is often misused; please use snprintf");
-int vsprintf(char* __s, const char* __fmt, va_list __args)
-    __printflike(2, 0) __warnattr_strict("vsprintf is often misused; please use vsnprintf");
-char* tmpnam(char* __s)
-    __warnattr("tempnam is unsafe, use mkstemp or tmpfile instead");
-#define P_tmpdir "/tmp/" /* deprecated */
-char* tempnam(const char* __dir, const char* __prefix)
-    __warnattr("tempnam is unsafe, use mkstemp or tmpfile instead");
-
-/**
- * [rename(2)](http://man7.org/linux/man-pages/man2/rename.2.html) changes
- * the name or location of a file.
- *
- * Returns 0 on success, and returns -1 and sets `errno` on failure.
- */
-int rename(const char* __old_path, const char* __new_path);
-
-/**
- * [renameat(2)](http://man7.org/linux/man-pages/man2/renameat.2.html) changes
- * the name or location of a file, interpreting relative paths using an fd.
- *
- * Returns 0 on success, and returns -1 and sets `errno` on failure.
- */
-int renameat(int __old_dir_fd, const char* __old_path, int __new_dir_fd, const char* __new_path);
-
-#if defined(__USE_GNU)
-
-/**
- * Flag for [renameat2(2)](http://man7.org/linux/man-pages/man2/renameat2.2.html)
- * to fail if the new path already exists.
- */
-#define RENAME_NOREPLACE (1<<0)
-
-/**
- * Flag for [renameat2(2)](http://man7.org/linux/man-pages/man2/renameat2.2.html)
- * to atomically exchange the two paths.
- */
-#define RENAME_EXCHANGE (1<<1)
-
-/**
- * Flag for [renameat2(2)](http://man7.org/linux/man-pages/man2/renameat2.2.html)
- * to create a union/overlay filesystem object.
- */
-#define RENAME_WHITEOUT (1<<2)
-
-/**
- * [renameat2(2)](http://man7.org/linux/man-pages/man2/renameat2.2.html) changes
- * the name or location of a file, interpreting relative paths using an fd,
- * with optional `RENAME_` flags.
- *
- * Returns 0 on success, and returns -1 and sets `errno` on failure.
- */
-int renameat2(int __old_dir_fd, const char* __old_path, int __new_dir_fd, const char* __new_path, unsigned __flags) __INTRODUCED_IN(30);
-
+#endif
 #endif
 
-int fseek(FILE* __fp, long __offset, int __whence);
-long ftell(FILE* __fp);
+#ifndef _OFF64_T_DEFINED
+#define _OFF64_T_DEFINED
+  typedef long long _off64_t;
+#if !defined(NO_OLDNAMES) || defined(_POSIX)
+  typedef long long off64_t;
+#endif
+#endif
 
-/* See https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md */
-#if defined(__USE_FILE_OFFSET64)
-int fgetpos(FILE* __fp, fpos_t* __pos) __RENAME(fgetpos64) __INTRODUCED_IN(24);
-int fsetpos(FILE* __fp, const fpos_t* __pos) __RENAME(fsetpos64) __INTRODUCED_IN(24);
-int fseeko(FILE* __fp, off_t __offset, int __whence) __RENAME(fseeko64) __INTRODUCED_IN(24);
-off_t ftello(FILE* __fp) __RENAME(ftello64) __INTRODUCED_IN(24);
-#  if defined(__USE_BSD)
-FILE* funopen(const void* __cookie,
-              int (*__read_fn)(void*, char*, int),
-              int (*__write_fn)(void*, const char*, int),
-              fpos_t (*__seek_fn)(void*, fpos_t, int),
-              int (*__close_fn)(void*)) __RENAME(funopen64) __INTRODUCED_IN(24);
-#  endif
+#ifndef _STDIO_DEFINED
+#ifdef _WIN64
+  _CRTIMP FILE *__cdecl __iob_func(void);
 #else
-int fgetpos(FILE* __fp, fpos_t* __pos);
-int fsetpos(FILE* __fp, const fpos_t* __pos);
-int fseeko(FILE* __fp, off_t __offset, int __whence);
-off_t ftello(FILE* __fp);
-#  if defined(__USE_BSD)
-FILE* funopen(const void* __cookie,
-              int (*__read_fn)(void*, char*, int),
-              int (*__write_fn)(void*, const char*, int),
-              fpos_t (*__seek_fn)(void*, fpos_t, int),
-              int (*__close_fn)(void*));
-#  endif
+#ifdef _MSVCRT_
+extern FILE _iob[];     /* A pointer to an array of FILE */
+#define __iob_func()    (_iob)
+#else
+extern FILE (*_imp___iob)[];    /* A pointer to an array of FILE */
+#define __iob_func()    (*_imp___iob)
+#define _iob __iob_func()
 #endif
-int fgetpos64(FILE* __fp, fpos64_t* __pos) __INTRODUCED_IN(24);
-int fsetpos64(FILE* __fp, const fpos64_t* __pos) __INTRODUCED_IN(24);
-int fseeko64(FILE* __fp, off64_t __offset, int __whence) __INTRODUCED_IN(24);
-off64_t ftello64(FILE* __fp) __INTRODUCED_IN(24);
-#if defined(__USE_BSD)
-FILE* funopen64(const void* __cookie,
-                int (*__read_fn)(void*, char*, int),
-                int (*__write_fn)(void*, const char*, int),
-                fpos64_t (*__seek_fn)(void*, fpos64_t, int),
-                int (*__close_fn)(void*)) __INTRODUCED_IN(24);
+#endif
 #endif
 
-FILE* fopen(const char* __path, const char* __mode);
-FILE* fopen64(const char* __path, const char* __mode) __INTRODUCED_IN(24);
-FILE* freopen(const char* __path, const char* __mode, FILE* __fp);
-FILE* freopen64(const char* __path, const char* __mode, FILE* __fp) __INTRODUCED_IN(24);
-FILE* tmpfile(void);
-FILE* tmpfile64(void) __INTRODUCED_IN(24);
+#ifndef _FPOS_T_DEFINED
+#define _FPOS_T_DEFINED
+#undef _FPOSOFF
 
-int snprintf(char* __buf, size_t __size, const char* __fmt, ...) __printflike(3, 4);
-int vfscanf(FILE* __fp, const char* __fmt, va_list __args) __scanflike(2, 0);
-int vscanf(const char* __fmt , va_list __args) __scanflike(1, 0);
-int vsnprintf(char* __buf, size_t __size, const char* __fmt, va_list __args) __printflike(3, 0);
-int vsscanf(const char* __s, const char* __fmt, va_list __args) __scanflike(2, 0);
-
-#define L_ctermid 1024 /* size for ctermid() */
-char* ctermid(char* __buf) __INTRODUCED_IN(26);
-
-FILE* fdopen(int __fd, const char* __mode);
-int fileno(FILE* __fp);
-int pclose(FILE* __fp);
-FILE* popen(const char* __command, const char* __mode);
-void flockfile(FILE* __fp);
-int ftrylockfile(FILE* __fp);
-void funlockfile(FILE* __fp);
-int getc_unlocked(FILE* __fp);
-int getchar_unlocked(void);
-int putc_unlocked(int __ch, FILE* __fp);
-int putchar_unlocked(int __ch);
-
-FILE* fmemopen(void* __buf, size_t __size, const char* __mode) __INTRODUCED_IN(23);
-FILE* open_memstream(char** __ptr, size_t* __size_ptr) __INTRODUCED_IN(23);
-
-#if defined(__USE_BSD) || defined(__BIONIC__) /* Historically bionic exposed these. */
-int  asprintf(char** __s_ptr, const char* __fmt, ...) __printflike(2, 3);
-char* fgetln(FILE* __fp, size_t* __length_ptr);
-int fpurge(FILE* __fp);
-void setbuffer(FILE* __fp, char* __buf, int __size);
-int setlinebuf(FILE* __fp);
-int vasprintf(char** __s_ptr, const char* __fmt, va_list __args) __printflike(2, 0);
-void clearerr_unlocked(FILE* __fp) __INTRODUCED_IN(23);
-int feof_unlocked(FILE* __fp) __INTRODUCED_IN(23);
-int ferror_unlocked(FILE* __fp) __INTRODUCED_IN(23);
-int fileno_unlocked(FILE* __fp) __INTRODUCED_IN(24);
-#define fropen(cookie, fn) funopen(cookie, fn, 0, 0, 0)
-#define fwopen(cookie, fn) funopen(cookie, 0, fn, 0, 0)
+#if (!defined(NO_OLDNAMES) || defined(__GNUC__)) && _INTEGRAL_MAX_BITS >= 64
+  typedef __int64 fpos_t;
+#define _FPOSOFF(fp) ((long)(fp))
+#else
+  typedef long long fpos_t;
+#define _FPOSOFF(fp) ((long)(fp))
 #endif
 
-#if defined(__USE_BSD)
-int fflush_unlocked(FILE* __fp) __INTRODUCED_IN(28);
-int fgetc_unlocked(FILE* __fp) __INTRODUCED_IN(28);
-int fputc_unlocked(int __ch, FILE* __fp) __INTRODUCED_IN(28);
-size_t fread_unlocked(void* __buf, size_t __size, size_t __count, FILE* __fp) __INTRODUCED_IN(28);
-size_t fwrite_unlocked(const void* __buf, size_t __size, size_t __count, FILE* __fp) __INTRODUCED_IN(28);
 #endif
 
-#if defined(__USE_GNU)
-int fputs_unlocked(const char* __s, FILE* __fp) __INTRODUCED_IN(28);
-char* fgets_unlocked(char* __buf, int __size, FILE* __fp) __INTRODUCED_IN(28);
+#ifndef _STDSTREAM_DEFINED
+#define _STDSTREAM_DEFINED
+
+#define stdin (&__iob_func()[0])
+#define stdout (&__iob_func()[1])
+#define stderr (&__iob_func()[2])
 #endif
 
-#if defined(__BIONIC_INCLUDE_FORTIFY_HEADERS)
-#include <bits/fortify/stdio.h>
+#define _IOREAD 0x0001
+#define _IOWRT 0x0002
+
+#define _IOFBF 0x0000
+#define _IOLBF 0x0040
+#define _IONBF 0x0004
+
+#define _IOMYBUF 0x0008
+#define _IOEOF 0x0010
+#define _IOERR 0x0020
+#define _IOSTRG 0x0040
+#define _IORW 0x0080
+#ifdef _POSIX_
+#define _IOAPPEND 0x0200
 #endif
 
-__END_DECLS
+#define _TWO_DIGIT_EXPONENT 0x1
+
+#ifndef _STDIO_DEFINED
+
+  _CRTIMP int __cdecl _filbuf(FILE *_File);
+  _CRTIMP int __cdecl _flsbuf(int _Ch,FILE *_File);
+#ifdef _POSIX_
+  _CRTIMP FILE *__cdecl _fsopen(const char *_Filename,const char *_Mode);
+#else
+  _CRTIMP FILE *__cdecl _fsopen(const char *_Filename,const char *_Mode,int _ShFlag);
+#endif
+  void __cdecl clearerr(FILE *_File);
+  int __cdecl fclose(FILE *_File);
+  _CRTIMP int __cdecl _fcloseall(void);
+#ifdef _POSIX_
+  FILE *__cdecl fdopen(int _FileHandle,const char *_Mode);
+#else
+  _CRTIMP FILE *__cdecl _fdopen(int _FileHandle,const char *_Mode);
+#endif
+  int __cdecl feof(FILE *_File);
+  int __cdecl ferror(FILE *_File);
+  int __cdecl fflush(FILE *_File);
+  int __cdecl fgetc(FILE *_File);
+  _CRTIMP int __cdecl _fgetchar(void);
+  int __cdecl fgetpos(FILE *_File ,fpos_t *_Pos);
+  char *__cdecl fgets(char *_Buf,int _MaxCount,FILE *_File);
+#ifdef _POSIX_
+  int __cdecl fileno(FILE *_File);
+#else
+  _CRTIMP int __cdecl _fileno(FILE *_File);
+#endif
+  _CRTIMP char *__cdecl _tempnam(const char *_DirName,const char *_FilePrefix);
+  _CRTIMP int __cdecl _flushall(void);
+  FILE *__cdecl fopen(const char *_Filename,const char *_Mode);
+  FILE *fopen64(const char *filename,const char *mode);
+  int __cdecl fprintf(FILE *_File,const char *_Format,...);
+  int __cdecl fputc(int _Ch,FILE *_File);
+  _CRTIMP int __cdecl _fputchar(int _Ch);
+  int __cdecl fputs(const char *_Str,FILE *_File);
+  size_t __cdecl fread(void *_DstBuf,size_t _ElementSize,size_t _Count,FILE *_File);
+  FILE *__cdecl freopen(const char *_Filename,const char *_Mode,FILE *_File);
+  int __cdecl fscanf(FILE *_File,const char *_Format,...);
+  int __cdecl fsetpos(FILE *_File,const fpos_t *_Pos);
+  int __cdecl fseek(FILE *_File,long _Offset,int _Origin);
+   int fseeko64(FILE* stream, _off64_t offset, int whence);
+  long __cdecl ftell(FILE *_File);
+  _off64_t ftello64(FILE * stream);
+  int __cdecl _fseeki64(FILE *_File,__int64 _Offset,int _Origin);
+  __int64 __cdecl _ftelli64(FILE *_File);
+  size_t __cdecl fwrite(const void *_Str,size_t _Size,size_t _Count,FILE *_File);
+  int __cdecl getc(FILE *_File);
+  int __cdecl getchar(void);
+  _CRTIMP int __cdecl _getmaxstdio(void);
+  char *__cdecl gets(char *_Buffer);
+  int __cdecl _getw(FILE *_File);
+#ifndef _CRT_PERROR_DEFINED
+#define _CRT_PERROR_DEFINED
+  void __cdecl perror(const char *_ErrMsg);
+#endif
+  _CRTIMP int __cdecl _pclose(FILE *_File);
+  _CRTIMP FILE *__cdecl _popen(const char *_Command,const char *_Mode);
+#if !defined(NO_OLDNAMES) && !defined(popen)
+#define popen   _popen
+#define pclose  _pclose
+#endif
+  int __cdecl printf(const char *_Format,...);
+  int __cdecl putc(int _Ch,FILE *_File);
+  int __cdecl putchar(int _Ch);
+  int __cdecl puts(const char *_Str);
+  _CRTIMP int __cdecl _putw(int _Word,FILE *_File);
+#ifndef _CRT_DIRECTORY_DEFINED
+#define _CRT_DIRECTORY_DEFINED
+  int __cdecl remove(const char *_Filename);
+  int __cdecl rename(const char *_OldFilename,const char *_NewFilename);
+  _CRTIMP int __cdecl _unlink(const char *_Filename);
+#ifndef NO_OLDNAMES
+  int __cdecl unlink(const char *_Filename);
+#endif
+#endif
+  void __cdecl rewind(FILE *_File);
+  _CRTIMP int __cdecl _rmtmp(void);
+  int __cdecl scanf(const char *_Format,...);
+  void __cdecl setbuf(FILE *_File,char *_Buffer);
+  _CRTIMP int __cdecl _setmaxstdio(int _Max);
+  _CRTIMP unsigned int __cdecl _set_output_format(unsigned int _Format);
+  _CRTIMP unsigned int __cdecl _get_output_format(void);
+  int __cdecl setvbuf(FILE *_File,char *_Buf,int _Mode,size_t _Size);
+  _CRTIMP int __cdecl _scprintf(const char *_Format,...);
+  int __cdecl sscanf(const char *_Src,const char *_Format,...);
+  _CRTIMP int __cdecl _snscanf(const char *_Src,size_t _MaxCount,const char *_Format,...);
+  FILE *__cdecl tmpfile(void);
+  char *__cdecl tmpnam(char *_Buffer);
+  int __cdecl ungetc(int _Ch,FILE *_File);
+  int __cdecl vfprintf(FILE *_File,const char *_Format,va_list _ArgList);
+  int __cdecl vprintf(const char *_Format,va_list _ArgList);
+  /* Make sure macros are not defined.  */
+#pragma push_macro("vsnprintf")
+#pragma push_macro("snprintf")
+# undef vsnprintf
+# undef snprintf
+  extern
+  __attribute__((format(gnu_printf, 3, 0))) __attribute__((nonnull (3)))
+  int __mingw_vsnprintf(char *_DstBuf,size_t _MaxCount,const char *_Format,va_list _ArgList);
+  extern
+  __attribute__((format(gnu_printf, 3, 4))) __attribute__((nonnull (3)))
+  int __mingw_snprintf(char* s, size_t n, const char*  format, ...);
+  int __cdecl vsnprintf(char *_DstBuf,size_t _MaxCount,const char *_Format,va_list _ArgList);
+  _CRTIMP int __cdecl _snprintf(char *_Dest,size_t _Count,const char *_Format,...);
+  _CRTIMP int __cdecl _vsnprintf(char *_Dest,size_t _Count,const char *_Format,va_list _Args);
+  int __cdecl sprintf(char *_Dest,const char *_Format,...);
+  int __cdecl vsprintf(char *_Dest,const char *_Format,va_list _Args);
+#ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
+  int __cdecl snprintf(char* s, size_t n, const char*  format, ...);
+  __CRT_INLINE int __cdecl vsnprintf (char* s, size_t n, const char* format,va_list arg) {
+    return _vsnprintf ( s, n, format, arg);
+  }
+  int __cdecl vscanf(const char * Format, va_list argp);
+  int __cdecl vfscanf (FILE * fp, const char * Format,va_list argp);
+  int __cdecl vsscanf (const char * _Str,const char * Format,va_list argp);
+#endif
+/* Restore may prior defined macros snprintf/vsnprintf.  */
+#pragma pop_macro("snprintf")
+#pragma pop_macro("vsnprintf")
+/* Check if vsnprintf and snprintf are defaulting to gnu-style.  */
+# if defined(USE_MINGW_GNU_SNPRINTF) && USE_MINGW_GNU_SNPRINTF
+# ifndef vsnprint
+# define vsnprintf __mingw_vsnprintf
+# endif
+# ifndef snprintf
+# define snprintf __mingw_snprintf
+# endif
+# endif
+  _CRTIMP int __cdecl _vscprintf(const char *_Format,va_list _ArgList);
+  _CRTIMP int __cdecl _set_printf_count_output(int _Value);
+  _CRTIMP int __cdecl _get_printf_count_output(void);
+
+#ifndef _WSTDIO_DEFINED
+
+#ifndef WEOF
+#define WEOF (wint_t)(0xFFFF)
+#endif
+
+#ifdef _POSIX_
+  _CRTIMP FILE *__cdecl _wfsopen(const wchar_t *_Filename,const wchar_t *_Mode);
+#else
+  _CRTIMP FILE *__cdecl _wfsopen(const wchar_t *_Filename,const wchar_t *_Mode,int _ShFlag);
+#endif
+  wint_t __cdecl fgetwc(FILE *_File);
+  _CRTIMP wint_t __cdecl _fgetwchar(void);
+  wint_t __cdecl fputwc(wchar_t _Ch,FILE *_File);
+  _CRTIMP wint_t __cdecl _fputwchar(wchar_t _Ch);
+  wint_t __cdecl getwc(FILE *_File);
+  wint_t __cdecl getwchar(void);
+  wint_t __cdecl putwc(wchar_t _Ch,FILE *_File);
+  wint_t __cdecl putwchar(wchar_t _Ch);
+  wint_t __cdecl ungetwc(wint_t _Ch,FILE *_File);
+  wchar_t *__cdecl fgetws(wchar_t *_Dst,int _SizeInWords,FILE *_File);
+  int __cdecl fputws(const wchar_t *_Str,FILE *_File);
+  _CRTIMP wchar_t *__cdecl _getws(wchar_t *_String);
+  _CRTIMP int __cdecl _putws(const wchar_t *_Str);
+  int __cdecl fwprintf(FILE *_File,const wchar_t *_Format,...);
+  int __cdecl wprintf(const wchar_t *_Format,...);
+  _CRTIMP int __cdecl _scwprintf(const wchar_t *_Format,...);
+  int __cdecl vfwprintf(FILE *_File,const wchar_t *_Format,va_list _ArgList);
+  int __cdecl vwprintf(const wchar_t *_Format,va_list _ArgList);
+  _CRTIMP int __cdecl swprintf(wchar_t*, const wchar_t*, ...);
+  _CRTIMP int __cdecl vswprintf(wchar_t*, const wchar_t*,va_list);
+  _CRTIMP int __cdecl _swprintf_c(wchar_t *_DstBuf,size_t _SizeInWords,const wchar_t *_Format,...);
+  _CRTIMP int __cdecl _vswprintf_c(wchar_t *_DstBuf,size_t _SizeInWords,const wchar_t *_Format,va_list _ArgList);
+  _CRTIMP int __cdecl _snwprintf(wchar_t *_Dest,size_t _Count,const wchar_t *_Format,...);
+  _CRTIMP int __cdecl _vsnwprintf(wchar_t *_Dest,size_t _Count,const wchar_t *_Format,va_list _Args);
+#ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
+  int __cdecl snwprintf (wchar_t* s, size_t n, const wchar_t*  format, ...);
+  __CRT_INLINE int __cdecl vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, va_list arg) { return _vsnwprintf(s,n,format,arg); }
+  int __cdecl vwscanf (const wchar_t *, va_list);
+  int __cdecl vfwscanf (FILE *,const wchar_t *,va_list);
+  int __cdecl vswscanf (const wchar_t *,const wchar_t *,va_list);
+#endif
+  _CRTIMP int __cdecl _swprintf(wchar_t *_Dest,const wchar_t *_Format,...);
+  _CRTIMP int __cdecl _vswprintf(wchar_t *_Dest,const wchar_t *_Format,va_list _Args);
+
+#ifndef RC_INVOKED
+#include <vadefs.h>
+#endif
+
+#ifdef _CRT_NON_CONFORMING_SWPRINTFS
+#ifndef __cplusplus
+#define swprintf _swprintf
+#define vswprintf _vswprintf
+#define _swprintf_l __swprintf_l
+#define _vswprintf_l __vswprintf_l
+#endif
+#endif
+
+  _CRTIMP wchar_t *__cdecl _wtempnam(const wchar_t *_Directory,const wchar_t *_FilePrefix);
+  _CRTIMP int __cdecl _vscwprintf(const wchar_t *_Format,va_list _ArgList);
+  int __cdecl fwscanf(FILE *_File,const wchar_t *_Format,...);
+  int __cdecl swscanf(const wchar_t *_Src,const wchar_t *_Format,...);
+  _CRTIMP int __cdecl _snwscanf(const wchar_t *_Src,size_t _MaxCount,const wchar_t *_Format,...);
+  int __cdecl wscanf(const wchar_t *_Format,...);
+  _CRTIMP FILE *__cdecl _wfdopen(int _FileHandle ,const wchar_t *_Mode);
+  _CRTIMP FILE *__cdecl _wfopen(const wchar_t *_Filename,const wchar_t *_Mode);
+  _CRTIMP FILE *__cdecl _wfreopen(const wchar_t *_Filename,const wchar_t *_Mode,FILE *_OldFile);
+#ifndef _CRT_WPERROR_DEFINED
+#define _CRT_WPERROR_DEFINED
+  _CRTIMP void __cdecl _wperror(const wchar_t *_ErrMsg);
+#endif
+  _CRTIMP FILE *__cdecl _wpopen(const wchar_t *_Command,const wchar_t *_Mode);
+#if !defined(NO_OLDNAMES) && !defined(wpopen)
+#define wpopen  _wpopen
+#endif
+  _CRTIMP int __cdecl _wremove(const wchar_t *_Filename);
+  _CRTIMP wchar_t *__cdecl _wtmpnam(wchar_t *_Buffer);
+  _CRTIMP wint_t __cdecl _fgetwc_nolock(FILE *_File);
+  _CRTIMP wint_t __cdecl _fputwc_nolock(wchar_t _Ch,FILE *_File);
+  _CRTIMP wint_t __cdecl _ungetwc_nolock(wint_t _Ch,FILE *_File);
+
+#undef _CRT_GETPUTWCHAR_NOINLINE
+
+#if !defined(__cplusplus) || defined(_CRT_GETPUTWCHAR_NOINLINE)
+#define getwchar() fgetwc(stdin)
+#define putwchar(_c) fputwc((_c),stdout)
+#else
+  __CRT_INLINE wint_t __cdecl getwchar() { return (fgetwc(stdin)); }
+  __CRT_INLINE wint_t __cdecl putwchar(wchar_t _C) { return (fputwc(_C,stdout)); }
+#endif
+
+#define getwc(_stm) fgetwc(_stm)
+#define putwc(_c,_stm) fputwc(_c,_stm)
+#define _putwc_nolock(_c,_stm) _fputwc_nolock(_c,_stm)
+#define _getwc_nolock(_stm) _fgetwc_nolock(_stm)
+
+#define _WSTDIO_DEFINED
+#endif
+
+#define _STDIO_DEFINED
+#endif
+
+#define _fgetc_nolock(_stream) (--(_stream)->_cnt >= 0 ? 0xff & *(_stream)->_ptr++ : _filbuf(_stream))
+#define _fputc_nolock(_c,_stream) (--(_stream)->_cnt >= 0 ? 0xff & (*(_stream)->_ptr++ = (char)(_c)) : _flsbuf((_c),(_stream)))
+#define _getc_nolock(_stream) _fgetc_nolock(_stream)
+#define _putc_nolock(_c,_stream) _fputc_nolock(_c,_stream)
+#define _getchar_nolock() _getc_nolock(stdin)
+#define _putchar_nolock(_c) _putc_nolock((_c),stdout)
+#define _getwchar_nolock() _getwc_nolock(stdin)
+#define _putwchar_nolock(_c) _putwc_nolock((_c),stdout)
+
+  _CRTIMP void __cdecl _lock_file(FILE *_File);
+  _CRTIMP void __cdecl _unlock_file(FILE *_File);
+  _CRTIMP int __cdecl _fclose_nolock(FILE *_File);
+  _CRTIMP int __cdecl _fflush_nolock(FILE *_File);
+  _CRTIMP size_t __cdecl _fread_nolock(void *_DstBuf,size_t _ElementSize,size_t _Count,FILE *_File);
+  _CRTIMP int __cdecl _fseek_nolock(FILE *_File,long _Offset,int _Origin);
+  _CRTIMP long __cdecl _ftell_nolock(FILE *_File);
+  _CRTIMP int __cdecl _fseeki64_nolock(FILE *_File,__int64 _Offset,int _Origin);
+  _CRTIMP __int64 __cdecl _ftelli64_nolock(FILE *_File);
+  _CRTIMP size_t __cdecl _fwrite_nolock(const void *_DstBuf,size_t _Size,size_t _Count,FILE *_File);
+  _CRTIMP int __cdecl _ungetc_nolock(int _Ch,FILE *_File);
+
+#if !defined(NO_OLDNAMES) || !defined(_POSIX)
+#define P_tmpdir _P_tmpdir
+#define SYS_OPEN _SYS_OPEN
+
+  char *__cdecl tempnam(const char *_Directory,const char *_FilePrefix);
+  int __cdecl fcloseall(void);
+  FILE *__cdecl fdopen(int _FileHandle,const char *_Format);
+  int __cdecl fgetchar(void);
+  int __cdecl fileno(FILE *_File);
+  int __cdecl flushall(void);
+  int __cdecl fputchar(int _Ch);
+  int __cdecl getw(FILE *_File);
+  int __cdecl putw(int _Ch,FILE *_File);
+  int __cdecl rmtmp(void);
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#pragma pack(pop)
+
+#include <sec_api/stdio_s.h>
 
 #endif
