@@ -11,7 +11,7 @@ function(get_libtcc1_sources __TARGET_ARCHITECTURE__ __TARGET_PLATFORM__ __LIBTC
     endif()
 
     set(__SOURCES_BCHECK__ bcheck.c)
-    set(__SOURCES_BT__ bt-exe.c bt-log.c)
+    set(__SOURCES_BT__ bt-log.c)
     set(__SOURCES_B__ bcheck.c bt-dll.c)
 
     set(__SOURCES_DSO__ dsohandle.c)

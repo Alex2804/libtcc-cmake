@@ -3,25 +3,6 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/extension/lib_src/lib_libtcc1 DESTINATION 
 if(WIN32)
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/extension/lib_src/win32/lib_libtcc1 DESTINATION ${CMAKE_BINARY_DIR})
 endif()
-# copy additional include files
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/tccrun.c DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/config.h DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/tcc.h DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/libtcc.h DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/elf.h DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/stab.h DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/stab.def DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/tcctok.h DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/${LOWERCASE_LIBTCC_TARGET_ARCHITECTURE}-gen.c DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/${LOWERCASE_LIBTCC_TARGET_ARCHITECTURE}-link.c DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-if(${LIBTCC_TARGET_ARCHITECTURE} STREQUAL X86_64 OR ${LIBTCC_TARGET_ARCHITECTURE} STREQUAL I386)
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/i386-tok.h DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/${LOWERCASE_LIBTCC_TARGET_ARCHITECTURE}-asm.h DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-elseif(${LIBTCC_TARGET_ARCHITECTURE} STREQUAL ARM)
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/${LOWERCASE_LIBTCC_TARGET_ARCHITECTURE}-asm.c DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-elseif(${LIBTCC_TARGET_ARCHITECTURE} STREQUAL C67)
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/tcc/coff.h DESTINATION ${CMAKE_BINARY_DIR}/include/tcc)
-endif()
 
 # include extension include directories
 target_include_directories(${LIBTCC_NAME} PRIVATE extension/include/tcc extension/src
