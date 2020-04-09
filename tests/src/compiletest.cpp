@@ -110,8 +110,9 @@ GTEST_TEST(Libtcc_Extension_Tests, compile3) {
     func = reinterpret_cast<char*(*)(const char*)>(tcc_get_symbol(tccState, "test"));
     ASSERT_TRUE(func);
 
-    char* tmp = func("Hello World");
+    char *tmp = func("Hello World");
     ASSERT_STREQ(tmp, "Hello World <---> Hello World!");
+    free(tmp);
 
     tmp = func("Test");
     ASSERT_STREQ(tmp, "Test <---> Test!");

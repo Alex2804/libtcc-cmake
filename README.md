@@ -4,6 +4,9 @@ This Project aims to build libtcc for supported platforms system independent wit
 Valgrind indicates a memory leak when memory is allocated in tcc compiled code and released in the main program
 (or vice versa). This seems to be a false positive.
 
+If you allocate memory in tcc compiled code and free it in the main program, the program crashes if it is compiled with
+MSVC.
+
 ## Usage
 You can embed this CMake project as a subdirectory or build it as every other CMake script.
 

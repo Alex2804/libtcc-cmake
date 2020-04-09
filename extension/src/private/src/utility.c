@@ -112,5 +112,5 @@ void atcc_free_splitted_string(char** splitted)
 
 char** atcc_get_libtcc1_files()
 {
-    return atcc_split_string(ALIBTCC1_SOURCES, '|');
+    return atcc_split_string(ALIBTCC1_SOURCES, ':');
 }
