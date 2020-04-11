@@ -74,7 +74,7 @@ The string will not be copied so make sure it is not deallocated during its use 
 
 ## CMake Variables
 #### <a name="LIBTCC_INCLUDE_PATH">LIBTCC_INCLUDE_PATH</a>
-Specifies the include path of libtcc for every TCCState which will be configured which will be configured by
+Specifies the include path of libtcc for every TCCState which will be configured by
 [atcc_configure_state](#atcc_configure_state).  
 By default this is "*include/*".
 
@@ -88,19 +88,13 @@ By default this is "libtcc1-\*.a" where "\*" is target specific (e.g. on x86_64 
 Specifies the path to the source files for libtcc1.a.  
 By default this is "*lib_libtcc1/*" (**This should not be changed if you have no good reason!**).
 
-**The path must end with a "/"!**
-
 ---
 #### <a name="LIBTCC1_OBJ_PATH">LIBTCC1_OBJ_PATH</a>
 Specifies the destination folder in which the object files for the compilation of libtcc1.a are placed. These are
 deleted after compilation and packing.  
 By default this is "*lib/*"
 
-**The path must end with a "/"!**
-
 ---
 #### <a name="LIBTCC1_DEST_PATH">LIBTCC1_DEST_PATH</a>
 Specifies the destination folder in which libtcc1.a is placed.  
 By default this is "*lib/*"
-
-**The path must end with a "/"!**

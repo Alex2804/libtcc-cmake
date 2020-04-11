@@ -1,10 +1,10 @@
 
-if(__define_libtcc_link_libraries)
+if(__libtcc_link_libraries)
     return()
 endif()
-set(__define_libtcc_link_libraries INCLUDED)
+set(__libtcc_link_libraries INCLUDED)
 
-function(define_libtcc_link_libraries __LIBTCC_LINK_LIBRARIES__ __STATUS_MESSAGE__)
+function(libtcc_link_libraries __LIBTCC_LINK_LIBRARIES__ __STATUS_MESSAGE__)
     if(DEFINED ${__LIBTCC_LINK_LIBRARIES__})
         list(APPEND __LINK_LIBRARIES__ "${${__LIBTCC_LINK_LIBRARIES__}}")
     endif()

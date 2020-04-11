@@ -1,10 +1,10 @@
 
-if(__define_libtcc_sources)
+if(__libtcc_sources)
     return()
 endif()
-set(__define_libtcc_sources INCLUDED)
+set(__libtcc_sources INCLUDED)
 
-function(define_libtcc_sources __TARGET_ARCHITECTURE__ __LIBTCC_SOURCES__ __STATUS_MESSAGE__)
+function(libtcc_sources __TARGET_ARCHITECTURE__ __LIBTCC_SOURCES__ __STATUS_MESSAGE__)
     if(DEFINED ${__LIBTCC_SOURCES__})
         list(APPEND __SOURCES__ "${${__LIBTCC_SOURCES__}}")
     endif()
@@ -28,10 +28,8 @@ function(define_libtcc_sources __TARGET_ARCHITECTURE__ __LIBTCC_SOURCES__ __STAT
     endif()
 
     if(LIBTCC_ENABLE_EXTENSION)
-        list(APPEND __SOURCES__ extension/src/libtcc_ext.c extension/src/private/src/utility.c extension/src/private/src/filesystem.c extension/src/private/src/str_builder.c)
-        if(NOT LIBTCC_ONE_SOURCE)
-            list(APPEND __SOURCES__ src/tcctools.c)
-        endif()
+        include(extension/cmake/libtcc_extension_sources.cmake)
+        libtcc_extension_sources(__SOURCES__)
     endif()
 
     if(${__STATUS_MESSAGE__})

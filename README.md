@@ -15,7 +15,7 @@ Make sure that you change the CMake variables according to your needs.
 The default values should be enough to build a static library to link against with the required
 dependencies in *"path/to/binary/dir/lib"* and *"path/to/binary/dir/include"*
 
-## <a name="extension">Extension</a>
+## <a name="Extension">Extension</a>
 There is an extension to compile *libtcc1.a* at runtime.
 You can enable or disable the extension with [LIBTCC_ENABLE_EXTENSION](#LIBTCC_ENABLE_EXTENSION).  
 For more information like CMake variables look [here](extension/README.md).
@@ -49,7 +49,8 @@ Possible Values:
 - TRUE
 - FALSE *(Default)*
 
-Defines if the target architecture should be contained in the resulting library (**Ignored if [LIBTCC_NAME](#LIBTCC_NAME) is defined**!).
+Defines if the target architecture should be contained in the resulting library
+(**Ignored if [LIBTCC_NAME](#LIBTCC_NAME) is defined**!).
 
 ---
 #### <a name="LIBTCC_INSTALL_RUNTIME">LIBTCC_INSTALL_RUNTIME</a>
@@ -57,7 +58,14 @@ Possible Values:
 - TRUE *(Default)*
 - FALSE
 
-Defines if the include headers get copied into "${CMAKE_BINARY_DIR}**/include/**".
+Defines if the include headers get copied into "[LIBTCC_RUNTIME_PATH](#LIBTCC_RUNTIME_PATH)**/include/**".
+
+---
+#### <a name="LIBTCC_RUNTIME_PATH">LIBTCC_RUNTIME_PATH</a>
+Defines the directory where the runtime files (include headers and source files for libtcc1 if the
+[extension](#Extension) is enabled) get copied (in subdirectories).  
+By default this is the binary directory itself (relative path = "*.*")  
+**The Path is relative to the binary directory (CMAKE_BINARY_DIR)!**
 
 ---
 #### <a name="LIBTCC_TARGET_ARCHITECTURE">LIBTCC_TARGET_ARCHITECTURE</a>

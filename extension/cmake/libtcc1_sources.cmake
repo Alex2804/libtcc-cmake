@@ -27,7 +27,7 @@ function(get_libtcc1_sources __TARGET_ARCHITECTURE__ __TARGET_PLATFORM__ __LIBTC
     list(APPEND __SOURCES__ ${__SOURCES_${${__TARGET_ARCHITECTURE__}}__})
     if(__LIBTCC1_TARGET_PLATFORM__ STREQUAL "windows")
         list(APPEND __SOURCES__ ${__SOURCES_WIN__})
-        if(${${__TARGET_ARCHITECTURE__}} STREQUAL I386 OR ${${__TARGET_ARCHITECTURE__}} STREQUAL X86_64)
+        if(${${__TARGET_ARCHITECTURE__}} MATCHES "^(I386|X86_64)$")
             list(APPEND __SOURCES__ chkstk.S ${__SOURCES_B__})
         endif()
     elseif(__LIBTCC1_TARGET_PLATFORM__ STREQUAL "darwin")
