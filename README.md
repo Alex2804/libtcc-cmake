@@ -64,7 +64,7 @@ Defines if the include headers get copied into "[LIBTCC_RUNTIME_PATH](#LIBTCC_RU
 #### <a name="LIBTCC_RUNTIME_PATH">LIBTCC_RUNTIME_PATH</a>
 Defines the directory where the runtime files (include headers and source files for libtcc1 if the
 [extension](#Extension) is enabled) get copied (in subdirectories).  
-By default this is the binary directory itself (relative path = "*.*")  
+By default this is "*libtcc/*"-  
 **The Path is relative to the binary directory (CMAKE_BINARY_DIR)!**
 
 ---
