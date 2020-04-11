@@ -86,7 +86,7 @@ By default this is "libtcc1-\*.a" where "\*" is target specific (e.g. on x86_64 
 ---
 #### <a name="LIBTCC1_SRC_PATH">LIBTCC1_SRC_PATH</a>
 Specifies the path to the source files for libtcc1.a.  
-By default this is "*lib_libtcc1/*" (**This should not be changed if you have no good reason!**).
+By default this is "*libtcc1_src/*" (**This should not be changed if you have no good reason!**).
 
 ---
 #### <a name="LIBTCC1_OBJ_PATH">LIBTCC1_OBJ_PATH</a>
