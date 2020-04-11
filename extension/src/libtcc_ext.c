@@ -49,6 +49,11 @@ void atcc_configure_state(TCCState* state)
 #endif
         }
 
+#ifdef __ANDROID__
+        tcc_add_library_path(state, "/system/lib");
+        tcc_add_library_path(state, "/system/lib64");
+#endif
+
 #ifdef _WIN32
         tcc_add_sysinclude_path(state, "include/winapi");
 #else
@@ -124,7 +129,7 @@ int atcc_build_libtcc1()
     }
 
     src_names = atcc_get_libtcc1_files();
-    file_count = atcc_splitted_string_length(src_names);
+    file_count = (int) atcc_splitted_string_length(src_names);
     obj_names = (char**) tcc_malloc(file_count * sizeof(char*));
 
     for(i = 0; i < file_count; i++) {
