@@ -27,8 +27,13 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "../str_builder.h"
-#include "../utility.h"
+#if ONE_SOURCE
+# include "str_builder.c"
+# include "utility.c"
+#else
+# include "../str_builder.h"
+# include "../utility.h"
+#endif
 
 #ifdef _WIN32
 # include <windows.h>

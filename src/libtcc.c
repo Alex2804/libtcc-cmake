@@ -19,41 +19,44 @@
  */
 
 #if !defined ONE_SOURCE || ONE_SOURCE
-#include "tccpp.c"
-#include "tccgen.c"
-#include "tccelf.c"
-#include "tccrun.c"
-#ifdef TCC_TARGET_I386
-#include "i386-gen.c"
-#include "i386-link.c"
-#include "i386-asm.c"
-#elif defined(TCC_TARGET_ARM)
-#include "arm-gen.c"
-#include "arm-link.c"
-#include "arm-asm.c"
-#elif defined(TCC_TARGET_ARM64)
-#include "arm64-gen.c"
-#include "arm64-link.c"
-#elif defined(TCC_TARGET_C67)
-#include "c67-gen.c"
-#include "c67-link.c"
-#include "tcccoff.c"
-#elif defined(TCC_TARGET_X86_64)
-#include "x86_64-gen.c"
-#include "x86_64-link.c"
-#include "i386-asm.c"
-#elif defined(TCC_TARGET_RISCV64)
-#include "riscv64-gen.c"
-#include "riscv64-link.c"
-#else
-#error unknown target
-#endif
-#ifdef CONFIG_TCC_ASM
-#include "tccasm.c"
-#endif
-#ifdef TCC_TARGET_PE
-#include "tccpe.c"
-#endif
+# include "tccpp.c"
+# include "tccgen.c"
+# include "tccelf.c"
+# include "tccrun.c"
+# ifdef TCC_TARGET_I386
+#  include "i386-gen.c"
+#  include "i386-link.c"
+#  include "i386-asm.c"
+# elif defined(TCC_TARGET_ARM)
+#  include "arm-gen.c"
+#  include "arm-link.c"
+#  include "arm-asm.c"
+# elif defined(TCC_TARGET_ARM64)
+#  include "arm64-gen.c"
+#  include "arm64-link.c"
+# elif defined(TCC_TARGET_C67)
+#  include "c67-gen.c"
+#  include "c67-link.c"
+#  include "tcccoff.c"
+# elif defined(TCC_TARGET_X86_64)
+#  include "x86_64-gen.c"
+#  include "x86_64-link.c"
+#  include "i386-asm.c"
+# elif defined(TCC_TARGET_RISCV64)
+#  include "riscv64-gen.c"
+#  include "riscv64-link.c"
+# else
+#  error unknown target
+# endif
+# ifdef CONFIG_TCC_ASM
+# include "tccasm.c"
+# endif
+# ifdef TCC_TARGET_PE
+#  include "tccpe.c"
+# endif
+# ifdef ALIBTCC_ENABLE_EXTENSION
+#  include "../extension/src/libtcc_ext.c"
+# endif
 #endif /* ONE_SOURCE */
 
 #include "tcc.h"
@@ -614,28 +617,30 @@ PUB_FUNC void _tcc_warning(const char *fmt, ...)
 /********************************************************/
 /* I/O layer */
 
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
+#include <android/asset_manager.h>
+ST_DATA AAssetManager* asset_manager = NULL;
+#endif
+
 ST_FUNC AFileHandle atcc_open_file_handle(const char* filename, int flags)
 {
     AFileHandle fh;
     fh.fd = open(filename, flags);
-#ifdef __ANDROID__
-    if(fh.fd < 0 && asset_manager != NULL) {
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
+    if(fh.fd < 0 && asset_manager != NULL)
         fh.asset = AAssetManager_open(asset_manager, filename, AASSET_MODE_UNKNOWN);
-    } else {
+    else
         fh.asset = NULL;
-    }
 #endif
     return fh;
 }
 ST_FUNC void atcc_close_file_handle(AFileHandle fh)
 {
-    if(fh.fd > 0) {
+    if(fh.fd > 0)
         close(fh.fd);
-    }
-#ifdef __ANDROID__
-    if(fh.asset != NULL) {
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
+    if(fh.asset != NULL)
         AAsset_close(fh.asset);
-    }
 #endif
 }
 
@@ -643,7 +648,7 @@ ST_FUNC AFileHandle atcc_get_invalid_file_handle()
 {
     AFileHandle fh;
     fh.fd = -1;
-#ifdef __ANDROID__
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
     fh.asset = NULL;
 #endif
     return fh;
@@ -651,7 +656,7 @@ ST_FUNC AFileHandle atcc_get_invalid_file_handle()
 ST_FUNC int atcc_file_handle_is_valid(AFileHandle handle)
 {
     return handle.fd >= 0
-#ifdef __ANDROID__
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
         || handle.asset != NULL
 #endif
     ;
@@ -662,7 +667,7 @@ ST_FUNC ssize_t atcc_read(AFileHandle fh, void* const buf, size_t count)
     ssize_t read_bytes = -1;
     if(fh.fd >= 0)
         read_bytes = read(fh.fd, buf, count);
-#ifdef __ANDROID__
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
     else if(fh.asset != NULL)
         read_bytes = AAsset_read(fh.asset, buf, count);
 #endif
@@ -673,19 +678,12 @@ ST_FUNC long atcc_lseek(AFileHandle fh, long offset, int whence)
     long ret = -1;
     if(fh.fd >= 0)
         ret = lseek(fh.fd, offset, whence);
-#ifdef __ANDROID__
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
     else if(fh.asset != NULL)
         ret = AAsset_seek(fh.asset, offset, whence);
 #endif
     return ret;
 }
-
-#ifdef __ANDROID__
-ST_FUNC void tcc_set_asset_manager(AAssetManager* manager)
-{
-    asset_manager = manager;
-}
-#endif
 
 ST_FUNC void tcc_open_bf(TCCState *s1, const char *filename, int initlen)
 {

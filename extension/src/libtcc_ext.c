@@ -1,7 +1,10 @@
 #include "tcc/tcc.h" // must be included before libtcc_ext.h for correct definition of LIBTCCAPI
 #if ONE_SOURCE
+# include "private/src/filesystem.c"
 # include "tcctools.c"
 #else
+# include "private/filesystem.h"
+# include "private/utility.h"
 ST_FUNC int tcc_tool_ar(TCCState *s, int argc, char **argv);
 #endif
 
@@ -10,11 +13,18 @@ ST_FUNC int tcc_tool_ar(TCCState *s, int argc, char **argv);
 #include <string.h>
 #include <stdio.h>
 
-#include "private/utility.h"
-#include "private/filesystem.h"
+#ifndef ALIBTCC1_SRC_PATH
+#error "ALIBTCC1_SRC_PATH must be defined if you wish to use the extension"
+#endif
+#ifndef ALIBTCC1_DEST_PATH
+# define ALIBTCC1_DEST_PATH "lib"
+#endif
+#ifndef ALIBTCC1_OBJ_PATH
+# define ALIBTCC1_OBJ_PATH ALIBTCC1_DEST_PATH
+#endif
 
-#ifndef ALIBTCC_PRIVATE_INCLUDE_PATH
-# define ALIBTCC_PRIVATE_INCLUDE_PATH ALIBTCC_INCLUDE_PATH "/tcc"
+#ifndef ALIBTCC_INCLUDE_PATH
+# define ALIBTCC_INCLUDE_PATH "include"
 #endif
 
 typedef struct {
@@ -27,13 +37,13 @@ typedef struct {
     const char* libtcc1_dest_path;
 
     const char* include_path;
-    const char* private_include_path;
 } ATccExtensionVariables;
 
 static ATccExtensionVariables aTccExtensionVariables = {
         NULL, NULL,
         TCC_LIBTCC1, ALIBTCC1_SRC_PATH, ALIBTCC1_OBJ_PATH, ALIBTCC1_DEST_PATH,
-        ALIBTCC_INCLUDE_PATH, ALIBTCC_PRIVATE_INCLUDE_PATH};
+        ALIBTCC_INCLUDE_PATH
+};
 
 void atcc_configure_state(TCCState* state)
 {
@@ -61,7 +71,6 @@ void atcc_configure_state(TCCState* state)
 #endif
         if(aTccExtensionVariables.include_path != NULL)
             tcc_add_include_path(state, aTccExtensionVariables.include_path);
-        tcc_add_include_path(state, aTccExtensionVariables.private_include_path);
     }
 }
 
@@ -181,6 +190,13 @@ int atcc_build_libtcc1()
 
     return result;
 }
+
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
+LIBTCCAPI void atcc_set_asset_manager(AAssetManager* manager)
+{
+    asset_manager = manager;
+}
+#endif
 
 void atcc_set_error_func(void* error_opaque, TCCErrorFunc error_func)
 {

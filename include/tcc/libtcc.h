@@ -5,10 +5,6 @@
 # define LIBTCCAPI
 #endif
 
-#ifdef __ANDROID__
-# include <android/asset_manager.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,10 +35,6 @@ LIBTCCAPI void *tcc_get_error_opaque(TCCState *s);
 
 /* set options as from command line (multiple supported) */
 LIBTCCAPI void tcc_set_options(TCCState *s, const char *str);
-
-#ifdef __ANDROID__
-LIBTCCAPI void tcc_set_asset_manager(AAssetManager* manager);
-#endif
 
 /*****************************/
 /* preprocessor */

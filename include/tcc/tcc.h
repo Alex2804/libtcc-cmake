@@ -45,10 +45,6 @@ extern float strtof (const char *__nptr, char **__endptr);
 extern long double strtold (const char *__nptr, char **__endptr);
 #endif
 
-#ifdef __ANDROID__
-# include <android/asset_manager.h>
-#endif
-
 #ifdef _WIN32
 # include <windows.h>
 # include <io.h> /* open, close etc. */
@@ -586,14 +582,14 @@ typedef struct DLLReference {
 
 #define IO_BUF_SIZE 8192
 
-#ifdef __ANDROID__
-static AAssetManager* asset_manager = NULL;
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
+struct AAsset;
 #endif
 
 typedef struct AFileHandle {
     int fd;
-#ifdef __ANDROID__
-    AAsset* asset;
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
+    struct AAsset* asset;
 #endif
 } AFileHandle;
 
@@ -1187,6 +1183,11 @@ enum tcc_token {
 /* ------------ libtcc.c ------------ */
 
 ST_DATA struct TCCState *tcc_state;
+
+#if defined(ALIBTCC_ENABLE_EXTENSION) && defined(__ANDROID__)
+struct AAssetManager;
+ST_DATA struct AAssetManager* asset_manager;
+#endif
 
 /* public functions currently used by the tcc main function */
 ST_FUNC char *pstrcpy(char *buf, size_t buf_size, const char *s);
