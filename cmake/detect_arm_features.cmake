@@ -6,7 +6,7 @@ set(__detect_arm_features INCLUDED)
 
 
 function(detect_arm_features STATUS_MESSAGE)
-    if(LIBTCC_TARGET_ARCHITECTURE STREQUAL "ARM")
+    if(${LIBTCC_TARGET_ARCHITECTURE} STREQUAL ARM)
         set(IS_EABI TRUE PARENT_SCOPE)
         set(HAS_VFP TRUE PARENT_SCOPE)
         set(HAS_HARDFLOAT TRUE PARENT_SCOPE)
