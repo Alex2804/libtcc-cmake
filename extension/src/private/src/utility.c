@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include "tcc/tcc.h"
+#include "../../../../src/tcc.h"
 
 char* atcc_concatenate_path(const char* path, const char* filename, const char* extension)
 {
@@ -20,7 +20,7 @@ char* atcc_concatenate_path(const char* path, const char* filename, const char* 
     // format path
     length = strlen(path);
     last_char = '\0';
-    fpath = (char*)tcc_malloc((length + 1) * sizeof(char));
+    fpath = (char*) tcc_malloc((length + 1) * sizeof(char));
     for(i = 0; i < length; ++i) {
         current_char = path[i];
         if(current_char != '/' || last_char != '/')

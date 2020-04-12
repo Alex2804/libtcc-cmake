@@ -4,7 +4,8 @@ if(__detect_target_architecture)
 endif()
 set(__detect_target_architecture INCLUDED)
 
-function(detect_target_architecture FLAG ACTIVATE_MESSAGE)
+
+function(detect_target_architecture FLAG STATUS_MESSAGE)
     if(CMAKE_CL_64)
         set(MSVC64 1)
     endif()
@@ -65,7 +66,7 @@ function(detect_target_architecture FLAG ACTIVATE_MESSAGE)
         set(ARCH "ppc64")
     endif()
 
-    if(ACTIVATE_MESSAGE)
+    if(STATUS_MESSAGE)
         message(STATUS "Target Architecture: ${ARCH}")
     endif()
     set(${FLAG} "${ARCH}" PARENT_SCOPE)

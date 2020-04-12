@@ -1,4 +1,4 @@
-#include "tcc/tcc.h" // must be included before libtcc_ext.h for correct definition of LIBTCCAPI
+#include "../../src/tcc.h" // must be included before libtcc_ext.h for correct definition of LIBTCCAPI
 #if ONE_SOURCE
 # include "private/src/filesystem.c"
 # include "tcctools.c"

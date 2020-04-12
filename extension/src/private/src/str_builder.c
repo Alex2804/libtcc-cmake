@@ -27,7 +27,7 @@
 #include <string.h>
 
 #if !ONE_SOURCE
-# include "tcc.h"
+# include "../../../../src/tcc.h"
 #endif
 
 #include "../str_builder.h"
