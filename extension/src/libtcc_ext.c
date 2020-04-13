@@ -131,6 +131,9 @@ int atcc_build_libtcc1()
 
     state = tcc_new();
     atcc_configure_state(state);
+#ifdef TCC_TARGET_MACHO
+    tcc_define_symbol(state, "_ANSI_SOURCE", "1");
+#endif
 
     if((result = tcc_set_output_type(state, TCC_OUTPUT_OBJ)) != 0) {
         tcc_delete(state);
