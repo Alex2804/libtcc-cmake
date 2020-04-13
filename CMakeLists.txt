@@ -79,7 +79,7 @@ libtcc_link_libraries(LIBTCC_LINK_LIBRARIES TRUE)
 add_library(${LIBTCC_NAME} ${LIBTCC_BUILD_TYPE} ${LIBTCC_SOURCES})
 set_target_properties(${LIBTCC_NAME} PROPERTIES PREFIX "")
 target_include_directories(${LIBTCC_NAME} PUBLIC ${LIBTCC_PUBLIC_INCLUDE_DIRECTORIES}
-                                          PRIVATE ${LIBTCC_PRIVATE_INCLUDE_DIRECTORIES}})
+                                          PRIVATE ${LIBTCC_PRIVATE_INCLUDE_DIRECTORIES})
 target_compile_definitions(${LIBTCC_NAME} PUBLIC ${LIBTCC_COMPILE_DEFINITIONS})
 target_link_libraries(${LIBTCC_NAME} ${LIBTCC_LINK_LIBRARIES})
 
