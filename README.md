@@ -46,8 +46,8 @@ Defines if the Library should be static or shared
 ---
 #### <a name="LIBTCC_NAME">LIBTCC_NAME</a>
 Defines the name of the library file.
-By default this is "*tcc*" or "*tcc-(Platform specific postfix)*"
-depending on whether [LIBTCC_TARGET_SPECIFIC_NAME](#LIBTCC_TARGET_SPECIFIC_NAME) is true or false.
+By default this is "*libtcc*" or "*libtcc-(Platform specific postfix)*"
+depending on whether [LIBTCC_TARGET_SPECIFIC_NAME](#LIBTCC_TARGET_SPECIFIC_NAME) is false or true.
 
 ---
 #### <a name="LIBTCC_TARGET_SPECIFIC_NAME">LIBTCC_TARGET_SPECIFIC_NAME</a>
