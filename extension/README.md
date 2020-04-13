@@ -73,28 +73,29 @@ The string will not be copied so make sure it is not deallocated during its use 
 ---
 
 ## CMake Variables
-#### <a name="LIBTCC_INCLUDE_PATH">LIBTCC_INCLUDE_PATH</a>
-Specifies the include path of libtcc for every TCCState which will be configured by
-[atcc_configure_state](#atcc_configure_state).  
-By default this is "*include/*".
-
----
 #### <a name="LIBTCC1_NAME">LIBTCC1_NAME</a>
 Specifies the name of libtcc1.  
 By default this is "libtcc1-\*.a" where "\*" is target specific (e.g. on x86_64 the library is called libtcc1-x86_64.a).
 
 ---
+#### <a name="LIBTCC_INCLUDE_PATH">LIBTCC_INCLUDE_PATH</a>
+Specifies the include path of libtcc for every TCCState which will be configured by
+[atcc_configure_state](#atcc_configure_state).  
+By default this is "*[LIBTCC_RUNTIME_PATH](../README.md#LIBTCC_RUNTIME_PATH)/include/*".
+
+---
 #### <a name="LIBTCC1_SRC_PATH">LIBTCC1_SRC_PATH</a>
 Specifies the path to the source files for libtcc1.a.  
-By default this is "*libtcc1_src/*" (**This should not be changed if you have no good reason!**).
+By default this is "*[LIBTCC_RUNTIME_PATH](../README.md#LIBTCC_RUNTIME_PATH)/libtcc1_src/*"  
+(**This should not be changed if you have no good reason!**).
 
 ---
 #### <a name="LIBTCC1_OBJ_PATH">LIBTCC1_OBJ_PATH</a>
 Specifies the destination folder in which the object files for the compilation of libtcc1.a are placed. These are
 deleted after compilation and packing.  
-By default this is "*lib/*"
+By default this is "*[LIBTCC_RUNTIME_PATH](../README.md#LIBTCC_RUNTIME_PATH)/lib/*"
 
 ---
 #### <a name="LIBTCC1_DEST_PATH">LIBTCC1_DEST_PATH</a>
 Specifies the destination folder in which libtcc1.a is placed.  
-By default this is "*lib/*"
+By default this is "*[LIBTCC_RUNTIME_PATH](../README.md#LIBTCC_RUNTIME_PATH)/lib/*"
