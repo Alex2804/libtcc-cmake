@@ -1,12 +1,6 @@
 # Libtcc
 This Project aims to build libtcc for supported platforms system independent with CMake.
 
-Valgrind indicates a memory leak when memory is allocated in tcc compiled code and released in the main program
-(or vice versa). This seems to be a false positive.
-
-If you allocate memory in tcc compiled code and free it in the main program, the program crashes if it is compiled with
-MSVC.
-
 ## Usage
 You can embed this CMake project as a subdirectory or build it as every other CMake script.
 
@@ -19,6 +13,18 @@ dependencies in *"path/to/binary/dir/lib"* and *"path/to/binary/dir/include"*
 There is an extension to compile *libtcc1.a* at runtime.
 You can enable or disable the extension with [LIBTCC_ENABLE_EXTENSION](#LIBTCC_ENABLE_EXTENSION).  
 For more information like CMake variables look [here](extension/README.md).
+
+## Issues
+- Valgrind indicates a memory leak when memory is allocated in libtcc compiled code and released in the main application
+  (or vice versa). This seems to be a false positive.
+
+- If you allocate memory in tcc compiled code and free it in the main application, the program crashes if it is compiled
+  with MSVC (The compiler of libtcc itself is negligible, only the compiler of the main application is crucial).
+
+- On Android ARM (tested ARMv7 but should be the case for most/all arm architectures less than or equal ARMv7) double
+  argument passing from libtcc compiled code to other code (e.g. the main application or c standard library) is not
+  working.  
+  (**especially ARMv8 is not affected by this!**)
 
 ---
 ## CMake Variables
