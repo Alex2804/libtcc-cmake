@@ -6,9 +6,6 @@ You can embed this CMake project as a subdirectory or build it as every other CM
 
 Make sure that you change the CMake variables according to your needs.
 
-The default values should be enough to build a static library to link against with the required
-dependencies in *"path/to/binary/dir/lib"* and *"path/to/binary/dir/include"*
-
 ## <a name="Extension">Extension</a>
 There is an extension to compile *libtcc1.a* at runtime.
 You can enable or disable the extension with [LIBTCC_ENABLE_EXTENSION](#LIBTCC_ENABLE_EXTENSION).  
