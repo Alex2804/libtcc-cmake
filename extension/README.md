@@ -9,7 +9,7 @@ The extension is enabled by default and you can disable it by setting
 
 
 ## How does the extension work?
-The extension looks every `atcc_new()` call, if libtcc-\*.a exists in [LIBTCC1_DEST_PATH](#LIBTCC1_DEST_PATH)
+The extension looks every `atcc_new()` call, if libtcc1-\*.a exists in [LIBTCC1_DEST_PATH](#LIBTCC1_DEST_PATH)
 and compiles it if this is not the case.
 
 
