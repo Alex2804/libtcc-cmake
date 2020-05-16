@@ -6,10 +6,25 @@ You can embed this CMake project as a subdirectory or build it as every other CM
 
 Make sure that you change the CMake variables according to your needs.
 
-## <a name="Extension">Extension</a>
-There is an extension to compile *libtcc1.a* at runtime.
-You can enable or disable the extension with [LIBTCC_ENABLE_EXTENSION](#LIBTCC_ENABLE_EXTENSION).  
-For more information like CMake variables look [here](extension/README.md).
+## Supported and Tested Platforms
+the library was tested with the following operating systems and architectures:
+- Linux
+    - x86
+    - x86_64
+    - armeabi with Hardfloat (tested ARMv7a)
+    - aarch64 (arm64)
+- Android (look [here](https://github.com/Alex2804/libtcc-cmake-android) for a small demo)
+    - x86
+    - x86_64
+    - armeabi (with Hardfloat, tested ARMv7a, take a look at [Issues](#Issues) for limitations on this architecture)
+    - aarch64 (arm64)
+- Windows
+    - x86
+    - x86_64
+- MacOS
+    - x86_64
+    
+Even though RISC-V 64Bit is supported by libtcc, I have no RISC-V 64 Bit device or emulator to test this, yet.
 
 ## Issues
 - Valgrind indicates a memory leak when memory is allocated in libtcc compiled code and released in the main application
@@ -19,9 +34,14 @@ For more information like CMake variables look [here](extension/README.md).
   with MSVC (The compiler of libtcc itself is negligible, only the compiler of the main application is crucial).
 
 - On Android ARM (tested ARMv7 but should be the case for most/all arm architectures less than or equal ARMv7) double
-  argument passing from libtcc compiled code to other code (e.g. the main application or c standard library) is not
-  working.  
-  (**especially ARMv8 is not affected by this!**)
+  argument passing from libtcc compiled code to other code (or vice versa) (e.g. the main application or c standard
+  library) is not working.  
+  (**especially ARMv8 (aarch64/arm64) is not affected by this!**)
+
+## <a name="Extension">Extension</a>
+There is an extension to compile *libtcc1.a* at runtime.
+You can enable or disable the extension with [LIBTCC_ENABLE_EXTENSION](#LIBTCC_ENABLE_EXTENSION).  
+For more information like CMake variables look [here](extension/README.md).
 
 ---
 ## CMake Variables
