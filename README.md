@@ -72,7 +72,7 @@ Possible Values:
 - TRUE
 - FALSE *(Default)*
 
-Defines if the target architecture should be contained in the resulting library
+Defines if the target architecture should be contained in the resulting library name
 (**Ignored if [LIBTCC_NAME](#LIBTCC_NAME) is defined**!).
 
 ---
